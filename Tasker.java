@@ -4,26 +4,140 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Event.Reminders;
-import com.google.api.services.calendar.model.EventReminder;
+import com.google.api.services.calendar.model.EventDateTime;
+
+class TaskBuilder {
+	
+	/***************************** Data Members ************************/
+	private String description;
+	private String venue;
+	private EventDateTime startTime=null;
+	private EventDateTime endTime=null;
+	private EventDateTime startDate=null;
+	private EventDateTime endDate=null;
+	private boolean hasReminder=false;
+	private Reminders reminder=null;
+	private String recurringEventId=null;
+	private boolean hasRecurrence=false;
+	private String recurrence=null;
+	private boolean completed=false;
+
+	/***************************** Constructors ************************/
+	public TaskBuilder() {
+		
+	}
+	
+	public TaskBuilder setDescription(String description) {
+		this.description = description;
+		return this;
+	}
+	
+	public TaskBuilder setVenue(String venue) {
+		this.venue = venue;
+		return this;
+	}
+	
+	public TaskBuilder setStartTime(EventDateTime startTime) {
+		this.startTime = startTime;
+		return this;
+	}
+	
+	public TaskBuilder setEndTime(EventDateTime endTime) {
+		this.endTime = endTime;
+		return this;
+	}
+	
+	public TaskBuilder setStartDate(EventDateTime startDate) {
+		this.startDate = startDate;
+		return this;
+	}
+	
+	public TaskBuilder setEndDate(EventDateTime endDate) {
+		this.endDate = endDate;
+		return this;
+	}
+	
+	public TaskBuilder setHasReminder(boolean hasReminder) {
+		this.hasReminder = hasReminder;
+		return this;
+	}
+	
+	public TaskBuilder setReminder(Reminders reminder) {
+		this.reminder = reminder;
+		return this;
+	}
+	
+	public TaskBuilder setRecurringEventId(String recurringEventId) {
+		this.recurringEventId = recurringEventId;
+		return this;
+	}
+	
+	public TaskBuilder setHasRecurrence(boolean hasRecurrence) {
+		this.hasRecurrence = hasRecurrence;
+		return this;
+	}
+	
+	public TaskBuilder setRecurrence(String recurrence) {
+		this.recurrence = recurrence;
+		return this;
+	}
+	
+	public TaskBuilder setCompleted(boolean completed) {
+		this.completed = completed;
+		return this;
+	}
+	
+	public Task buildTask() {
+		return new Task(description, venue, startTime, endTime, startDate, endDate, hasReminder, 
+				reminder, recurringEventId, hasRecurrence, recurrence, completed);
+}
 
 class Task {
 	
 	/***************************** Data Members ************************/
-	String description;
-	String venue;
-	DateTime startTime;
-	DateTime endTime;
-	DateTime startDate;
-	DateTime endDate;
-	EventReminder reminder;
-	repeat;
-	boolean completed;
+	private String description;
+	private String venue;
+	private EventDateTime startTime;
+	private EventDateTime endTime;
+	private EventDateTime startDate;
+	private EventDateTime endDate;
+	private boolean hasReminder;
+	private Reminders reminder;
+	private String recurringEventId;
+	private boolean hasRecurrence;
+	private String recurrence;
+	private boolean completed;
 
 	/***************************** Constructors ************************/
-	
+	public Task (
+			String description,
+			String venue,
+			EventDateTime startTime,
+			EventDateTime endTime,
+			EventDateTime startDate,
+			EventDateTime endDate,
+			boolean hasReminder,
+			Reminders reminder,
+			String recurringEventId,
+			boolean hasRecurrence,
+			String recurrence,
+			boolean completed
+			) {
+		this.description = description;
+		this.venue = venue;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.hasReminder = hasReminder;
+		this.reminder = reminder;
+		this.recurringEventId = recurringEventId;
+		this.hasRecurrence = hasRecurrence;
+		this.recurrence = recurrence;
+		this.completed = completed;
+	}
 	
 	/***************************** Accessors ************************/
 	
