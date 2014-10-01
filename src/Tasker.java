@@ -25,38 +25,6 @@ public class Tasker {
 		return null;
 	}
 	
-	public static String interpretCmd(String userInput) {
-		return null;
-	}
-	
-	public static void executeCmd(String cmdType, String details) {
-		
-	}
-	
-	public static String addTask(String details) {
-		return null;
-	}
-
-	public static String deleteTask(String number) {
-		return null;
-	}
-	
-	public static String updateTask(String details) {
-		return null;
-	}
-	
-	public static String undo() {
-		return null;
-	}
-	
-	public static String markAsComplete(String number) {
-		return null;
-	}
-	
-	public static String searchTask(String searchString) {
-		return null;
-	}
-	
 	public static String writeToFile() {
 		return null;
 	}
