@@ -6,6 +6,10 @@ import java.util.ArrayList;
 
 public class Storage {
 	
+	public static String readFromFile() {
+		return null;
+	}
+	
 	public static String writeToFile() {
 		return null;
 	}
@@ -28,6 +32,21 @@ public class Storage {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+	}
+	
+	public static String add(String details) {
+		return null;
+	}
+	
+	public static String delete(String number) {
+		return null;
+	}
+	
+	public static String update(String details) {
+		return null;
+	}
+	
+	public static String search(String searchString) {
+		return null;
 	}
 }
