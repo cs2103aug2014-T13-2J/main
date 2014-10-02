@@ -26,6 +26,10 @@ public class Logic {
 		return null;
 	}
 	
+	public static String repeatTask(String number, int number) {
+		return null;
+	}
+	
 	public static String markAsComplete(String number) {
 		return null;
 	}
