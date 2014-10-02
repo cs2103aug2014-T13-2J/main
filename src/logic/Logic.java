@@ -1,3 +1,4 @@
+package logic;
 public class Logic {
 	
 	public static String addTask(String details) {
@@ -26,7 +27,7 @@ public class Logic {
 		return null;
 	}
 	
-	public static String repeatTask(String number, int number) {
+	public static String repeatTask(String number) {
 		return null;
 	}
 	

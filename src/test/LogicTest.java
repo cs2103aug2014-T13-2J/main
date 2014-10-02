@@ -1,3 +1,4 @@
+package test;
 import static org.junit.Assert.*;
 
 import org.junit.After;
@@ -43,11 +44,11 @@ public class LogicTest {
 		String result6 = "New task added. Description: overseas, Start date: 05102014, End date: 10102014";
 		String result7 = "New task added. Description: overseas, Start date: 05102014, End date: 10102014";
 		
-		assertEquals()
-		addTask(details2);
-		addTask(details3);
-		addTask(details4);
-		addTask(details5);
+//		assertEquals()
+//		addTask(details2);
+//		addTask(details3);
+//		addTask(details4);
+//		addTask(details5);
 	}
 
 }
