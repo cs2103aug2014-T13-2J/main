@@ -40,5 +40,6 @@
 	<classpathentry kind="lib" path="libs/transaction-api-1.1.jar"/>
 	<classpathentry kind="lib" path="libs/xpp3-1.1.4c.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="libs/joda-time-2.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
