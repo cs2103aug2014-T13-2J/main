@@ -124,4 +124,20 @@ class Task {
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
 	}
+	
+	public String toString() {
+		String result = "";
+		result = result + description + "#!";
+		result = result + venue + "#!";
+		result = result + startDateTime + "#!";
+		result = result + endDateTime + "#!";
+		result = result + hasReminder + "#!";
+		result = result + reminder + "#!";
+		result = result + recurringEventId + "#!";
+		result = result + hasRecurrence + "#!";
+		result = result + recurrence + "#!";
+		result = result + completed;
+		
+		return result;
+	}
 }
