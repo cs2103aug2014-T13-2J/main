@@ -34,7 +34,7 @@ class TaskBuilder {
 		return this;
 	}
 	
-	public TaskBuilder setendDateTime(DateTime endDateTime) {
+	public TaskBuilder setEndDateTime(DateTime endDateTime) {
 		this.endDateTime = endDateTime;
 		return this;
 	}
