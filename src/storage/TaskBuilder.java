@@ -1,4 +1,6 @@
 package storage;
+import org.joda.time.DateTime;
+
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Event.Reminders;
 
@@ -7,10 +9,8 @@ class TaskBuilder {
 	/***************************** Data Members ************************/
 	private String description;
 	private String venue;
-	private EventDateTime startTime=null;
-	private EventDateTime endTime=null;
-	private EventDateTime startDate=null;
-	private EventDateTime endDate=null;
+	private DateTime startDateTime=null;
+	private DateTime endDateTime=null;
 	private boolean hasReminder=false;
 	private Reminders reminder=null;
 	private String recurringEventId=null;
@@ -33,23 +33,13 @@ class TaskBuilder {
 		return this;
 	}
 	
-	public TaskBuilder setStartTime(EventDateTime startTime) {
-		this.startTime = startTime;
+	public TaskBuilder setStartDateTime(DateTime startDateTime) {
+		this.startDateTime = startDateTime;
 		return this;
 	}
 	
-	public TaskBuilder setEndTime(EventDateTime endTime) {
-		this.endTime = endTime;
-		return this;
-	}
-	
-	public TaskBuilder setStartDate(EventDateTime startDate) {
-		this.startDate = startDate;
-		return this;
-	}
-	
-	public TaskBuilder setEndDate(EventDateTime endDate) {
-		this.endDate = endDate;
+	public TaskBuilder setendDateTime(DateTime endDateTime) {
+		this.endDateTime = endDateTime;
 		return this;
 	}
 	
@@ -84,7 +74,7 @@ class TaskBuilder {
 	}
 	
 	public Task buildTask() {
-		return new Task(description, venue, startTime, endTime, startDate, endDate, hasReminder, 
+		return new Task(description, venue, startDateTime, endDateTime, hasReminder, 
 				reminder, recurringEventId, hasRecurrence, recurrence, completed);
 	}
 }
