@@ -1,5 +1,5 @@
 package storage;
-import com.google.api.services.calendar.model.EventDateTime;
+import org.joda.time.DateTime;
 import com.google.api.services.calendar.model.Event.Reminders;
 
 class Task {
@@ -7,10 +7,8 @@ class Task {
 	/***************************** Data Members ************************/
 	private String description;
 	private String venue;
-	private EventDateTime startTime;
-	private EventDateTime endTime;
-	private EventDateTime startDate;
-	private EventDateTime endDate;
+	private DateTime startDateTime=null;
+	private DateTime endDateTime=null;
 	private boolean hasReminder;
 	private Reminders reminder;
 	private String recurringEventId;
@@ -22,10 +20,8 @@ class Task {
 	public Task (
 			String description,
 			String venue,
-			EventDateTime startTime,
-			EventDateTime endTime,
-			EventDateTime startDate,
-			EventDateTime endDate,
+			DateTime startDateTime,
+			DateTime endDateTime,
 			boolean hasReminder,
 			Reminders reminder,
 			String recurringEventId,
@@ -35,10 +31,8 @@ class Task {
 			) {
 		this.description = description;
 		this.venue = venue;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.startDate = startDate;
-		this.endDate = endDate;
+		this.startDateTime = startDateTime;
+		this.endDateTime = endDateTime;
 		this.hasReminder = hasReminder;
 		this.reminder = reminder;
 		this.recurringEventId = recurringEventId;
@@ -56,20 +50,12 @@ class Task {
 		return venue;
 	}
 	
-	public EventDateTime getStartTime() {
-		return startTime;
+	public DateTime getStartDateTime() {
+		return startDateTime;
 	}
 	
-	public EventDateTime getEndTime() {
-		return endTime;
-	}
-	
-	public EventDateTime getStartDate() {
-		return startDate;
-	}
-	
-	public EventDateTime getEndDate() {
-		return endDate;
+	public DateTime getEndDateTime() {
+		return endDateTime;
 	}
 	
 	public boolean getHasReminder() {
@@ -106,20 +92,12 @@ class Task {
 		this.venue = venue;
 	}
 	
-	public void setStartTime(EventDateTime startTime) {
-		this.startTime = startTime;
+	public void setStartDateTime(DateTime startTime) {
+		this.startDateTime = startTime;
 	}
 	
-	public void setEndTime(EventDateTime endTime) {
-		this.endTime = endTime;
-	}
-	
-	public void setStartDate(EventDateTime startDate) {
-		this.startDate = startDate;
-	}
-	
-	public void setEndDate(EventDateTime endDate) {
-		this.endDate = endDate;
+	public void setEndDateTime(DateTime endTime) {
+		this.endDateTime = endTime;
 	}
 	
 	public void setHasReminder(boolean hasReminder) {
