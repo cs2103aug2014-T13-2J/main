@@ -1,7 +1,6 @@
 package storage;
 import org.joda.time.DateTime;
 
-import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Event.Reminders;
 
 class TaskBuilder {

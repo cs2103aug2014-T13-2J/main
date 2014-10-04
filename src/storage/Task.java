@@ -1,5 +1,6 @@
 package storage;
 import org.joda.time.DateTime;
+
 import com.google.api.services.calendar.model.Event.Reminders;
 
 class Task {
@@ -9,12 +10,12 @@ class Task {
 	private String venue;
 	private DateTime startDateTime=null;
 	private DateTime endDateTime=null;
-	private boolean hasReminder;
-	private Reminders reminder;
-	private String recurringEventId;
-	private boolean hasRecurrence;
-	private String recurrence;
-	private boolean completed;
+	private boolean hasReminder=false;
+	private Reminders reminder=null;
+	private String recurringEventId=null;
+	private boolean hasRecurrence=false;
+	private String recurrence=null;
+	private boolean completed=false;
 
 	/***************************** Constructors ************************/
 	public Task (
@@ -122,11 +123,5 @@ class Task {
 	
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
-	}
-	
-	public String toString() {
-		//uncompleted - put into a CSV friendly format
-		String result = "";
-		return result;
 	}
 }
