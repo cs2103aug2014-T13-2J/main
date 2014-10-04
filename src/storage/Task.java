@@ -1,8 +1,6 @@
 package storage;
 import org.joda.time.DateTime;
 
-import com.google.api.services.calendar.model.Event.Reminders;
-
 class Task {
 	
 	/***************************** Data Members ************************/
@@ -11,8 +9,7 @@ class Task {
 	private DateTime startDateTime=null;
 	private DateTime endDateTime=null;
 	private boolean hasReminder=false;
-	private Reminders reminder=null;
-	private String recurringEventId=null;
+	private DateTime reminder=null;
 	private boolean hasRecurrence=false;
 	private String recurrence=null;
 	private boolean completed=false;
@@ -24,8 +21,7 @@ class Task {
 			DateTime startDateTime,
 			DateTime endDateTime,
 			boolean hasReminder,
-			Reminders reminder,
-			String recurringEventId,
+			DateTime reminder,
 			boolean hasRecurrence,
 			String recurrence,
 			boolean completed
@@ -36,7 +32,6 @@ class Task {
 		this.endDateTime = endDateTime;
 		this.hasReminder = hasReminder;
 		this.reminder = reminder;
-		this.recurringEventId = recurringEventId;
 		this.hasRecurrence = hasRecurrence;
 		this.recurrence = recurrence;
 		this.completed = completed;
@@ -63,12 +58,8 @@ class Task {
 		return hasReminder;
 	}
 	
-	public Reminders getReminder() {
+	public DateTime getReminder() {
 		return reminder;
-	}
-	
-	public String getRecurringEventId() {
-		return recurringEventId;
 	}
 	
 	public boolean getHasRecurrence() {
@@ -105,12 +96,8 @@ class Task {
 		this.hasReminder = hasReminder;
 	}
 	
-	public void setReminder(Reminders reminder) {
+	public void setReminder(DateTime reminder) {
 		this.reminder = reminder;
-	}
-	
-	public void setRecurringEventId(String recurringEventId) {
-		this.recurringEventId = recurringEventId;
 	}
 	
 	public void setHasRecurrence(boolean hasRecurrence) {
@@ -133,7 +120,6 @@ class Task {
 		result = result + endDateTime + "#!";
 		result = result + hasReminder + "#!";
 		result = result + reminder + "#!";
-		result = result + recurringEventId + "#!";
 		result = result + hasRecurrence + "#!";
 		result = result + recurrence + "#!";
 		result = result + completed;
