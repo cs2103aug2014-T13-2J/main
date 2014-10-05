@@ -1,4 +1,4 @@
-package logic;
+package main.logic;
 
 public class RepeatHandler extends CommandHandler {
 

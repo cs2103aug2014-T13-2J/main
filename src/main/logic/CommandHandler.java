@@ -1,8 +1,8 @@
-package logic;
+package main.logic;
 
 import java.util.List;
 
-import storage.Task;
+import main.storage.Task;
 
 public abstract class CommandHandler {
 

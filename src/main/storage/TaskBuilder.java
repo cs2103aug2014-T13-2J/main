@@ -1,4 +1,4 @@
-package storage;
+package main.storage;
 import org.joda.time.DateTime;
 
 class TaskBuilder {

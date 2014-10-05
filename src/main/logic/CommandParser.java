@@ -1,4 +1,4 @@
-package logic;
+package main.logic;
 
 public abstract class CommandParser {
 	

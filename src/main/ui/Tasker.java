@@ -1,4 +1,4 @@
-package ui;
+package main.ui;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.io.File;
@@ -6,19 +6,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.BufferedReader;
+import java.io.IOException;
 
-import logic.CommandParser;
-
+import main.logic.CommandParser;
 
 public class Tasker {
 	
 	public static final String MESSAGE_WELCOME = "Welcome to Tasker!";
-	
-	public static void main(String[] args) {
-		initializeEnvironment();
-		readAndExecuteCommands();
-	}
-	
 	
 	public static void initializeEnvironment() {
 		System.out.println(MESSAGE_WELCOME);

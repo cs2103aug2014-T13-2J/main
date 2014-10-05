@@ -1,6 +1,6 @@
-package logic;
+package main.logic;
 
-public class UpdateParser extends CommandParser {
+public class UndoParser extends CommandParser {
 
 	@Override
 	public String parse(String userInput) {
