@@ -1,7 +1,10 @@
 package storage;
 import org.joda.time.DateTime;
 
+
 public class Task {
+	
+	static final String DELIMITER = "#!";
 	
 	/***************************** Data Members ************************/
 	private String description;
@@ -20,20 +23,16 @@ public class Task {
 			String venue,
 			DateTime startDateTime,
 			DateTime endDateTime,
-			boolean hasReminder,
 			DateTime reminder,
-			boolean hasRecurrence,
 			String recurrence,
 			boolean completed
 			) {
-		this.description = description;
-		this.venue = venue;
-		this.startDateTime = startDateTime;
-		this.endDateTime = endDateTime;
-		this.hasReminder = hasReminder;
-		this.reminder = reminder;
-		this.hasRecurrence = hasRecurrence;
-		this.recurrence = recurrence;
+		this.setDescription(description);
+		this.setVenue(venue);
+		this.setStartDateTime(startDateTime);
+		this.setEndDateTime(endDateTime);
+		this.setReminder(reminder);
+		this.setRecurrence(recurrence);
 		this.completed = completed;
 	}
 	
@@ -92,38 +91,68 @@ public class Task {
 		this.endDateTime = endTime;
 	}
 	
-	public void setHasReminder(boolean hasReminder) {
+	private void setHasReminder(boolean hasReminder) {
 		this.hasReminder = hasReminder;
 	}
 	
 	public void setReminder(DateTime reminder) {
+		if(reminder == null) {
+			this.setHasReminder(false);
+			this.reminder = reminder;
+		} else {
+			this.setHasReminder(true);
+			this.reminder = reminder;
+		}
+		this.setHasReminder(true);
 		this.reminder = reminder;
 	}
 	
-	public void setHasRecurrence(boolean hasRecurrence) {
+	private void setHasRecurrence(boolean hasRecurrence) {
 		this.hasRecurrence = hasRecurrence;
 	}
 	
 	public void setRecurrence(String recurrence) {
-		this.recurrence = recurrence;
+		if(recurrence == null) {
+			this.setHasRecurrence(false);
+			this.recurrence = recurrence;
+		} else {
+			this.setHasRecurrence(true);
+			this.recurrence = recurrence;
+		}
+		
 	}
 	
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
 	}
 	
+	public String convertToCSVFormat() {
+		String result = "";
+		result = result + this.getDescription() + DELIMITER;
+		result = result + this.getVenue() + DELIMITER;
+		result = result + this.getStartDateTime() + DELIMITER;
+		result = result + this.getEndDateTime() + DELIMITER;
+		result = result + this.getHasReminder() + DELIMITER;
+		result = result + this.getReminder() + DELIMITER;
+		result = result + this.getHasRecurrence() + DELIMITER;
+		result = result + this.getRecurrence() + DELIMITER;
+		result = result + this.getCompleted();
+		
+		return result;
+	}
+	
 	public String toString() {
 		String result = "";
-		result = result + description + "#!";
-		result = result + venue + "#!";
-		result = result + startDateTime + "#!";
-		result = result + endDateTime + "#!";
-		result = result + hasReminder + "#!";
-		result = result + reminder + "#!";
-		result = result + hasRecurrence + "#!";
-		result = result + recurrence + "#!";
-		result = result + completed;
-		
+		result = result + "Description: " + this.getDescription() + ", ";
+		result = result + "Venue: " + this.getVenue() + ", ";
+		result = result + "Start date and time: " + this.getStartDateTime() + ", ";
+		result = result + "End date and time: " + this.getEndDateTime() + ", ";
+		if(this.getHasReminder()) {
+			result = result + "Reminder on: " + this.getReminder();
+		}
+		if(this.getHasRecurrence()) {
+			result = result + "Recurrence: " + this.getRecurrence() + ", ";
+		}
 		return result;
 	}
 }

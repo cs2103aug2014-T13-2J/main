@@ -34,9 +34,7 @@ public class TaskBuilderTest {
 		builder.setVenue("CLB");
 		builder.setStartDateTime(new DateTime(2014, 10, 20, 9, 0, 0, 0));
 		builder.setEndDateTime(new DateTime(2014, 11, 21, 10, 0, 0, 0));
-		builder.setHasReminder(true);
 		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
-		builder.setHasRecurrence(true);
 		builder.setRecurrence("weekly");
 		builder.setCompleted(false);
 		Task task = builder.buildTask();
@@ -44,12 +42,15 @@ public class TaskBuilderTest {
 		assertEquals("meeting", task.getDescription());
 		
 		assertEquals("CLB", task.getVenue());
-		
+		int month = task.getStartDateTime().getMonthOfYear();
+		System.out.println(month);
+		System.out.println(task.getStartDateTime().getMonthOfYear());
 		assertEquals("startDateTime - Year: ", 2014, task.getStartDateTime().getYear());
 		assertEquals("startDateTime - Month: ", 10, task.getStartDateTime().getMonthOfYear());
 		assertEquals("StartDateTime - Day: ", 20, task.getStartDateTime().getDayOfMonth());
 		assertEquals("StartDateTime - Hour: ", 9, task.getStartDateTime().getHourOfDay());
 		assertEquals("StartDateTime - Minute: ", 0, task.getStartDateTime().getMinuteOfDay());
+
 		
 		assertEquals("endDateTime - Year: ", 2014, task.getEndDateTime().getYear());
 		assertEquals("endDateTime - Month: ", 10, task.getEndDateTime().getMonthOfYear());

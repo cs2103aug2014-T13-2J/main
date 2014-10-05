@@ -30,7 +30,7 @@ public class Storage {
 			CSVWriter writer = new CSVWriter(new FileWriter(fileName));
 			String[] currentEntry;
 			for(Task task: tasks) {
-				currentEntry = toString(task).split("#!"); 
+				currentEntry = task.convertToCSVFormat().split("#!"); 
 				writer.writeNext(currentEntry);
 			}
 			writer.close();
