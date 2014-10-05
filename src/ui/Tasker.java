@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.BufferedReader;
 
+import logic.CommandParser;
+
 
 public class Tasker {
 	
@@ -29,7 +31,7 @@ public class Tasker {
 		while(true){
 			System.out.println(MESSAGE_PROMPT);
 			String userCommand=scanner.nextLine();
-			Interpreter.interpretCmd(userCommand);
+			CommandParser.parse(userCommand);
 		}
 	}
 	
