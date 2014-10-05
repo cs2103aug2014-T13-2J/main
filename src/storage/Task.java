@@ -1,7 +1,7 @@
 package storage;
 import org.joda.time.DateTime;
 
-class Task {
+public class Task {
 	
 	/***************************** Data Members ************************/
 	private String description;
