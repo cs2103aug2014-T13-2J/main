@@ -2,9 +2,7 @@ package main.storage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-
 import au.com.bytecode.opencsv.CSVWriter;
 
 
@@ -37,6 +35,8 @@ public class Storage {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		return "Tasks added.";
 	}
 	
 	public static String add(String details) {

@@ -103,8 +103,6 @@ public class Task {
 			this.setHasReminder(true);
 			this.reminder = reminder;
 		}
-		this.setHasReminder(true);
-		this.reminder = reminder;
 	}
 	
 	private void setHasRecurrence(boolean hasRecurrence) {
@@ -143,15 +141,19 @@ public class Task {
 	
 	public String toString() {
 		String result = "";
-		result = result + "Description: " + this.getDescription() + ", ";
-		result = result + "Venue: " + this.getVenue() + ", ";
-		result = result + "Start date and time: " + this.getStartDateTime() + ", ";
-		result = result + "End date and time: " + this.getEndDateTime() + ", ";
+		result = result + "Description: " + this.getDescription();
+		result = result + ", " + "Venue: " + this.getVenue();
+		if(this.getStartDateTime() != null) {
+			result = result + ", " + "Start date and time: " + this.getStartDateTime();
+		}
+		if(this.getEndDateTime() != null) {
+			result = result + ", " + "End date and time: " + this.getEndDateTime();
+		}
 		if(this.getHasReminder()) {
-			result = result + "Reminder on: " + this.getReminder();
+			result = result + ", " + "Reminder on: " + this.getReminder();
 		}
 		if(this.getHasRecurrence()) {
-			result = result + "Recurrence: " + this.getRecurrence() + ", ";
+			result = result + ", " + "Recurrence: " + this.getRecurrence();
 		}
 		return result;
 	}
