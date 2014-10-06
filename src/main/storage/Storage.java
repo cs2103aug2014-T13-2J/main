@@ -15,16 +15,26 @@ import au.com.bytecode.opencsv.CSVWriter;
 public class Storage {
 	
 	private static final int DESCRIPTION_INDEX = 0;
-	private static final int VENUE_INDEX = 0;
-	private static final int START_DATE_TIME_INDEX = 0;
-	private static final int END_DATE_TIME_INDEX = 0;
-	private static final int REMINDER_INDEX = 0;
-	private static final int RECURRENCE_INDEX = 0;
-	private static final int COMPLETED_INDEX = 0;
-
+	private static final int VENUE_INDEX = 1;
+	private static final int START_DATE_TIME_INDEX = 2;
+	private static final int END_DATE_TIME_INDEX = 3;
+	private static final int REMINDER_INDEX = 4;
+	private static final int RECURRENCE_INDEX = 5;
+	private static final int COMPLETED_INDEX = 6;
+	private static final String DATA_OVERWRITTEN_MESSAGE = "Storage arraylist is not empty. Data will be overwritten. Operation discontinued.";
+	private static final String READ_FROM_FILE_SUCCESS_MESSAGE = "Data read from storage.";
+	private static final String WRITE_FROM_FILE_SUCCESS_MESSAGE = "Tasks added."; 
+	private static final int DATE_INDEX = 0;
+	private static final int TIME_INDEX = 1;
+	private static final int YEAR_INDEX = 0;
+	private static final int MONTH_INDEX = 1;
+	private static final int DAY_INDEX = 2;
+	private static final int HOUR_INDEX = 0;
+	private static final int MINUTE_INDEX = 1;
+	
 	public static String readFromFile(String fileName, ArrayList<Task> tasks) {
 		if(!tasks.isEmpty()) {
-			return "Storage arraylist is not empty. Data will be overwritten. Operation discontinued.";
+			return DATA_OVERWRITTEN_MESSAGE;
 		} else {
 		    try {
 		    	String[] nextLine;
@@ -57,12 +67,32 @@ public class Storage {
 				e.printStackTrace();
 			}
 		    
-		    return "Data read from storage.";
+		    return READ_FROM_FILE_SUCCESS_MESSAGE;
 		}
 	}
 	
 	public static DateTime convertToDateTime(String dateTime) {
-		return null;
+		//DateTime format example: 2014-10-20T09:00:00.000+08:00
+		if(dateTime.equals("null"))
+			return null;
+		String[] parameters = dateTime.split("T");
+		String date = parameters[DATE_INDEX];
+		String[] yearMonthDay = date.split("-");
+		String time = parameters[TIME_INDEX];
+		String[] hourMinuteSecond = time.split(":");
+
+		int year = Integer.parseInt(yearMonthDay[YEAR_INDEX]);
+		int month = Integer.parseInt(yearMonthDay[MONTH_INDEX]);
+		String dayString = yearMonthDay[DAY_INDEX];
+		if(dayString.substring(1) == "0") {
+			dayString = dayString.substring(1, dayString.length()-1);
+		}
+		int dayInt = Integer.parseInt(dayString); 
+		int hour = Integer.parseInt(hourMinuteSecond[HOUR_INDEX]);
+		int minute = Integer.parseInt(hourMinuteSecond[MINUTE_INDEX]);
+		
+		DateTime result = new DateTime(year, month, dayInt, hour, minute);
+		return result;
 	}
 	
 	public static boolean convertToBoolean(String completed) {
@@ -96,7 +126,7 @@ public class Storage {
 			e.printStackTrace();
 		}
 		
-		return "Tasks added.";
+		return WRITE_FROM_FILE_SUCCESS_MESSAGE;
 	}
 	
 	public static String add(String details) {

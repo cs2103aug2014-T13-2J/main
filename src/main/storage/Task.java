@@ -8,7 +8,7 @@ public class Task {
 	
 	/***************************** Data Members ************************/
 	private String description;
-	private String venue;
+	private String venue=null;
 	private DateTime startDateTime=null;
 	private DateTime endDateTime=null;
 	private boolean hasReminder=false;
@@ -130,9 +130,7 @@ public class Task {
 		result = result + this.getVenue() + DELIMITER;
 		result = result + this.getStartDateTime() + DELIMITER;
 		result = result + this.getEndDateTime() + DELIMITER;
-		result = result + this.getHasReminder() + DELIMITER;
 		result = result + this.getReminder() + DELIMITER;
-		result = result + this.getHasRecurrence() + DELIMITER;
 		result = result + this.getRecurrence() + DELIMITER;
 		result = result + this.getCompleted();
 		

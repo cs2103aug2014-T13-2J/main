@@ -5,7 +5,7 @@ class TaskBuilder {
 	
 	/***************************** Data Members ************************/
 	private String description;
-	private String venue;
+	private String venue=null;
 	private DateTime startDateTime=null;
 	private DateTime endDateTime=null;
 	private DateTime reminder=null;
