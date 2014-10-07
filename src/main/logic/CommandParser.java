@@ -2,7 +2,10 @@ package main.logic;
 
 public abstract class CommandParser {
 	
-	public abstract String parse(String userInput);
+	public static String parse(String userInput) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	protected String getCommandType(String userInput) {
 		String commandType = userInput.trim().split(" ")[0];
