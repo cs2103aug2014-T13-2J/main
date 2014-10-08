@@ -33,6 +33,44 @@ public class Logic {
 	}
 
 	public static String executeCommand(CommandType commandType, String details) {
+		switch (commandType) {
+		case ADD:
+			return addTask(details);
+		case DELETE:
+			return deleteTask(details);
+		case DISPLAY:
+			return displayTask(details);
+		case UPDATE:
+			return updateTask(details);
+		case EXIT:
+			return exit(details);
+		default:
+			return null;
+		}
+	}
+
+	private static String addTask(String details) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static String deleteTask(String details) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static String displayTask(String details) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static String updateTask(String details) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static String exit(String details) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
