@@ -9,6 +9,6 @@ public class TaskerStart {
 	public static void main(String[] args) throws IOException {
 		Tasker.initializeEnvironment();
 		Tasker.readAndExecuteCommands();
-		Tasker.initializeFileForIO(args[0]);
+		//Tasker.initializeFileForIO(args[0]);
 	}
 }

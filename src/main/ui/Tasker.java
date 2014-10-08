@@ -31,7 +31,7 @@ public class Tasker {
 		return null;
 	}*/
 	
-	public static void initializeFileForIO(String userArgument) throws IOException{
+	/*public static void initializeFileForIO(String userArgument) throws IOException{
 		filename = userArgument;
 		File file = new File(filename);
 		if (!file.exists()) {
@@ -45,7 +45,7 @@ public class Tasker {
 			}
 			reader.close(); 
 			fileReader.close();
-	}
+	}*/
 	
 	public static void displayResult(){
 		if(textArray.isEmpty()) {
