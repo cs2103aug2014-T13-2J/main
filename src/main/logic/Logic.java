@@ -39,7 +39,7 @@ public class Logic {
 		case DELETE:
 			return deleteTask(details);
 		case DISPLAY:
-			return displayTask(details);
+			return displayTasks(details);
 		case UPDATE:
 			return updateTask(details);
 		case EXIT:
@@ -59,7 +59,7 @@ public class Logic {
 		return null;
 	}
 
-	private static String displayTask(String details) {
+	private static String displayTasks(String details) {
 		// TODO Auto-generated method stub
 		return null;
 	}
