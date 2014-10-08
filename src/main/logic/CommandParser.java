@@ -9,8 +9,8 @@ public abstract class CommandParser {
 //		return commandType;
 //	}
 	
-	protected String getCommandDetails(String userInput) {
-		String commandDetails = userInput.trim().split(" ", 2)[1];
-		return commandDetails;
-	}
+//	protected String getCommandDetails(String userInput) {
+//		String commandDetails = userInput.trim().split(" ", 2)[1];
+//		return commandDetails;
+//	}
 }
