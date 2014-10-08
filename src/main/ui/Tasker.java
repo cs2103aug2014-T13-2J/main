@@ -10,7 +10,6 @@ import main.logic.Logic;
 
 public class Tasker {
 	public static String filename;
-	public static ArrayList<String> textArray = new ArrayList<>();
 
 	public static final String MESSAGE_WELCOME = "Welcome to Tasker!";
 	public static final String MESSAGE_PROMPT = "Enter Command:";
@@ -46,15 +45,5 @@ public class Tasker {
 			fileReader.close();
 	}*/
 	
-	public static void displayResult(){
-		if(textArray.isEmpty()) {
-			System.out.println(MESSAGE_EMPTY);
-		}
-		else {
-			for (int i=0; i < textArray.size(); i++) { 
-				System.out.println((i+1) + "." + textArray.get(i));
-			} 
-		}
-	}	
 
 }
