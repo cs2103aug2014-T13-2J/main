@@ -11,7 +11,9 @@ public class Logic {
 	public static String uiToLogic(String userCommand) {
 		String commandTypeString = getFirstWord(userCommand);
 		CommandType commandType = determineCommandType(commandTypeString);
-		return null;
+		String details = removeFirstWord(userCommand);
+		String message = executeCommand(commandType, details);
+		return message;
 	}
 
 	private static CommandType determineCommandType(String commandTypeString) {
@@ -40,7 +42,8 @@ public class Logic {
 	}
 	
 	private static String removeFirstWord(String userCommand) {
-		return null;
+		String withoutFirstWord = userCommand.replaceFirst(getFirstWord(userCommand), "").trim();
+		return withoutFirstWord;
 	}
 
 }
