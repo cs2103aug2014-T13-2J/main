@@ -6,13 +6,13 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import main.logic.CommandParser;
-
 public class Tasker {
 	public static String filename;
-	
+	public static ArrayList<String> textArray = new ArrayList<>();
+
 	public static final String MESSAGE_WELCOME = "Welcome to Tasker!";
 	public static final String MESSAGE_PROMPT = "Enter Command:";
+	public static final String MESSAGE_EMPTY = "File is empty.";
 	
 	public static void initializeEnvironment() {
 		System.out.println(MESSAGE_WELCOME);
@@ -23,7 +23,7 @@ public class Tasker {
 		while(true){
 			System.out.println(MESSAGE_PROMPT);
 			String userCommand=scanner.nextLine();
-			//CommandParser.parse(userCommand);
+			//CommandParser.getCommandDetails(userCommand);
 		}
 	}
 	
@@ -40,14 +40,22 @@ public class Tasker {
 			FileReader fileReader = new FileReader(filename); 
 			BufferedReader reader = new BufferedReader(fileReader); 
 			String textLine;
-			ArrayList<String> textArray = new ArrayList<>();
 			while ((textLine = reader.readLine()) != null) {
 			textArray.add(textLine);
 			}
 			reader.close(); 
 			fileReader.close();
 	}
-
 	
+	public static void displayResult(){
+		if(textArray.isEmpty()) {
+			System.out.println(MESSAGE_EMPTY);
+		}
+		else {
+			for (int i=0; i < textArray.size(); i++) { 
+				System.out.println((i+1) + "." + textArray.get(i));
+			} 
+		}
+	}	
 
 }
