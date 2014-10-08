@@ -23,7 +23,7 @@ public class Tasker {
 		while(true){
 			System.out.println(MESSAGE_PROMPT);
 			String userCommand=scanner.nextLine();
-			CommandParser.parse(userCommand);
+			//CommandParser.parse(userCommand);
 		}
 	}
 	
