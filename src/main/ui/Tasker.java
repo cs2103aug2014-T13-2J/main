@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import main.logic.Logic;
+
 public class Tasker {
 	public static String filename;
 	public static ArrayList<String> textArray = new ArrayList<>();
@@ -23,13 +25,10 @@ public class Tasker {
 		while(true){
 			System.out.println(MESSAGE_PROMPT);
 			String userCommand=scanner.nextLine();
-			//CommandParser.getCommandDetails(userCommand);
+			Logic.uiToLogic(userCommand);
 		}
 	}
 	
-	/*public static String readCmd(Scanner sc) {
-		return null;
-	}*/
 	
 	/*public static void initializeFileForIO(String userArgument) throws IOException{
 		filename = userArgument;
