@@ -1,7 +1,5 @@
 package main.logic;
 
-import java.util.ArrayList;
-
 public class Logic {
 
 	private enum CommandType {
@@ -50,13 +48,15 @@ public class Logic {
 	}
 
 	private static String addTask(String details) {
-		// TODO Auto-generated method stub
-		return null;
+		CommandHandler executor = new AddHandler(details);
+		String message = executor.execute();
+		return message;
 	}
 
 	private static String deleteTask(String details) {
-		// TODO Auto-generated method stub
-		return null;
+		CommandHandler executor = new DeleteHandler(details);
+		String message = executor.execute();
+		return message;
 	}
 
 	private static String displayTasks(String details) {
@@ -65,8 +65,9 @@ public class Logic {
 	}
 
 	private static String updateTask(String details) {
-		// TODO Auto-generated method stub
-		return null;
+		CommandHandler executor = new UpdateHandler(details);
+		String message = executor.execute();
+		return message;
 	}
 
 	private static String exit(String details) {
