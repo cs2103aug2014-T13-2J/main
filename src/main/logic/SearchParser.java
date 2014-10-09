@@ -9,7 +9,7 @@ public class SearchParser extends CommandParser {
 	}
 
 	@Override
-	public String parse(String userInput) {
+	public String parse() {
 		// search should be done here
 		return null;
 	}
