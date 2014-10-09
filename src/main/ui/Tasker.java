@@ -23,7 +23,7 @@ public class Tasker {
 		Scanner scanner = new Scanner(System.in);
 		while(true){
 			System.out.println(MESSAGE_PROMPT);
-			String userCommand=scanner.nextLine();
+			String userCommand = scanner.nextLine();
 			Logic.uiToLogic(userCommand);
 		}
 	}

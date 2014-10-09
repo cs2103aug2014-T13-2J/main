@@ -11,6 +11,10 @@ public class AddParser extends CommandParser {
 		super(arguments);
 		userInput = arguments;
 	}
+	
+	public String getUserInput() {
+		return this.userInput;
+	}
 
 	public String parse() {
 		String description=null, venue=null, startDate=null, endDate=null, startTime=null, endTime=null;
