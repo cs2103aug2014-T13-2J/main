@@ -6,5 +6,5 @@ public abstract class CommandParser {
 		
 	}
 	
-	public abstract String parse(String userInput);
+	public abstract String parse();
 }
