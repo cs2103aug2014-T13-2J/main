@@ -29,7 +29,7 @@ public class LogicTest {
 	@Test
 	public void testAddTask() {
 		String details1 = "add meeting with Prof at CLB next Thursday at 11pm";
-		String details2 = "add meeting on next Thursday from 11pm to 1am at Utown";
+		String details2 = "add meeting on next Thursday from 11pm to Friday 1am at Utown";
 		String details3 = "add gathering on 3/10/2014";
 		String details4 = "add mid terms on 3/10 at 9am";
 		String details5 = "add make up lecture on 3 October";
