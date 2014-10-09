@@ -5,12 +5,14 @@ import java.util.Arrays;
 
 public class AddParser extends CommandParser {
 	
+	private String userInput;
+	
 	public AddParser(String arguments) {
 		super(arguments);
-		// TODO Auto-generated constructor stub
+		userInput = arguments;
 	}
 
-	public String parse(String userInput) {
+	public String parse() {
 		String description=null, venue=null, startDate=null, endDate=null, startTime=null, endTime=null;
 		
 		String[] words = userInput.split(" ");
