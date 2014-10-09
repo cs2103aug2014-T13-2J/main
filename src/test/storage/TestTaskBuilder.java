@@ -1,6 +1,7 @@
 package test.storage;
 
 import static org.junit.Assert.*;
+import main.storage.TaskBuilder;
 
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -36,7 +37,7 @@ public class TestTaskBuilder {
 		builder.setVenue("CLB");
 		builder.setStartDateTime(new DateTime());
 		builder.setEndDateTime(new DateTime());
-		builder.setHasReminder(true);
+//		builder.setHasReminder(true);
 	}
 
 }
