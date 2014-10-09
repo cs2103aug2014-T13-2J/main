@@ -4,6 +4,11 @@ import java.util.ArrayList;
 
 public class AddParser extends CommandParser {
 	
+	public AddParser(String arguments) {
+		super(arguments);
+		// TODO Auto-generated constructor stub
+	}
+
 	public String parse(String userInput) {
 		String description, venue, startDate, endDate, startTime;
 		

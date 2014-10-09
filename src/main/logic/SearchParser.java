@@ -3,6 +3,11 @@ import java.util.ArrayList;
 
 public class SearchParser extends CommandParser {
 	
+	public SearchParser(String arguments) {
+		super(arguments);
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public String parse(String userInput) {
 		// search should be done here
