@@ -1,5 +1,6 @@
 package main.logic;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import main.storage.Task;
@@ -18,7 +19,7 @@ public class DisplayHandler extends CommandHandler {
 	}
 	
 	@Override
-	protected List<Task> getCurrentTaskList() {
+	protected ArrayList<Task> getCurrentTaskList() {
 		// TODO Auto-generated method stub
 		return super.getCurrentTaskList();
 	}

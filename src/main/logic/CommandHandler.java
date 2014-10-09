@@ -1,7 +1,9 @@
 package main.logic;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import main.storage.Storage;
 import main.storage.Task;
 
 public abstract class CommandHandler {
@@ -12,7 +14,9 @@ public abstract class CommandHandler {
 
 	public abstract String execute();
 	
-	protected List<Task> getCurrentTaskList() {
-		return null;
+	protected ArrayList<Task> getCurrentTaskList() {
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		Storage storage = new Storage(tasks);
+		return tasks;
 	}
 }

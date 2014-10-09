@@ -12,7 +12,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 
-class Storage {
+public class Storage {
 	
 	private static final int DESCRIPTION_INDEX = 0;
 	private static final int VENUE_INDEX = 1;
