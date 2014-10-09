@@ -17,11 +17,5 @@ public class DisplayHandler extends CommandHandler {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	@Override
-	protected ArrayList<Task> getCurrentTaskList() {
-		// TODO Auto-generated method stub
-		return super.getCurrentTaskList();
-	}
 
 }
