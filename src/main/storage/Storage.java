@@ -12,7 +12,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 
-public class Storage {
+class Storage {
 	
 	private static final int DESCRIPTION_INDEX = 0;
 	private static final int VENUE_INDEX = 1;
@@ -32,7 +32,13 @@ public class Storage {
 	private static final int HOUR_INDEX = 0;
 	private static final int MINUTE_INDEX = 1;
 	
-	public static String readFromFile(String fileName, ArrayList<Task> tasks) {
+	private ArrayList<Task> tasks;
+	
+	public Storage (ArrayList<Task> tasks) {
+		this.tasks = tasks;
+	}
+	
+	public String readFromFile(String fileName) {
 		if(!tasks.isEmpty()) {
 			return DATA_OVERWRITTEN_MESSAGE;
 		} else {
@@ -106,7 +112,7 @@ public class Storage {
 		}
 	}
 	
-	public static String writeToFile(String fileName, ArrayList<Task> tasks) {
+	public String writeToFile(String fileName) {
 		//this function assumes that the ArrayList containing tasks is fully updated
 		File file = new File(fileName);
 
@@ -127,6 +133,10 @@ public class Storage {
 		}
 		
 		return WRITE_FROM_FILE_SUCCESS_MESSAGE;
+	}
+	
+	public ArrayList<Task> getTasks() {
+		return this.tasks;
 	}
 	
 	public static String add(String details) {

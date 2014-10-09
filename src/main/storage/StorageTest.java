@@ -69,11 +69,13 @@ public class StorageTest {
 		
 		tasks.add(task2);
 		
-		assertEquals("writeToFile: ", "Tasks added.", Storage.writeToFile(fileName, tasks));
+		Storage s1 = new Storage(tasks);
+		
+		assertEquals("writeToFile: ", "Tasks added.", s1.writeToFile(fileName));
 		
 		tasks.clear();
 		
-		assertEquals("readFromFile: ", "Data read from storage.", Storage.readFromFile(fileName, tasks));
+		assertEquals("readFromFile: ", "Data read from storage.", s1.readFromFile(fileName));
 		
 		for(Task task: tasks) {
 			System.out.println(task);
