@@ -60,8 +60,9 @@ public class Logic {
 	}
 
 	private static String displayTasks(String details) {
-		// TODO Auto-generated method stub
-		return null;
+		CommandHandler executor = new DisplayHandler(details);
+		String message = executor.execute();
+		return message;
 	}
 
 	private static String updateTask(String details) {
