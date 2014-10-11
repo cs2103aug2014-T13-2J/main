@@ -1,11 +1,15 @@
 package main.logic;
 
+import org.joda.time.DateTime;
+
+import main.storage.Storage;
+import main.storage.Task;
 import main.storage.TaskBuilder;
 
 public class AddHandler extends CommandHandler {
-	
+
 	private AddParser parser;
-	
+
 	public AddHandler(String details) {
 		super(details);
 		parser = new AddParser(details);
@@ -24,14 +28,11 @@ public class AddHandler extends CommandHandler {
 		//use TaskBuilder to create the task
 		TaskBuilder builder = new TaskBuilder();
 		builder.setDescription(parser.getDescription());
-		builder.setVenue(parser.getVenue());
 		
-		DateTime startDateTime = new DateTime(parser.getStartDateYear(), parser.getStartDateMonth(), parser.getStartDateDay, parser.getStartTimeHour(), 
-				parser.getStartTimeMinute(), DEFAULT_SECOND, DEFAULT_MILLISECOND);
-		DateTime startDateTime = new DateTime(parser.getEndDateYear(), parser.getEndDateMonth(), parser.getEndDateDay, parser.getEndTimeHour(), 
-				parser.getEndTimeMinute(), DEFAULT_SECOND, DEFAULT_MILLISECOND);
+		Task task = builder.buildTask();
 		//store the task in storage
-		
+		Storage storage = Storage.getInstance();
+		storage.addTask(task);
 		return null;
 	}
 
