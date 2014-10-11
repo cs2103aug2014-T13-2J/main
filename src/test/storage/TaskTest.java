@@ -1,6 +1,8 @@
-package main.storage;
+package test.storage;
 
 import static org.junit.Assert.*;
+import main.storage.Task;
+import main.storage.TaskBuilder;
 
 import org.joda.time.DateTime;
 import org.junit.After;
