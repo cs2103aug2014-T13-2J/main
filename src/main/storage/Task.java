@@ -8,14 +8,14 @@ public class Task {
 	
 	/***************************** Data Members ************************/
 	private String description;
-	private String venue=null;
-	private DateTime startDateTime=null;
-	private DateTime endDateTime=null;
-	private boolean hasReminder=false;
-	private DateTime reminder=null;
-	private boolean hasRecurrence=false;
-	private String recurrence=null;
-	private boolean completed=false;
+	private String venue = null;
+	private DateTime startDateTime = null;
+	private DateTime endDateTime = null;
+	private boolean hasReminder = false;
+	private DateTime reminder = null;
+	private boolean hasRecurrence = false;
+	private String recurrence = null;
+	private boolean completed = false;
 
 	/***************************** Constructors ************************/
 	public Task (
