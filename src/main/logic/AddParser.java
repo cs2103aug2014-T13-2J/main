@@ -5,7 +5,9 @@ import java.util.LinkedList;
 
 public class AddParser extends CommandParser {
 	
-	final static String INVALID_DESCRIPTION_MESSAGE = "Sorry, we did not recognize your description. Please try again.";
+	final static String INVALID_DESCRIPTION_MESSAGE = "Sorry, we did not capture your description. Please try again.";
+	final static String INVALID_TIME_FORMAT_MESSAGE = "Sorry we did not manage to capture the time. Please ensure you entered it in the correct format.";
+	final static String INVALID_VENUE_MESSAGE = "Sorry we did not manage to capture the venue. Please try again.";
 	
 	private String userInput;
 	
@@ -27,17 +29,28 @@ public class AddParser extends CommandParser {
 
 		description = getDescriptionAndTrimUserInput(wordsList);
 		
-		String currentReservedWord;
 		while(!wordsList.isEmpty()) {
-			currentReservedWord = wordsList.poll();
-			//assert that currentReservedWord is indeed a reserved word
+			String currentReservedWord = wordsList.poll();
+			//insert an assert that currentReservedWord is indeed a reserved word
 			if(currentReservedWord.equals("at")) {
+				String nextWord = wordsList.poll();
 				//determine if next word is time or venue
-					//if time, get time
-					//else if venue, get venue
-					//else throw exception
+				if(representsTime(nextWord)) {
+					//if we have already parsed through start date or start time
+					if(startTime == null) {
+						startTime = getTime(nextWord);
+					} else {
+						//find endTime
+						endTime = getTime(nextWord);
+					}
+				} else {
+					//if it's not time, then the next word must represent venue
+					venue = getVenueAndTrimUserInput(wordsList);
+				}
 			} else if(currentReservedWord.equals("on")) {
 				//get date
+				startDate = getDateAndTrimUserInput(wordsList);
+				endDate = startDate;
 			} else if(currentReservedWord.equals("from")) {
 				//get start date
 				//get start time
@@ -50,13 +63,7 @@ public class AddParser extends CommandParser {
 				//set end time equal to 2359
 			}
 		}
-		//if "at", determine venue or time
-		venue = getVenueAndTrimUserInput(wordsList);
-			//if venue, get venue
-			//else if time, get time
-			//else throw exception
-		//else if "on", determine date
-		//else if "next", determine date 
+
 		return null;
 	}
 	
@@ -84,8 +91,52 @@ public class AddParser extends CommandParser {
 		}
 	}
 	
-	public static String getVenueAndTrimUserInput(LinkedList<String> wordsList) {
+	public static boolean representsTime(String word) {
+		if( word.matches("\\d") && 
+				(word.substring(word.length()-2, word.length()).equals("am") 
+						|| word.substring(word.length()-2, word.length()).equals("pm") ) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	//This function assumes that word will be of the format HH.MM(am/pm) or HH(am/pm)
+	public static String getTime(String word) {
+		boolean isPm;
+		if(word.substring(word.length()-2, word.length()).equals("pm")) {
+			isPm = true;
+		} else {
+			isPm = false;
+		}
+		word = word.substring(0, word.length()-2);
+		Integer numTime = Integer.parseInt(word);
+		if(isPm == true) {
+			numTime += 12;
+		}
 		
+		String stringTime = numTime.toString();
+		return stringTime;
+		
+	}
+	
+	public static String getVenueAndTrimUserInput(LinkedList<String> wordsList) {
+		String currentWord, venue = "";
+		while(!wordsList.isEmpty()) {
+			currentWord = wordsList.poll();
+			if(!isReservedWord(currentWord)) {
+				venue += currentWord;
+			}
+		}
+		if(venue.equals("")) {
+			throw new IllegalArgumentException(INVALID_VENUE_MESSAGE);
+		}
+		venue = venue.trim();
+		return venue;
+	}
+	
+	public static String getDateAndTrimUserInput(LinkedList<String> wordsList) {
+		return null;
 	}
 
 }
