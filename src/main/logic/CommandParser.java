@@ -5,10 +5,10 @@ public abstract class CommandParser {
 	/***************************** Data Members ************************/
 	private String description = null;
 	private String venue = null;
-	private String startDate = null;
-	private String endDate = null;
-	private String startTime = null;
-	private String endTime = null;	
+	private String startDate = null; 	//stored in DD/MM/YYYY format
+	private String endDate = null; 		//stored in DD/MM/YYYY format
+	private String startTime = null;	//stored in HH/MM format
+	private String endTime = null;		//stored in HH/MM format
 	private String reminder = null;
 	private String recurrence = null;
 	private String completed = null;

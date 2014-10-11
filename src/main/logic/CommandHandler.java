@@ -7,6 +7,8 @@ import main.storage.Task;
 
 public abstract class CommandHandler {
 	
+	final static String INVALID_INPUT_MESSAGE = "";
+	
 	private static ArrayList<Task> tasks = new ArrayList<Task>();
 	protected static Storage storage = Storage.getInstance();
 	
