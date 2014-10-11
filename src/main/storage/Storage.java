@@ -33,9 +33,18 @@ public class Storage {
 	private static final int MINUTE_INDEX = 1;
 	
 	private ArrayList<Task> tasks;
+	private static Storage theOne = null;
 	
-	public Storage (ArrayList<Task> tasks) {
-		this.tasks = tasks;
+	public static Storage getInstance() {
+		if (theOne == null) {
+			theOne = new Storage();
+		}
+
+		return theOne;
+	}
+	
+	public Storage () {
+		tasks = new ArrayList<Task>();
 	}
 	
 	public String readFromFile(String fileName) {
