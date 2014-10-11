@@ -46,6 +46,10 @@ public class Storage {
 		tasks = new ArrayList<Task>();
 	}
 	
+	public void addTask(Task task) {
+		tasks.add(task);
+	}
+	
 	public String readFromFile(String fileName) {
 		if(!tasks.isEmpty()) {
 			return DATA_OVERWRITTEN_MESSAGE;
