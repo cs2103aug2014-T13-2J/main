@@ -24,7 +24,7 @@ public class UI {
 		while(true){
 			System.out.println(MESSAGE_PROMPT);
 			String userCommand = scanner.nextLine();
-			Logic.uiToLogic(userCommand);
+			System.out.println(Logic.uiToLogic(userCommand));
 		}
 	}
 
