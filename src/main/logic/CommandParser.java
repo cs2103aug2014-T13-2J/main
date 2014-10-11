@@ -5,10 +5,16 @@ public abstract class CommandParser {
 	/***************************** Data Members ************************/
 	private String description = null;
 	private String venue = null;
-	private String startDate = null; 	//stored in DD/MM/YYYY format
-	private String endDate = null; 		//stored in DD/MM/YYYY format
-	private String startTime = null;	//stored in HH/MM format
-	private String endTime = null;		//stored in HH/MM format
+	private String startDateYear = null; 	
+	private String startDateMonth = null;
+	private String startDateDay = null;
+	private String endDateYear = null;
+	private String endDateMonth = null;		
+	private String endDateDay = null;
+	private String startTimeHour = null;
+	private String startTimeMinute = null;
+	private String endTimeHour = null;	
+	private String endTimeMinute = null;
 	private String reminder = null;
 	private String recurrence = null;
 	private String completed = null;
@@ -26,21 +32,45 @@ public abstract class CommandParser {
 	public String getVenue() {
 		return venue;
 	}
-
-	public String getStartDate() {
-		return startDate;
+	
+	public String getStartDateYear() {
+		return startDateYear;
 	}
 
-	public String getEndDate() {
-		return endDate;
+	public String getStartDateMonth() {
+		return startDateMonth;
 	}
 
-	public String getStartTime() {
-		return startTime;
-	}	
+	public String getStartDateDay() {
+		return startDateDay;
+	}
 
-	public String getEndTime() {
-		return endTime;
+	public String getEndDateYear() {
+		return endDateYear;
+	}
+
+	public String getEndDateMonth() {
+		return endDateMonth;
+	}
+	
+	public String getEndDateDay() {
+		return endDateDay;
+	}
+
+	public String getStartTimeHour() {
+		return startTimeHour;
+	}
+
+	public String getStartTimeMinute() {
+		return startTimeMinute;
+	}
+
+	public String getEndTimeHour() {
+		return endTimeHour;
+	}
+	
+	public String getEndTimeMinute() {
+		return endTimeMinute;
 	}
 
 	public String getRecurrence() {
@@ -59,24 +89,45 @@ public abstract class CommandParser {
 	public void setVenue(String venue) {
 		this.venue = venue;
 	}
-
-	public void setStartDate(String startDate) {
-		this.startDate = startDate;
+	
+	public void setStartDateYear(String startDateYear) {
+		this.startDateYear = startDateYear;
 	}
 
 
-	public void setEndDate(String endDate) {
-		this.endDate = endDate;
+	public void setStartDateMonth(String startDateMonth) {
+		this.startDateMonth = startDateMonth;
 	}
 
 
-	public void setStartTime(String startTime) {
-		this.startTime = startTime;
+	public void setEndDateYear(String endDateYear) {
+		this.endDateYear = endDateYear;
 	}
 
 
-	public void setEndTime(String endTime) {
-		this.endTime = endTime;
+	public void setEndDateMonth(String endDateMonth) {
+		this.endDateMonth = endDateMonth;
+	}
+
+
+	public void setEndDateDay(String endDateDay) {
+		this.endDateDay = endDateDay;
+	}
+
+	public void setStartTimeHour(String startTimeHour) {
+		this.startTimeHour = startTimeHour;
+	}
+
+	public void setStartTimeMinute(String startTimeMinute) {
+		this.startTimeMinute = startTimeMinute;
+	}
+
+	public void setEndTimeHour(String endTimeHour) {
+		this.endTimeHour = endTimeHour;
+	}
+
+	public void setEndTimeMinute(String endTimeMinute) {
+		this.endTimeMinute = endTimeMinute;
 	}
 
 	public String getReminder() {
@@ -97,5 +148,7 @@ public abstract class CommandParser {
 	}
 	
 	public abstract String parse();
+
+
 
 }
