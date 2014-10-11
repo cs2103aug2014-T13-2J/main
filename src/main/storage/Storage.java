@@ -146,20 +146,5 @@ public class Storage {
 	public ArrayList<Task> getTasks() {
 		return this.tasks;
 	}
-	
-	public static String add(String details) {
-		return null;
-	}
-	
-	public static String delete(String number) {
-		return null;
-	}
-	
-	public static String update(String details) {
-		return null;
-	}
-	
-	public static String search(String searchString) {
-		return null;
-	}
+
 }
