@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import main.logic.Logic;
 
-public class Tasker {
+public class UI {
 	public static String filename;
 
 	public static final String MESSAGE_WELCOME = "Welcome to Tasker!";
@@ -19,7 +19,7 @@ public class Tasker {
 		System.out.println(MESSAGE_WELCOME);
 	}
 	
-	public static void readAndExecuteCommands() throws IOException{
+	public static void readAndExecuteCommands() throws IOException {
 		Scanner scanner = new Scanner(System.in);
 		while(true){
 			System.out.println(MESSAGE_PROMPT);
@@ -27,23 +27,5 @@ public class Tasker {
 			Logic.uiToLogic(userCommand);
 		}
 	}
-	
-	
-	/*public static void initializeFileForIO(String userArgument) throws IOException{
-		filename = userArgument;
-		File file = new File(filename);
-		if (!file.exists()) {
-			file.createNewFile();
-			}
-			FileReader fileReader = new FileReader(filename); 
-			BufferedReader reader = new BufferedReader(fileReader); 
-			String textLine;
-			while ((textLine = reader.readLine()) != null) {
-			textArray.add(textLine);
-			}
-			reader.close(); 
-			fileReader.close();
-	}*/
-	
 
 }

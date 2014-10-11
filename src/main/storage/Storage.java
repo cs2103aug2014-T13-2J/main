@@ -39,7 +39,6 @@ public class Storage {
 		if (theOne == null) {
 			theOne = new Storage();
 		}
-
 		return theOne;
 	}
 	
