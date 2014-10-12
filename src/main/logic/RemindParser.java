@@ -1,15 +1,16 @@
 package main.logic;
 
-public class UndoParser extends CommandParser {
+public class RemindParser extends CommandParser {
 
-	public UndoParser(String arguments) {
+	public RemindParser(String arguments) {
 		super(arguments);
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public String parse() {
+		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }
