@@ -5,6 +5,8 @@ import main.storage.Task;
 import main.storage.TaskBuilder;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -35,8 +37,8 @@ public class TaskTest {
 		TaskBuilder builder = new TaskBuilder();
 		builder.setDescription("meeting");
 		builder.setVenue("CLB");
-		builder.setStartDateTime(new DateTime(2014, 10, 20, 9, 0, 0, 0));
-		builder.setEndDateTime(new DateTime(2014, 11, 21, 10, 0, 0, 0));
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
 		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
 		builder.setRecurrence("weekly");
 		builder.setCompleted(false);
@@ -47,35 +49,71 @@ public class TaskTest {
 	}
 
 	@Test
-	public void testSetStartDateTime() {
+	public void testSetStartDate() {
 		TaskBuilder builder = new TaskBuilder();
 		builder.setDescription("meeting");
 		builder.setVenue("CLB");
-		builder.setStartDateTime(new DateTime(2014, 10, 20, 9, 0, 0, 0));
-		builder.setEndDateTime(new DateTime(2014, 11, 21, 10, 0, 0, 0));
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
 		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
 		builder.setRecurrence("weekly");
 		builder.setCompleted(false);
 		Task task = builder.buildTask();
 		
-		task.setStartDateTime(new DateTime(2014, 9, 20, 15, 0, 0, 0));
-		assertEquals("Start date and time: ", "2014-09-20T15:00:00.000+08:00", task.getStartDateTime().toString());
+		task.setStartDate(new LocalDate(2014, 9, 13));
+		assertEquals("Start date: ", "2014-09-13", task.getStartDate().toString());
+	}
+	
+	@Test
+	public void testSetStartTime() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setStartTime(new LocalTime(12, 30));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setEndTime(new LocalTime(14, 30));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		
+		task.setStartTime(new LocalTime(9, 0));
+		assertEquals("Start time: ", "09:00:00.000", task.getStartTime().toString());
 	}
 
 	@Test
-	public void testSetEndDateTime() {
+	public void testSetEndDate() {
 		TaskBuilder builder = new TaskBuilder();
 		builder.setDescription("meeting");
 		builder.setVenue("CLB");
-		builder.setStartDateTime(new DateTime(2014, 10, 20, 9, 0, 0, 0));
-		builder.setEndDateTime(new DateTime(2014, 11, 21, 10, 0, 0, 0));
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
 		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
 		builder.setRecurrence("weekly");
 		builder.setCompleted(false);
 		Task task = builder.buildTask();
 		
-		task.setEndDateTime(new DateTime(2014, 12, 25, 23, 59, 0, 0));
-		assertEquals("End date and time: ", "2014-12-25T23:59:00.000+08:00", task.getEndDateTime().toString());
+		task.setEndDate(new LocalDate(2014, 12, 25));
+		assertEquals("End date: ", "2014-12-25", task.getEndDate().toString());
+	}
+	
+	@Test
+	public void testSetEndTime() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setStartTime(new LocalTime(12, 30));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setEndTime(new LocalTime(14, 30));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		
+		task.setEndTime(new LocalTime(20, 59));
+		assertEquals("End time: ", "20:59:00.000", task.getEndTime().toString());
 	}
 
 	@Test
@@ -83,8 +121,9 @@ public class TaskTest {
 		TaskBuilder builder = new TaskBuilder();
 		builder.setDescription("meeting");
 		builder.setVenue("CLB");
-		builder.setStartDateTime(new DateTime(2014, 10, 20, 9, 0, 0, 0));
-		builder.setEndDateTime(new DateTime(2014, 11, 21, 10, 0, 0, 0));
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
 		builder.setRecurrence("weekly");
 		builder.setCompleted(false);
 		Task task = builder.buildTask();
@@ -132,8 +171,8 @@ public class TaskTest {
 		
 		System.out.println(task.convertToCSVFormat());
 		
-		task.setStartDateTime(new DateTime(2014, 10, 20, 9, 0, 0, 0));
-		task.setEndDateTime(new DateTime(2014, 11, 21, 10, 0, 0, 0));
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
 		task.setRecurrence("weekly");
 		task.setCompleted(true);
 		
@@ -148,6 +187,6 @@ public class TaskTest {
 		builder.setVenue("CLB");
 		Task task = builder.buildTask();
 		
-		System.out.println(task);
+		//System.out.println(task);
 	}
 }
