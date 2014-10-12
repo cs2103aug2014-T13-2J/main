@@ -18,13 +18,16 @@ public class AddParser extends CommandParser {
 	final static Integer DAY_INDEX = 0;
 	final static Integer MONTH_INDEX = 1;
 	final static Integer YEAR_INDEX = 2;
+	final static String DEFAULT_START_HOUR_VALUE = "00";
+	final static String DEFAULT_START_MINUTE_VALUE = "00";
+	final static String DEFAULT_END_HOUR_VALUE = "23";
+	final static String DEFAULT_END_MINUTE_VALUE = "59";
 
 	private String userInput;
 
 	public AddParser(String arguments) {
 		super(arguments);
 		userInput = arguments;
-		this.parse();
 	}
 
 	public String getUserInput() {
@@ -34,9 +37,9 @@ public class AddParser extends CommandParser {
 	public String parse() {
 		String description = null, venue = null;
 		String startDate = null, startDateYear = null, startDateMonth = null, startDateDay = null;
-		String startTime = null, startTimeHour = null, startTimeMinute = null;
+		String startTime = null, startTimeHour = DEFAULT_START_HOUR_VALUE, startTimeMinute = DEFAULT_START_MINUTE_VALUE;
 		String endDate = null, endDateYear = null, endDateMonth = null, endDateDay = null;
-		String endTime = null, endTimeHour = null, endTimeMinute = null;
+		String endTime = null, endTimeHour = DEFAULT_END_HOUR_VALUE, endTimeMinute = DEFAULT_END_MINUTE_VALUE;
 
 		String[] userInput = this.getUserInput().split(" ");
 		LinkedList<String> wordsList = new LinkedList<String>(
