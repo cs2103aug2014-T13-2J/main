@@ -1,5 +1,7 @@
 package main.storage;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 
 
 public class Task {
@@ -9,8 +11,10 @@ public class Task {
 	/***************************** Data Members ************************/
 	private String description;
 	private String venue = null;
-	private DateTime startDateTime = null;
-	private DateTime endDateTime = null;
+	private LocalDate startDate = null;
+	private LocalTime startTime = null;
+	private LocalDate endDate = null;
+	private LocalTime endTime = null;
 	private boolean hasReminder = false;
 	private DateTime reminder = null;
 	private boolean hasRecurrence = false;
@@ -21,16 +25,20 @@ public class Task {
 	public Task (
 			String description,
 			String venue,
-			DateTime startDateTime,
-			DateTime endDateTime,
+			LocalDate startDate,
+			LocalTime startTime,
+			LocalDate endDate,
+			LocalTime endTime,
 			DateTime reminder,
 			String recurrence,
 			boolean completed
 			) {
 		this.setDescription(description);
 		this.setVenue(venue);
-		this.setStartDateTime(startDateTime);
-		this.setEndDateTime(endDateTime);
+		this.setStartDate(startDate);
+		this.setStartTime(startTime);
+		this.setEndDate(endDate);
+		this.setEndTime(endTime);
 		this.setReminder(reminder);
 		this.setRecurrence(recurrence);
 		this.completed = completed;
@@ -45,12 +53,20 @@ public class Task {
 		return venue;
 	}
 	
-	public DateTime getStartDateTime() {
-		return startDateTime;
+	public LocalDate getStartDate() {
+		return startDate;
 	}
 	
-	public DateTime getEndDateTime() {
-		return endDateTime;
+	public LocalTime getStartTime() {
+		return startTime;
+	}
+	
+	public LocalDate getEndDate() {
+		return endDate;
+	}
+	
+	public LocalTime getEndTime() {
+		return endTime;
 	}
 	
 	public boolean getHasReminder() {
@@ -83,12 +99,20 @@ public class Task {
 		this.venue = venue;
 	}
 	
-	public void setStartDateTime(DateTime startTime) {
-		this.startDateTime = startTime;
+	public void setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
 	}
 	
-	public void setEndDateTime(DateTime endTime) {
-		this.endDateTime = endTime;
+	public void setStartTime(LocalTime startTime) {
+		this.startTime = startTime;
+	}
+	
+	public void setEndDate(LocalDate endDate) {
+		this.endDate = endDate;
+	}
+	
+	public void setEndTime(LocalTime endTime) {
+		this.endTime = endTime;
 	}
 	
 	private void setHasReminder(boolean hasReminder) {
@@ -128,8 +152,10 @@ public class Task {
 		String result = "";
 		result = result + this.getDescription() + DELIMITER;
 		result = result + this.getVenue() + DELIMITER;
-		result = result + this.getStartDateTime() + DELIMITER;
-		result = result + this.getEndDateTime() + DELIMITER;
+		result = result + this.getStartDate() + DELIMITER;
+		result = result + this.getStartTime() + DELIMITER;
+		result = result + this.getEndDate() + DELIMITER;
+		result = result + this.getEndTime() + DELIMITER;
 		result = result + this.getReminder() + DELIMITER;
 		result = result + this.getRecurrence() + DELIMITER;
 		result = result + this.getCompleted();
@@ -141,12 +167,7 @@ public class Task {
 		String result = "";
 		result = result + "Description: " + this.getDescription();
 		result = result + ", " + "Venue: " + this.getVenue();
-		if(this.getStartDateTime() != null) {
-			result = result + ", " + "Start date and time: " + this.getStartDateTime();
-		}
-		if(this.getEndDateTime() != null) {
-			result = result + ", " + "End date and time: " + this.getEndDateTime();
-		}
+		//insert print statements for date and time
 		if(this.getHasReminder()) {
 			result = result + ", " + "Reminder on: " + this.getReminder();
 		}

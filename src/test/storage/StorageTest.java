@@ -9,6 +9,8 @@ import main.storage.Task;
 import main.storage.TaskBuilder;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -50,40 +52,38 @@ public class StorageTest {
 	@Test
 	public void testWriteToFileAndReadFromFile() {
 		String fileName = "data.csv";
-		ArrayList<Task> tasks = new ArrayList<Task>();
-		
+		Storage s1 = Storage.getInstance();
 		TaskBuilder builder = new TaskBuilder();
 		builder.setDescription("meeting");
 		builder.setVenue("CLB");
-		builder.setStartDateTime(new DateTime(2014, 10, 20, 9, 0, 0, 0));
-		builder.setEndDateTime(new DateTime(2014, 11, 21, 10, 0, 0, 0));
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setStartTime(new LocalTime(20, 0));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setEndTime(new LocalTime(23, 59));
 		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
 		builder.setRecurrence("weekly");
 		Task task1 = builder.buildTask();
 		
-		tasks.add(task1);
+		s1.addTask(task1);
 		
 		builder.setDescription("overseas");
 		builder.setVenue("Germany");
-		builder.setStartDateTime(new DateTime(2014, 11, 20, 20, 0, 0, 0));
-		builder.setEndDateTime(new DateTime(2014, 11, 30, 23, 0, 0, 0));
+		builder.setStartDate(new LocalDate(2015, 12, 20));
+		builder.setStartTime(new LocalTime(20, 0));
+		builder.setEndDate(new LocalDate(2015, 12, 31));
+		builder.setEndTime(new LocalTime(23, 59));
 		builder.setReminder(null);
 		builder.setRecurrence(null);
 		Task task2 = builder.buildTask();
 		
-		tasks.add(task2);
-		
-		Storage s1 = new Storage(tasks);
+		s1.addTask(task2);
 		
 		assertEquals("writeToFile: ", "Tasks added.", s1.writeToFile(fileName));
 		
-		tasks.clear();
+		s1.clearAllTasks();
 		
 		assertEquals("readFromFile: ", "Data read from storage.", s1.readFromFile(fileName));
 		
-		for(Task task: tasks) {
-			System.out.println(task);
-		}
 	}
 
 }
