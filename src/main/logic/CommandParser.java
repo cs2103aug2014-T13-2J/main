@@ -85,11 +85,11 @@ public abstract class CommandParser {
 	public String getCompleted() {
 		return completed;
 	}
-	
+
 	public boolean hasVenue() {
 		return hasVenue;
 	}
-	
+
 	public boolean hasStartDate() {
 		return hasStartDate;
 	}
@@ -117,8 +117,10 @@ public abstract class CommandParser {
 	}
 
 	public void setStartDateYear(String startDateYear) {
-		this.startDateYear = startDateYear;
-		this.setHasStartDate(true);
+		if (startDateYear != null) {
+			this.startDateYear = startDateYear;
+			this.setHasStartDate(true);
+		}
 	}
 
 	public void setStartDateMonth(String startDateMonth) {
@@ -130,8 +132,10 @@ public abstract class CommandParser {
 	}
 
 	public void setEndDateYear(String endDateYear) {
-		this.endDateYear = endDateYear;
-		this.setHasEndDate(true);
+		if (endDateYear != null) {
+			this.endDateYear = endDateYear;
+			this.setHasEndDate(true);
+		}
 	}
 
 	public void setEndDateMonth(String endDateMonth) {
@@ -197,6 +201,5 @@ public abstract class CommandParser {
 	}
 
 	public abstract String parse();
-
 
 }
