@@ -3,7 +3,7 @@ package main.logic;
 public class Logic {
 
 	private enum CommandType {
-		ADD, DELETE, DISPLAY, UPDATE, INVALID, EXIT
+		ADD, DELETE, DISPLAY, UPDATE, SEARCH, UNDO, REPEAT, REMIND, INVALID, EXIT
 	}
 
 	public static String uiToLogic(String userCommand) {
@@ -23,6 +23,14 @@ public class Logic {
 			return CommandType.DISPLAY;
 		} else if (commandTypeString.equalsIgnoreCase("update")) {
 			return CommandType.UPDATE;
+		} else if (commandTypeString.equalsIgnoreCase("search")) {
+			return CommandType.SEARCH;
+		} else if (commandTypeString.equalsIgnoreCase("undo")) {
+			return CommandType.UNDO;
+		} else if (commandTypeString.equalsIgnoreCase("repeat")) {
+			return CommandType.REPEAT;
+		} else if (commandTypeString.equalsIgnoreCase("remind")) {
+			return CommandType.REMIND;
 		} else if (commandTypeString.equalsIgnoreCase("exit")) {
 			return CommandType.EXIT;
 		} else {
@@ -40,8 +48,16 @@ public class Logic {
 			return displayTasks(details);
 		case UPDATE:
 			return updateTask(details);
+		case SEARCH:
+			return searchTask(details);
+		case UNDO:
+			return undo(details);
+		case REPEAT:
+			return repeatTask(details);
+		case REMIND:
+			return remindTask(details);
 		case EXIT:
-			return exit(details);
+			System.exit(0);
 		default:
 			return null;
 		}
@@ -70,10 +86,29 @@ public class Logic {
 		String message = executor.execute();
 		return message;
 	}
+	
+	private static String remindTask(String details) {
+		CommandHandler executor = new RemindHandler(details);
+		String message = executor.execute();
+		return message;
+	}
 
-	private static String exit(String details) {
-		// TODO Auto-generated method stub
-		return null;
+	private static String repeatTask(String details) {
+		CommandHandler executor = new RepeatHandler(details);
+		String message = executor.execute();
+		return message;
+	}
+
+	private static String undo(String details) {
+		CommandHandler executor = new UndoHandler(details);
+		String message = executor.execute();
+		return message;
+	}
+
+	private static String searchTask(String details) {
+		CommandHandler executor = new SearchHandler(details);
+		String message = executor.execute();
+		return message;
 	}
 
 	private static String getFirstWord(String userCommand) {
