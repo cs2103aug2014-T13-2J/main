@@ -160,6 +160,8 @@ public class TaskTest {
 		Task task = builder.buildTask();	
 		
 		task.setCompleted(true);
+		
+		assertEquals("completed: ", true, task.getCompleted());
 	}
 
 	@Test
@@ -169,24 +171,59 @@ public class TaskTest {
 		builder.setVenue("CLB");
 		Task task = builder.buildTask();
 		
-		System.out.println(task.convertToCSVFormat());
+		//System.out.println(task.convertToCSVFormat());
 		
 		builder.setStartDate(new LocalDate(2014, 10, 20));
 		builder.setEndDate(new LocalDate(2014, 11, 21));
 		task.setRecurrence("weekly");
 		task.setCompleted(true);
 		
-		System.out.println(task.convertToCSVFormat());
+		//System.out.println(task.convertToCSVFormat());
 		
 	}
-
+	
 	@Test
-	public void testToString() {
-		TaskBuilder builder = new TaskBuilder();
-		builder.setDescription("meeting");
-		builder.setVenue("CLB");
-		Task task = builder.buildTask();
+	public void testEndIsEarlierThanStart() {
+		LocalDate startDate = new LocalDate(2014, 10, 13);
+		LocalDate endDate = new LocalDate(2014, 10, 14);
+		LocalTime startTime = new LocalTime(10, 0);
+		LocalTime endTime = new LocalTime(12, 0);
+		//start earlier than end
+		assertEquals("End earlier than start: ", false, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
 		
-		//System.out.println(task);
+		startDate = new LocalDate(2014, 10, 15);
+		endDate = new LocalDate(2014, 10, 10);
+		startTime = new LocalTime(10, 0);
+		endTime = new LocalTime(12, 0);
+		//startDate later than endDate
+		assertEquals("End earlier than start: ", true, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
+		
+		startDate = new LocalDate(2014, 10, 10);
+		endDate = new LocalDate(2014, 10, 10);
+		startTime = new LocalTime(12, 0);
+		endTime = new LocalTime(10, 0);
+		//For the same date, startTime later than endTime
+		assertEquals("End earlier than start: ", true, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
+		
+		startDate = new LocalDate(2014, 10, 10);
+		endDate = new LocalDate(2014, 10, 10);
+		startTime = null;
+		endTime = null;
+		//user did not specify a startTime and endTime and startDate equals endDate
+		assertEquals("End earlier than start: ", false, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
+		
+		startDate = new LocalDate(2014, 10, 10);
+		endDate = new LocalDate(2014, 10, 12);
+		startTime = null;
+		endTime = null;
+		//user did not specify a startTime and endTime and startDate is earlier than endDate
+		assertEquals("End earlier than start: ", false, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
+		
+		startDate = new LocalDate(2014, 10, 20);
+		endDate = new LocalDate(2014, 10, 10);
+		startTime = null;
+		endTime = null;
+		//user did not specify a startTime and endTime and startDate is later than endDate
+		assertEquals("End earlier than start: ", true, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
 	}
 }

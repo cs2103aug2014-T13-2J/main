@@ -1,6 +1,7 @@
 package main.storage;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
@@ -28,13 +29,19 @@ public class Task {
 	/***************************** Constructors ************************/
 	public Task(String description, String venue, LocalDate startDate,
 			LocalTime startTime, LocalDate endDate, LocalTime endTime,
-			DateTime reminder, String recurrence, boolean completed) {
+			DateTime reminder, String recurrence, boolean completed)
+			throws IllegalArgumentException {
 		this.setDescription(description);
 		this.setVenue(venue);
 		this.setStartDate(startDate);
 		this.setStartTime(startTime);
 		this.setEndDate(endDate);
 		this.setEndTime(endTime);
+
+		if (endIsEarlierThanStart(startDate, startTime, endDate, endTime)) {
+			throw new IllegalArgumentException();
+		}
+
 		this.setReminder(reminder);
 		this.setRecurrence(recurrence);
 		this.completed = completed;
@@ -193,7 +200,6 @@ public class Task {
 			this.setHasRecurrence(true);
 			this.recurrence = recurrence;
 		}
-
 	}
 
 	public void setCompleted(boolean completed) {
@@ -245,4 +251,41 @@ public class Task {
 		return result;
 	}
 
+	public static boolean endIsEarlierThanStart(LocalDate startDate,
+			LocalTime startTime, LocalDate endDate, LocalTime endTime)throws IllegalArgumentException {
+		if (startDate == null && endDate == null) {
+			return false;
+		}
+		DateTime d1 = startDate.toDateTimeAtStartOfDay();
+		DateTime d2 = endDate.toDateTimeAtStartOfDay();
+		int compareResult = DateTimeComparator.getDateOnlyInstance().compare(d1, d2);
+		switch (compareResult) {
+		case -1: // startDate is earlier than endDate
+			return false;
+		case 0: {	// if dates are equal we compare time unless they are null
+			if (startTime == null && endTime == null) {
+				return false;
+			} else {
+				DateTime t1 = startTime.toDateTimeToday();
+				DateTime t2 = endTime.toDateTimeToday();
+				compareResult = DateTimeComparator.getTimeOnlyInstance().compare(t1, t2);
+			}
+		}	
+		case 1: // startDate is later than endDate
+			return true;
+		}
+
+		switch (compareResult) {
+		case -1: // startTime is earlier than endTime
+			return false;
+		case 0: // startTime is equal to endTime
+			return false;
+		case 1: // startTime is later than endTime
+			return true;
+		default:
+			// we should never reach this case
+			throw new IllegalArgumentException();
+		}
+
+	}
 }
