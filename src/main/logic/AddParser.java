@@ -18,10 +18,6 @@ public class AddParser extends CommandParser {
 	final static Integer DAY_INDEX = 0;
 	final static Integer MONTH_INDEX = 1;
 	final static Integer YEAR_INDEX = 2;
-	final static String DEFAULT_START_HOUR_VALUE = "00";
-	final static String DEFAULT_START_MINUTE_VALUE = "00";
-	final static String DEFAULT_END_HOUR_VALUE = "23";
-	final static String DEFAULT_END_MINUTE_VALUE = "59";
 
 	private String userInput;
 
@@ -37,9 +33,9 @@ public class AddParser extends CommandParser {
 	public String parse() {
 		String description = null, venue = null;
 		String startDate = null, startDateYear = null, startDateMonth = null, startDateDay = null;
-		String startTime = null, startTimeHour = DEFAULT_START_HOUR_VALUE, startTimeMinute = DEFAULT_START_MINUTE_VALUE;
+		String startTime = null, startTimeHour = null, startTimeMinute = null;
 		String endDate = null, endDateYear = null, endDateMonth = null, endDateDay = null;
-		String endTime = null, endTimeHour = DEFAULT_END_HOUR_VALUE, endTimeMinute = DEFAULT_END_MINUTE_VALUE;
+		String endTime = null, endTimeHour = null, endTimeMinute = null;
 
 		String[] userInput = this.getUserInput().split(" ");
 		LinkedList<String> wordsList = new LinkedList<String>(
@@ -54,25 +50,28 @@ public class AddParser extends CommandParser {
 				String nextWord = wordsList.peek();
 				// determine if next word is time or venue
 				if (representsTime(nextWord)) {
-					// if we have already parsed through start date or start
-					// time
+					// if we have already parsed through or start time
 					if (startTime == null) {
 						startTime = getTime(wordsList);
 						startTimeHour = getHour(startTime);
 						startTimeMinute = getMinute(startTime);
+						
+						//set endTime to startTime by default, in the case that user only
+						//specifies startTime without endTime
+						endTime = startTime;
+						endTimeHour = getHour(endTime);
+						endTimeMinute = getMinute(endTime);
 					} else {
 						// find endTime
 						endTime = getTime(wordsList);
-						startTimeHour = getHour(startTime);
-						startTimeMinute = getMinute(startTime);
+						endTimeHour = getHour(endTime);
+						endTimeMinute = getMinute(endTime);
 					}
 				} else {
 					// if it's not time, then the next word must represent venue
 					venue = getVenueAndTrimUserInput(wordsList);
 				}
-			} else if (currentReservedWord.equals("on")) {
-				// get date
-
+			} else if (currentReservedWord.equals("on")) { // get date
 				startDate = getDateAndTrimUserInput(wordsList);
 				endDate = startDate;
 				
