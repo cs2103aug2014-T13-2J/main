@@ -33,9 +33,10 @@ public class DisplayHandler extends CommandHandler {
 		}
 		return DISPLAY_SUCCESS_MESSAGE;
 	}
-
+	
 	public static void displayTask(int number, Task task) {
-		String result = getTaskNumber(number);
+		String result = "";
+		result += getTaskNumber(number);
 		result += getDescription(task);
 		result += getVenue(task);
 		// if a task has a start date, it will definitely have an end date, it
@@ -77,7 +78,8 @@ public class DisplayHandler extends CommandHandler {
 	private static String getTaskNumber(int number) {
 		return number + 1 + "." + SPACE;
 	}
-	private static String getDescription(Task task) {
+
+		private static String getDescription(Task task) {
 		return task.getDescription() + SPACE;
 	}
 
