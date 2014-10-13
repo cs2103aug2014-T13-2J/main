@@ -270,6 +270,7 @@ public class Task {
 				DateTime t2 = endTime.toDateTimeToday();
 				compareResult = DateTimeComparator.getTimeOnlyInstance().compare(t1, t2);
 			}
+			break;
 		}	
 		case 1: // startDate is later than endDate
 			return true;
