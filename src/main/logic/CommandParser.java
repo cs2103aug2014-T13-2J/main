@@ -117,8 +117,10 @@ public abstract class CommandParser {
 	}
 
 	public void setStartDateYear(String startDateYear) {
-		if (startDateYear != null) {
-			this.startDateYear = startDateYear;
+		this.startDateYear = startDateYear;
+		if (startDateYear == null) {
+			this.setHasStartDate(false);
+		} else {
 			this.setHasStartDate(true);
 		}
 	}
@@ -132,8 +134,10 @@ public abstract class CommandParser {
 	}
 
 	public void setEndDateYear(String endDateYear) {
-		if (endDateYear != null) {
-			this.endDateYear = endDateYear;
+		this.endDateYear = endDateYear;
+		if (endDateYear == null) {
+			this.setHasEndDate(false);
+		} else {
 			this.setHasEndDate(true);
 		}
 	}
@@ -148,7 +152,12 @@ public abstract class CommandParser {
 
 	public void setStartTimeHour(String startTimeHour) {
 		this.startTimeHour = startTimeHour;
-		this.setHasStartTime(true);
+		if(startTimeHour == null) {
+			this.setHasStartTime(false);
+		} else {
+			this.setHasStartTime(true);
+		}
+ 		
 	}
 
 	public void setStartTimeMinute(String startTimeMinute) {
@@ -157,7 +166,11 @@ public abstract class CommandParser {
 
 	public void setEndTimeHour(String endTimeHour) {
 		this.endTimeHour = endTimeHour;
-		this.setHasEndTime(true);
+		if(endTimeHour == null) {
+			this.setHasEndTime(false);
+		} else {
+			this.setHasEndTime(true);
+		}
 	}
 
 	public void setEndTimeMinute(String endTimeMinute) {
