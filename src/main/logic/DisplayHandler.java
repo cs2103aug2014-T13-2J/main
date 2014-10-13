@@ -28,14 +28,14 @@ public class DisplayHandler extends CommandHandler {
 			System.out.println(MESSAGE_EMPTY);
 		} else {
 			for (int i = 0; i < tasks.size(); i++) {
-				displayTask(tasks.get(i));
+				displayTask(i,tasks.get(i));
 			}
 		}
 		return DISPLAY_SUCCESS_MESSAGE;
 	}
 
-	public static void displayTask(Task task) {
-		String result = "";
+	public static void displayTask(int number, Task task) {
+		String result = getTaskNumber(number);
 		result += getDescription(task);
 		result += getVenue(task);
 		// if a task has a start date, it will definitely have an end date, it
@@ -74,6 +74,9 @@ public class DisplayHandler extends CommandHandler {
 		System.out.println(result);
 	}
 
+	private static String getTaskNumber(int number) {
+		return number + 1 + "." + SPACE;
+	}
 	private static String getDescription(Task task) {
 		return task.getDescription() + SPACE;
 	}

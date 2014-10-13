@@ -31,7 +31,7 @@ public class TaskTest {
 	public void tearDown() throws Exception {
 	}
 
-
+/**
 	@Test
 	public void testSetVenue() {
 		TaskBuilder builder = new TaskBuilder();
@@ -181,10 +181,10 @@ public class TaskTest {
 		//System.out.println(task.convertToCSVFormat());
 		
 	}
-	
+	**/
 	@Test
 	public void testEndIsEarlierThanStart() {
-		LocalDate startDate = new LocalDate(2014, 10, 13);
+/**		LocalDate startDate = new LocalDate(2014, 10, 13);
 		LocalDate endDate = new LocalDate(2014, 10, 14);
 		LocalTime startTime = new LocalTime(10, 0);
 		LocalTime endTime = new LocalTime(12, 0);
@@ -224,6 +224,13 @@ public class TaskTest {
 		startTime = null;
 		endTime = null;
 		//user did not specify a startTime and endTime and startDate is later than endDate
-		assertEquals("End earlier than start: ", true, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
+		assertEquals("End earlier than start: ", true, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime)); **/
+		
+		LocalDate startDate = new LocalDate(2014, 10, 20);
+		LocalDate endDate = new LocalDate(2014, 10, 20);
+		LocalTime startTime = new LocalTime(10, 0);
+		LocalTime endTime = new LocalTime(10, 0);
+		//both times are equal
+		assertEquals("End earlier than start: ", false, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
 	}
 }
