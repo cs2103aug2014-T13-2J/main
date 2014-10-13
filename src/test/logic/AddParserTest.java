@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import main.logic.AddHandler;
 import main.logic.AddParser;
 
 import org.junit.After;
@@ -34,47 +33,216 @@ public class AddParserTest {
 
 	@Test
 	public void testParse() {
-		String s1 = "add meeting with Prof at 11pm at CLB on 3/10/2014";
-		String s2 = "add meeting with Prof at CLB at 11pm on 3/10";
-		String s3 = "add meeting with Prof at CLB on 4/12 at 11pm";
-		String s4 = "add gathering on 3/10/2014";
-		String s5 = "add gathering on 3/10";
-		String s6 = "add gathering on 3 October";
-		String s7 = "add gathering on 3 October 2014";
-		String s8 = "add meeting from 3/10/2014 11pm to 4/10/2014 1am Utown";
-		String s9 = "add meeting from 3/10 to 4/10 at Utown";
-		String s10 = "add meeting from 3 October 11pm to 4 October 1am at Utown";
-		String s11 = "add meeting from 3/10 to 18/10";
-		String s12 = "add meeting with Prof on 4/12 at CLB at 11pm";
-		String s13 = "add meeting with Prof on 4/12 at 11pm at CLB";
-		
+
+	
+		String s1 = "meeting with Prof at 11pm at CLB on 3/10/2014";
 		AddParser p1 = new AddParser(s1);
-		AddParser p2 = new AddParser(s2);
-		AddParser p3 = new AddParser(s3);
-		AddParser p4 = new AddParser(s4);
-		AddParser p5 = new AddParser(s5);
-		AddParser p6 = new AddParser(s6);
-		AddParser p7 = new AddParser(s7); 
-		AddParser p8 = new AddParser(s8); 
-		AddParser p9 = new AddParser(s9); 
-		AddParser p10 = new AddParser(s10); 
-		AddParser p11 = new AddParser(s11);  
-		AddParser p12 = new AddParser(s12); 
-		AddParser p13 = new AddParser(s13);
+		p1.parse();
+		assertEquals("Description: ", "meeting with Prof", p1.getDescription());
+		assertEquals("Venue: ", "CLB", p1.getVenue());
+		assertEquals("startTimeHour: ", "23", p1.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p1.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "23", p1.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p1.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p1.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p1.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p1.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p1.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p1.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p1.getEndDateDay());
 		
-		assertEquals("Parser: ", "Parse successful.", p1.parse());
-		assertEquals("Parser: ", "Parse successful.", p2.parse());
-		assertEquals("Parser: ", "Parse successful.", p3.parse());
-		assertEquals("Parser: ", "Parse successful.", p4.parse());
-		assertEquals("Parser: ", "Parse successful.", p5.parse());
-		assertEquals("Parser: ", "Parse successful.", p6.parse());
-		assertEquals("Parser: ", "Parse successful.", p7.parse()); 
-		assertEquals("Parser: ", "Parse successful.", p8.parse());  
-		assertEquals("Parser: ", "Parse successful.", p9.parse()); 
-		assertEquals("Parser: ", "Parse successful.", p10.parse()); 
-		assertEquals("Parser: ", "Parse successful.", p11.parse()); 
-		assertEquals("Parser: ", "Parse successful.", p12.parse()); 
-		assertEquals("Parser: ", "Parse successful.", p13.parse()); 
+		String s2 = "meeting with Prof at CLB at 11pm on 3/10";
+		AddParser p2 = new AddParser(s2);
+		p2.parse();
+		assertEquals("Description: ", "meeting with Prof", p2.getDescription());
+		assertEquals("Venue: ", "CLB", p2.getVenue());
+		assertEquals("startTimeHour: ", "23", p2.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p2.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "23", p2.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p2.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p2.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p2.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p2.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p2.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p2.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p2.getEndDateDay());
+		
+		String s3 = "meeting with Prof at CLB on 4/12 at 11pm";
+		AddParser p3 = new AddParser(s3);
+		p3.parse();
+		assertEquals("Description: ", "meeting with Prof", p3.getDescription());
+		assertEquals("Venue: ", "CLB", p3.getVenue());
+		assertEquals("startTimeHour: ", "23", p3.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p3.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "23", p3.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p3.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p3.getStartDateYear());
+		assertEquals("startDateMonth: ", "12", p3.getStartDateMonth());
+		assertEquals("startDateDay: ", "4", p3.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p3.getEndDateYear());
+		assertEquals("endDateMonth: ", "12", p3.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p3.getEndDateDay());
+				
+		String s4 = "gathering on 3/10/2014";
+		AddParser p4 = new AddParser(s4);
+		p4.parse();
+		assertEquals("Description: ", "gathering", p4.getDescription());
+		assertEquals("Venue: ", null, p4.getVenue());
+		assertEquals("startTimeHour: ", null, p4.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p4.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p4.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p4.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p4.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p4.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p4.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p4.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p4.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p4.getEndDateDay());
+		
+		String s5 = "gathering on 3/10";
+		AddParser p5 = new AddParser(s5);
+		p5.parse();
+		assertEquals("Description: ", "gathering", p5.getDescription());
+		assertEquals("Venue: ", null, p5.getVenue());
+		assertEquals("startTimeHour: ", null, p5.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p5.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p5.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p5.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p5.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p5.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p5.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p5.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p5.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p5.getEndDateDay());
+		
+		
+		String s6 = "gathering on 3 October";
+		AddParser p6 = new AddParser(s6);
+		p6.parse();
+		assertEquals("Description: ", "gathering", p6.getDescription());
+		assertEquals("Venue: ", null, p6.getVenue());
+		assertEquals("startTimeHour: ", null, p6.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p6.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p6.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p6.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p6.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p6.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p6.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p6.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p6.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p6.getEndDateDay());
+		
+		String s7 = "gathering on 3 October 2014";
+		AddParser p7 = new AddParser(s7); 
+		p7.parse();
+		assertEquals("Description: ", "gathering", p7.getDescription());
+		assertEquals("Venue: ", null, p7.getVenue());
+		assertEquals("startTimeHour: ", null, p7.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p7.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p7.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p7.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p7.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p7.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p7.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p7.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p7.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p7.getEndDateDay()); 
+		
+		String s8 = "meeting from 3/10/2014 11pm to 4/10/2014 1am at Utown";
+		AddParser p8 = new AddParser(s8); 
+		p8.parse();
+		assertEquals("Description: ", "meeting", p8.getDescription());
+		assertEquals("Venue: ", "Utown", p8.getVenue());
+		assertEquals("startTimeHour: ", "23", p8.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p8.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "1", p8.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p8.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p8.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p8.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p8.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p8.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p8.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p8.getEndDateDay());
+		
+		String s9 = "meeting from 3/10 to 4/10 at Utown";
+		AddParser p9 = new AddParser(s9);
+		p9.parse();
+		assertEquals("Description: ", "meeting", p9.getDescription());
+		assertEquals("Venue: ", "Utown", p9.getVenue());
+		assertEquals("startTimeHour: ", null, p9.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p9.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p9.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p9.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p9.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p9.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p9.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p9.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p9.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p9.getEndDateDay());
+		
+		String s10 = "meeting from 3 October 11pm to 4 October 1am at Utown";
+		AddParser p10 = new AddParser(s10);
+		p10.parse();
+		assertEquals("Description: ", "meeting", p10.getDescription());
+		assertEquals("Venue: ", "Utown", p10.getVenue());
+		assertEquals("startTimeHour: ", "23", p10.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p10.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "1", p10.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p10.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p10.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p10.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p10.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p10.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p10.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p10.getEndDateDay());
+
+		String s11 = "meeting from 3/10 to 18/10";	
+		AddParser p11 = new AddParser(s11);  
+		p11.parse();
+		assertEquals("Description: ", "meeting", p11.getDescription());
+		assertEquals("Venue: ", null, p11.getVenue());
+		assertEquals("startTimeHour: ", null, p11.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p11.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p11.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p11.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p11.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p11.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p11.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p11.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p11.getEndDateMonth());
+		assertEquals("endDateDay: ", "18", p11.getEndDateDay());
+		
+		String s12 = "meeting with Prof on 4/12 at CLB at 11pm";
+		AddParser p12 = new AddParser(s12); 
+		p12.parse();
+		assertEquals("Description: ", "meeting with Prof", p12.getDescription());
+		assertEquals("Venue: ", "CLB", p12.getVenue());
+		assertEquals("startTimeHour: ", "23", p12.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p12.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "23", p12.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p12.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p12.getStartDateYear());
+		assertEquals("startDateMonth: ", "12", p12.getStartDateMonth());
+		assertEquals("startDateDay: ", "4", p12.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p12.getEndDateYear());
+		assertEquals("endDateMonth: ", "12", p12.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p12.getEndDateDay());
+		
+		String s13 = "meeting with Prof on 4/12 at 11pm at CLB";
+		AddParser p13 = new AddParser(s13);
+		p13.parse();
+		assertEquals("Description: ", "meeting with Prof", p13.getDescription());
+		assertEquals("Venue: ", "CLB", p13.getVenue());
+		assertEquals("startTimeHour: ", "23", p13.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p13.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "23", p13.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p13.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p13.getStartDateYear());
+		assertEquals("startDateMonth: ", "12", p13.getStartDateMonth());
+		assertEquals("startDateDay: ", "4", p13.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p13.getEndDateYear());
+		assertEquals("endDateMonth: ", "12", p13.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p13.getEndDateDay());
 		
 	}
 	
@@ -106,10 +274,6 @@ public class AddParserTest {
 		assertEquals("Description", "Beach party", AddParser.getDescriptionAndTrimUserInput(l6));
 		//assertEquals("Description", new IllegalArgumentException(), AddParser.getDescriptionAndTrimUserInput(l7));		assertEquals("Description", new IllegalArgumentException(), AddParser.getDescriptionAndTrimUserInput(l7));
 		assertEquals("Description", "meeting with Prof", AddParser.getDescriptionAndTrimUserInput(l8));
-
-
-
-		
 	}
 
 	@Test
