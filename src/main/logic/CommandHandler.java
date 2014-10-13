@@ -7,7 +7,6 @@ import main.storage.Task;
 
 public abstract class CommandHandler {
 	
-	final static String INVALID_INPUT_MESSAGE = "";
 	final static Integer DEFAULT_SECOND = 0;
 	final static Integer DEFAULT_MILLISECOND = 0;
 	
