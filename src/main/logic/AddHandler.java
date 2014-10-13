@@ -10,6 +10,8 @@ import main.storage.TaskBuilder;
 
 public class AddHandler extends CommandHandler {
 
+	final static String TASK_ADDED_MESSAGE = "Task added!";
+	
 	private AddParser parser;
 
 	public AddHandler(String details) {
@@ -30,7 +32,7 @@ public class AddHandler extends CommandHandler {
 		Task task = convertParsedDetailsToTask();
 		Storage storage = Storage.getInstance();
 		storage.addTask(task);
-		return null;
+		return TASK_ADDED_MESSAGE;
 	}
 	
 	public Task convertParsedDetailsToTask() {
@@ -70,7 +72,7 @@ public class AddHandler extends CommandHandler {
 			
 			LocalDate date = new LocalDate(endDateYear, endDateMonth, endDateDay);
 
-			builder.setStartDate(date);
+			builder.setEndDate(date);
 		}
 		
 		if(parser.hasEndTime()) {
