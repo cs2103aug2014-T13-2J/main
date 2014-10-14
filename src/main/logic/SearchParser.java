@@ -20,7 +20,6 @@ public class SearchParser extends CommandParser {
 
 	@Override
 	public String parse() {
-		ArrayList<Task> linesWithTheKey = new ArrayList<Task>();
 		String returnMessage = "";
 		String lowerCaseKey = "";
 
