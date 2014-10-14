@@ -2,24 +2,27 @@ package main.logic;
 
 import java.util.ArrayList;
 
+import main.storage.Task;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-
-import main.storage.Task;
 
 public class DisplayHandler extends CommandHandler {
+	
+	public static final String DISPLAY_NUM_OF_TASKS = "Total number of tasks: %d\n";
+	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-5s %-25s %-15s %-10s %-10s\n";
 	public static final String MESSAGE_EMPTY = "There is nothing to display";
-	public static final String DISPLAY_SUCCESS_MESSAGE = "Display successful.";
+	public static final String MESSAGE_DISPLAY_SUCCESS = "Display successful.";
 	public static final Integer TIME_STRING_START_INDEX = 0;
 	public static final Integer TIME_STRING_END_INDEX = 5;
-	public static final String SPACE = " ";
-	public static final String ADDED_MESSAGE = " added!";
+	public static final String STRING_SPACE = " ";
+	public static final String MESSAGE_ADDED = " added!";
+	
+	private static String result = "";
 
 	public DisplayHandler(String details) {
 		super(details);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -28,27 +31,41 @@ public class DisplayHandler extends CommandHandler {
 		if (tasks.isEmpty()) {
 			System.out.println(MESSAGE_EMPTY);
 		} else {
-			for (int i = 0; i < tasks.size(); i++) {
-				displayAllTasks(i, tasks.get(i));
+			int numberOfTasks = tasks.size();
+			result = String.format(DISPLAY_NUM_OF_TASKS, numberOfTasks);
+			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, "ID", "DESCRIPTION", "VENUE", "TIME", "DATE");
+			result += displayLineSeparator();
+			for (int j = 0; j < tasks.size(); j++) {
+				result += displayAllTasks(j, tasks.get(j));
 			}
+			result += displayLineSeparator();
 		}
-		return DISPLAY_SUCCESS_MESSAGE;
+		return result;
+	}
+
+	private static String displayLineSeparator() {
+		String lineString = "";
+		for (int i = 0; i < 70; i++) {
+			lineString += "-";
+		}
+		lineString += "\n";
+		return lineString;
 	}
 	
 	public static String displayAllTasks(int number, Task task) {
-		String result = "";
-		result = result + getTaskNumber(number) + displayTask(task);
+		result = "";
+		result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, getTaskNumber(number), task.getDescription(), task.getVenue(), task.getStartTime().getHourOfDay(), task.getStartDate());
 		return result;
 	}
 	
 	public static String displayTaskForAdd(Task task) {
-		String result = "";
-		result = result + displayTask(task) + ADDED_MESSAGE;
+		result = "";
+		result = result + displayTask(task) + MESSAGE_ADDED;
 		return result;
 	}
 	
 	public static String displayTask(Task task) {
-		String result = "";
+		result = "";
 		result += getDescription(task);
 		result += getVenue(task);
 		// if a task has a start date, it will definitely have an end date, it
@@ -88,28 +105,28 @@ public class DisplayHandler extends CommandHandler {
 	}
 
 	private static String getTaskNumber(int number) {
-		return number + 1 + "." + SPACE;
+		return number + 1 + "." + STRING_SPACE;
 	}
 
 		private static String getDescription(Task task) {
-		return task.getDescription() + SPACE;
+		return task.getDescription() + STRING_SPACE;
 	}
 
 	private static String getVenue(Task task) {
 		String venue = task.getVenue();
 		if (venue != null) {
-			return "at " + task.getVenue() + SPACE;
+			return "at " + task.getVenue() + STRING_SPACE;
 		} else {
 			return "";
 		}
 	}
 
 	private static String addFrom() {
-		return "from" + SPACE;
+		return "from" + STRING_SPACE;
 	}
 
 	private static String addTo() {
-		return "to" + SPACE;
+		return "to" + STRING_SPACE;
 	}
 
 	// this function assumes that startDate and endDate will never be null
@@ -133,39 +150,39 @@ public class DisplayHandler extends CommandHandler {
 	}
 
 	private static String addStartDate(Task task) {
-		return task.getStartDate() + SPACE;
+		return task.getStartDate() + STRING_SPACE;
 	}
 
 	private static String addStartTime(Task task) {
 		return task.getStartTime().toString()
 				.substring(TIME_STRING_START_INDEX, TIME_STRING_END_INDEX)
-				+ SPACE;
+				+ STRING_SPACE;
 	}
 
 	private static String addEndDate(Task task) {
-		return task.getEndDate() + SPACE;
+		return task.getEndDate() + STRING_SPACE;
 	}
 
 	private static String addEndTime(Task task) {
 		return task.getEndTime().toString()
 				.substring(TIME_STRING_START_INDEX, TIME_STRING_END_INDEX)
-				+ SPACE;
+				+ STRING_SPACE;
 	}
 
 	private static String addOn(Task task) {
-		return "on" + SPACE;
+		return "on" + STRING_SPACE;
 	}
 
 	private static String addAt(Task task) {
-		return "at" + SPACE;
+		return "at" + STRING_SPACE;
 	}
 
 	private static String addRecurrence(Task task) {
-		return "(" + task.getRecurrence() + ")" + SPACE;
+		return "(" + task.getRecurrence() + ")" + STRING_SPACE;
 	}
 
 	private static String addCompleted(Task task) {
-		return "(" + task.getCompleted() + ")" + SPACE;
+		return "(" + task.getCompleted() + ")" + STRING_SPACE;
 	}
 
 }
