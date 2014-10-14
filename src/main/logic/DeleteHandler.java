@@ -2,25 +2,23 @@ package main.logic;
 
 import java.util.ArrayList;
 
-import main.storage.Task;
-
 public class DeleteHandler extends CommandHandler {
 	
-	private String details;
+	private DeleteParser parser;
 
 	public DeleteHandler(String details) {
 		super(details);
-		details = this.details;
+		parser = new DeleteParser(details);
 	}
 
 	@Override
 	public String execute() {
-		ArrayList<Task> tasks = getCurrentTaskList();
-		int userIndex = Integer.valueOf(details);
-		int arrayListIndex = userIndex - 1;
-		tasks.remove(arrayListIndex);
-		String message = "Task " + userIndex + " has been deleted.";
-		return message;
+		parser.parse();
+		ArrayList<Integer> listOfIndexes = parser.getListOfIndexes();
+		for (int index : listOfIndexes) {
+			storage.deleteTask(index);
+		}
+		return "Deleted successfully!";
 	}
 
 }
