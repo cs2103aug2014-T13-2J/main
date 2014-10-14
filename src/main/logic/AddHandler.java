@@ -1,12 +1,10 @@
 package main.logic;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-
-import main.storage.Storage;
 import main.storage.Task;
 import main.storage.TaskBuilder;
+
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 
 public class AddHandler extends CommandHandler {
 
@@ -30,7 +28,6 @@ public class AddHandler extends CommandHandler {
 		}
 		
 		Task task = convertParsedDetailsToTask();
-		Storage storage = Storage.getInstance();
 		storage.addTask(task);
 		return TASK_ADDED_MESSAGE;
 	}
