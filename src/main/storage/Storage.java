@@ -54,6 +54,10 @@ public class Storage {
 		tasks.add(task);
 	}
 	
+	public void deleteTask(int index) {
+		tasks.remove(index);
+	}
+	
 	public void clearAllTasks() {
 		tasks.clear();
 	}
