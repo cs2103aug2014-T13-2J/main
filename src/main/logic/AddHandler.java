@@ -29,7 +29,7 @@ public class AddHandler extends CommandHandler {
 		
 		Task task = convertParsedDetailsToTask();
 		storage.addTask(task);
-		return TASK_ADDED_MESSAGE;
+		return DisplayHandler.displayTaskForAdd(task);
 	}
 	
 	public Task convertParsedDetailsToTask() {

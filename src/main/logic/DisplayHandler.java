@@ -15,6 +15,7 @@ public class DisplayHandler extends CommandHandler {
 	public static final Integer TIME_STRING_START_INDEX = 0;
 	public static final Integer TIME_STRING_END_INDEX = 5;
 	public static final String SPACE = " ";
+	public static final String ADDED_MESSAGE = " added!";
 
 	public DisplayHandler(String details) {
 		super(details);
@@ -28,15 +29,26 @@ public class DisplayHandler extends CommandHandler {
 			System.out.println(MESSAGE_EMPTY);
 		} else {
 			for (int i = 0; i < tasks.size(); i++) {
-				displayTask(i,tasks.get(i));
+				displayAllTasks(i, tasks.get(i));
 			}
 		}
 		return DISPLAY_SUCCESS_MESSAGE;
 	}
 	
-	public static void displayTask(int number, Task task) {
+	public static String displayAllTasks(int number, Task task) {
 		String result = "";
-		result += getTaskNumber(number);
+		result = result + getTaskNumber(number) + displayTask(task);
+		return result;
+	}
+	
+	public static String displayTaskForAdd(Task task) {
+		String result = "";
+		result = result + displayTask(task) + ADDED_MESSAGE;
+		return result;
+	}
+	
+	public static String displayTask(Task task) {
+		String result = "";
 		result += getDescription(task);
 		result += getVenue(task);
 		// if a task has a start date, it will definitely have an end date, it
@@ -71,8 +83,8 @@ public class DisplayHandler extends CommandHandler {
 		if (task.getCompleted()) {
 			result += addCompleted(task);
 		}
-		result.trim();
-		System.out.println(result);
+		result = result.trim();
+		return result;
 	}
 
 	private static String getTaskNumber(int number) {
