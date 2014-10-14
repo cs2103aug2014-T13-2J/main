@@ -37,12 +37,8 @@ public class SearchParser extends CommandParser {
 
 			for (int i = 0; i < list.size(); i++) {
 				if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
-					linesWithTheKey.add(list.get(i));
+					DisplayHandler.displayTask(i, list.get(i));
 				}
-			}
-
-			for (int i = 0; i < linesWithTheKey.size(); i++) {
-				DisplayHandler.displayTask(i, linesWithTheKey.get(i));
 			}
 
 			return returnMessage;
