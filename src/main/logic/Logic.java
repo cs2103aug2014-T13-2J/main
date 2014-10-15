@@ -19,23 +19,33 @@ public class Logic {
 	
 	
 	private static CommandType determineCommandType(String commandTypeString) {
+		TaskerLog.logSystemInfo("determineCommandType received input");
 		if (commandTypeString.equalsIgnoreCase("add")) {
+			TaskerLog.logSystemInfo("add command detected");
 			return CommandType.ADD;
 		} else if (commandTypeString.equalsIgnoreCase("delete")) {
+			TaskerLog.logSystemInfo("delete command detected");
 			return CommandType.DELETE;
 		} else if (commandTypeString.equalsIgnoreCase("display")) {
+			TaskerLog.logSystemInfo("display command detected");
 			return CommandType.DISPLAY;
 		} else if (commandTypeString.equalsIgnoreCase("update")) {
+			TaskerLog.logSystemInfo("update command detected");
 			return CommandType.UPDATE;
 		} else if (commandTypeString.equalsIgnoreCase("search")) {
+			TaskerLog.logSystemInfo("search command detected");
 			return CommandType.SEARCH;
 		} else if (commandTypeString.equalsIgnoreCase("undo")) {
+			TaskerLog.logSystemInfo("undo command detected");
 			return CommandType.UNDO;
 		} else if (commandTypeString.equalsIgnoreCase("repeat")) {
+			TaskerLog.logSystemInfo("repeat command detected");
 			return CommandType.REPEAT;
 		} else if (commandTypeString.equalsIgnoreCase("remind")) {
+			TaskerLog.logSystemInfo("remind command detected");
 			return CommandType.REMIND;
 		} else if (commandTypeString.equalsIgnoreCase("exit")) {
+			TaskerLog.logSystemInfo("exit command detected");
 			return CommandType.EXIT;
 		} else {
 			TaskerLog.logSystemInfo("Invalid command type detected.");
@@ -45,6 +55,7 @@ public class Logic {
 
 	public static String executeCommand(CommandType commandType, String details) {
 		assert (commandType != null);
+		TaskerLog.logSystemInfo("executeCommand received commandType");
 		switch (commandType) {
 		case ADD:
 			return addTask(details);
