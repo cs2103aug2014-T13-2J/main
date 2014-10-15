@@ -38,6 +38,7 @@ public class SearchParser extends CommandParser {
 				if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
 					System.out.println(DisplayHandler.displayAllTasks(i, list.get(i)));
 				}
+				else System.out.println("Search term cannot be found in task list.");
 			}
 
 			return returnMessage;
