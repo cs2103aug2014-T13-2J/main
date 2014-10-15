@@ -33,8 +33,6 @@ public class AddParserTest {
 
 	@Test
 	public void testParse() {
-
-	
 		String s1 = "meeting with Prof at 11pm at CLB on 3/10/2014";
 		AddParser p1 = new AddParser(s1);
 		p1.parse();
@@ -243,7 +241,6 @@ public class AddParserTest {
 		assertEquals("endDateYear: ", "2014", p13.getEndDateYear());
 		assertEquals("endDateMonth: ", "12", p13.getEndDateMonth());
 		assertEquals("endDateDay: ", "4", p13.getEndDateDay());
-		
 	}
 	
 	@Test

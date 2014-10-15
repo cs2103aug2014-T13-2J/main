@@ -35,9 +35,15 @@ public class Storage {
 	private static final int DAY_INDEX = 2;
 	private static final int HOUR_INDEX = 0;
 	private static final int MINUTE_INDEX = 1;
-	
+
+	/***************************** Data Members ************************/
 	private ArrayList<Task> tasks;
 	private static Storage theOne = null;
+	
+	/***************************** Constructors ************************/
+	public Storage () {
+		tasks = new ArrayList<Task>();
+	}
 	
 	public static Storage getInstance() {
 		if (theOne == null) {
@@ -46,10 +52,12 @@ public class Storage {
 		return theOne;
 	}
 	
-	public Storage () {
-		tasks = new ArrayList<Task>();
+	/***************************** Accessors ************************/
+	public ArrayList<Task> getTasks() {
+		return this.tasks;
 	}
 	
+	/****************************************************************/
 	public void addTask(Task task) {
 		tasks.add(task);
 	}
@@ -202,10 +210,6 @@ public class Storage {
 		}
 		
 		return WRITE_FROM_FILE_SUCCESS_MESSAGE;
-	}
-	
-	public ArrayList<Task> getTasks() {
-		return this.tasks;
 	}
 
 }
