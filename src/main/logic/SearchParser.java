@@ -8,6 +8,7 @@ import main.logic.DisplayHandler;
 public class SearchParser extends CommandParser {
 	public static final String MESSAGE_ERROR = "No search term specified.";
 	public static final String MESSAGE_NULL = "There is nothing to search.";
+	public static final String MESSAGE_UNAVAILABLE = "Search term cannot be found in task list.";
 	private String userInput;
 	private ArrayList<Task> list;
 
@@ -38,6 +39,7 @@ public class SearchParser extends CommandParser {
 				if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
 					System.out.println(DisplayHandler.displayAllTasks(i, list.get(i)));
 				}
+				else System.out.println(MESSAGE_UNAVAILABLE);
 			}
 
 			return returnMessage;

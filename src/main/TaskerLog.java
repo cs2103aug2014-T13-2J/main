@@ -24,9 +24,9 @@ public class TaskerLog {
 			fh = new FileHandler(fileName, false);
 			logger.addHandler(fh);
 		} catch (SecurityException e) {
-			logger.severe("TaskerLog securityException " +e.getMessage());
+			logger.severe("TaskerLog securityException " + e.getMessage());
 		} catch (IOException e) {
-			logger.severe("TaskerLog IOException "+e.getMessage());
+			logger.severe("TaskerLog IOException " + e.getMessage());
 		}
 	}
 
@@ -34,20 +34,20 @@ public class TaskerLog {
 		return fileName;
 	}
 
-	public void logException(String Exception) {
+	private void logException(String Exception) {
 
 		MyFormatter formatter = new MyFormatter("Exception: ");
 		fh.setFormatter(formatter);
 		logger.severe(Exception);
 	}
-	
-	public void logInfo(String input) {
+
+	private void logInfo(String input) {
 
 		MyFormatter formatter = new MyFormatter("Info: ");
 		fh.setFormatter(formatter);
 		logger.info(input);
 	}
-	
+
 	public static void logSystemInfo(String logInfo) {
 		TaskerLog infoLogger = TaskerLog.getInstance();
 		infoLogger.logInfo(logInfo);
@@ -58,7 +58,6 @@ public class TaskerLog {
 		exceptionLogger.logException(logMessage);
 	}
 }
-
 
 class MyFormatter extends Formatter {
 	private String callerInfo;
