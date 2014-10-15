@@ -1,5 +1,6 @@
 package main.logic;
 
+import main.TaskerLog;
 import main.storage.Task;
 import main.storage.TaskBuilder;
 
@@ -24,7 +25,8 @@ public class AddHandler extends CommandHandler {
 			//attributes
 			parser.parse();
 		} catch (IllegalArgumentException e) {
-			return e.getMessage();
+			TaskerLog.logSystemExceptionError(e.getMessage());
+			//return e.getMessage();
 		}
 		
 		Task task = convertParsedDetailsToTask();
@@ -84,5 +86,6 @@ public class AddHandler extends CommandHandler {
 		return builder.buildTask();
 		
 	}
-
+	
+	
 }

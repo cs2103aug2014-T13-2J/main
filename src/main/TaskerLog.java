@@ -34,14 +34,14 @@ public class TaskerLog {
 		return fileName;
 	}
 
-	public void logException(String Exception) {
+	private void logException(String Exception) {
 
 		MyFormatter formatter = new MyFormatter("Exception: ");
 		fh.setFormatter(formatter);
 		logger.severe(Exception);
 	}
 
-	public void logInfo(String input) {
+	private void logInfo(String input) {
 
 		MyFormatter formatter = new MyFormatter("Info: ");
 		fh.setFormatter(formatter);
