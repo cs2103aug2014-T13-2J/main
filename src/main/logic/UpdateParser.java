@@ -55,7 +55,27 @@ public class UpdateParser extends CommandParser {
 			throw new IllegalArgumentException(MESSAGE_INVALID_FIELD);
 		}
 	}
+	
+	/****************************************************************/
+	@Override
+	public String parse() {
+		String[] userInput = this.getUserInput().split(" ");
+		LinkedList<String> wordsList = new LinkedList<String>(
+				Arrays.asList(userInput));
 
+		String taskNumber = wordsList.get(INDEX_FIRST_WORD);
+		setTaskNumber(taskNumber);
+		wordsList.poll();
+
+		String field = wordsList.get(INDEX_FIRST_WORD);
+		if(isValidField(field)){
+			wordsList.poll(); //remove field from user input
+			String details = getDetails(wordsList);
+			setFieldAndDetails(field, details, wordsList);
+		}
+		return MESSAGE_PARSE_SUCCESS;
+	}
+	
 	private boolean isValidField(String field) {
 		if (field.equals(FIELD_DESCRIPTION) || field.equals(FIELD_START)
 				|| field.equals(FIELD_END)
@@ -102,30 +122,6 @@ public class UpdateParser extends CommandParser {
 			setCompleted(details);
 			this.setField(FIELD_COMPLETED);
 		}
-	}
-
-	@Override
-	public String parse() {
-		String[] userInput = this.getUserInput().split(" ");
-		LinkedList<String> wordsList = new LinkedList<String>(
-				Arrays.asList(userInput));
-
-		String taskNumber = wordsList.get(INDEX_FIRST_WORD);
-		setTaskNumber(taskNumber);
-		wordsList.poll();
-
-		String field = wordsList.get(INDEX_FIRST_WORD);
-		if(isValidField(field)){
-			wordsList.poll(); //remove field from user input
-			String details = getDetails(wordsList);
-			setFieldAndDetails(field, details, wordsList);
-		}
-		
-
-		
-		
-
-		return MESSAGE_PARSE_SUCCESS;
 	}
 	
 	private static String getDetails(LinkedList<String> wordsList) {

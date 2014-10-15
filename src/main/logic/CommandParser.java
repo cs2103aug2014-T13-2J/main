@@ -244,7 +244,8 @@ public abstract class CommandParser {
 	private void setHasEndTime(boolean hasEndTime) {
 		this.hasEndTime = hasEndTime;
 	}
-
+	
+	/****************************************************************/
 	public abstract String parse();
 
 	// This function assumes that any of the reserved words will not be part of

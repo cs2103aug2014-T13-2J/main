@@ -1,7 +1,17 @@
 package main.logic;
 
+import java.util.ArrayList;
+
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+
+import main.storage.Storage;
+import main.storage.Task;
+
 public class UpdateHandler extends CommandHandler {
-	
+
+	private final static String MESSAGE_TASK_NOT_FOUND = "Sorry we couldn't find that task. Please try again.";
+
 	private UpdateParser parser;
 
 	public UpdateHandler(String details) {
@@ -12,31 +22,106 @@ public class UpdateHandler extends CommandHandler {
 	@Override
 	public String execute() {
 		try {
-			//parser will analyze the user input and store each piece of information into its respective
-			//attributes
+			// parser will analyze the user input and store each piece of
+			// information into its respective
+			// attributes
 			parser.parse();
+			String field = parser.getField();
+			Task task = getTask(parser.getTaskNumber());
+
+			if (field.equals(UpdateParser.FIELD_DESCRIPTION)) {
+				task.setDescription(parser.getDescription());
+			} else if (field.equals(UpdateParser.FIELD_START_DATE)) {
+				updateStartDate(task, parser);
+			} else if (field.equals(UpdateParser.FIELD_START_TIME)) {
+				updateStartTime(task, parser);
+			} else if (field.equals(UpdateParser.FIELD_END_DATE)) {
+				updateEndDate(task, parser);
+			} else if (field.equals(UpdateParser.FIELD_END_TIME)) {
+				updateEndTime(task, parser);
+			} else if (field.equals(UpdateParser.FIELD_RECURRENCE)) {
+				updateRecurrence(task, parser);
+			} else if (field.equals(UpdateParser.FIELD_REMINDER)) {
+				updateReminder(task, parser);
+			} else { // FIELD_COMPLETED
+				updateCompleted(task, parser);
+			}
+			String successMessage = getSuccessMessage(parser);
+			return successMessage;
+			
 		} catch (IllegalArgumentException e) {
 			return e.getMessage();
+		} catch (IndexOutOfBoundsException e) {
+			return MESSAGE_TASK_NOT_FOUND;
 		}
-		String field = parser.getField();
-		if(field.equals(UpdateParser.FIELD_DESCRIPTION)) {
-			//get task
-			//update task
-		} else if (field.equals(UpdateParser.FIELD_START_DATE)) {
-			
-		} else if (field.equals(UpdateParser.FIELD_START_TIME)) {
-			
-		} else if (field.equals(UpdateParser.FIELD_END_DATE)) {
-			
-		} else if (field.equals(UpdateParser.FIELD_END_TIME)) {
-			
-		} else if (field.equals(UpdateParser.FIELD_RECURRENCE)) {
-			
-		} else if (field.equals(UpdateParser.FIELD_REMINDER)) {
-			
-		} else { //FIELD_COMPLETED
-			
+	}
+
+	private static Task getTask(Integer number) {
+		Storage storage = Storage.getInstance();
+		ArrayList<Task> tasks = storage.getTasks();
+		return tasks.get(number - 1);
+	}
+
+	private static void updateStartDate(Task task, UpdateParser parser) {
+		Integer startDateYear = Integer.parseInt(parser.getStartDateYear());
+		Integer startDateMonth = Integer.parseInt(parser.getStartDateMonth());
+		Integer startDateDay = Integer.parseInt(parser.getStartDateDay());
+
+		LocalDate newStartDate = new LocalDate(startDateYear, startDateMonth,
+				startDateDay);
+		task.setStartDate(newStartDate);
+	}
+
+	private static void updateEndDate(Task task, UpdateParser parser) {
+		Integer endDateYear = Integer.parseInt(parser.getEndDateYear());
+		Integer endDateMonth = Integer.parseInt(parser.getEndDateMonth());
+		Integer endDateDay = Integer.parseInt(parser.getEndDateDay());
+
+		LocalDate newEndDate = new LocalDate(endDateYear, endDateMonth,
+				endDateDay);
+		task.setEndDate(newEndDate);
+	}
+
+	private static void updateStartTime(Task task, UpdateParser parser) {
+		Integer startTimeHour = Integer.parseInt(parser.getStartTimeHour());
+		Integer startTimeMinute = Integer.parseInt(parser.getStartTimeMinute());
+
+		LocalTime newStartTime = new LocalTime(startTimeHour, startTimeMinute);
+
+		task.setStartTime(newStartTime);
+	}
+
+	private static void updateEndTime(Task task, UpdateParser parser) {
+		Integer endTimeHour = Integer.parseInt(parser.getEndTimeHour());
+		Integer endTimeMinute = Integer.parseInt(parser.getEndTimeMinute());
+
+		LocalTime newEndTime = new LocalTime(endTimeHour, endTimeMinute);
+
+		task.setStartTime(newEndTime);
+	}
+
+	private static void updateRecurrence(Task task, UpdateParser parser) {
+		task.setRecurrence(parser.getRecurrence());
+	}
+
+	private static void updateReminder(Task task, UpdateParser parser) {
+		// don't know do what
+	}
+
+	// this function assumes that parser's completed attribute will only either
+	// be "true" or "false"
+	private static void updateCompleted(Task task, UpdateParser parser) {
+		String trueFalse = parser.getCompleted();
+		if (trueFalse.equals("true")) {
+			task.setCompleted(true);
+		} else {
+			task.setCompleted(false);
 		}
-		return null;
+	}
+	
+	private static String getSuccessMessage(UpdateParser parser) {
+		String result;
+		result = "Task " + parser.getTaskNumber().toString() + "'s" + parser.getField() + " updated!";
+		return result;
 	}
 }
