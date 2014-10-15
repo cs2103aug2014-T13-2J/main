@@ -11,6 +11,7 @@ public class Task {
 
 	/***************************** Data Members ************************/
 	private String description;
+	private boolean hasVenue = false;
 	private String venue = null;
 	private boolean hasStartDate = false;
 	private LocalDate startDate = null;
@@ -50,6 +51,10 @@ public class Task {
 	/***************************** Accessors ************************/
 	public String getDescription() {
 		return description;
+	}
+	
+	public boolean getHasVenue() {
+		return hasVenue;
 	}
 
 	public String getVenue() {
@@ -112,9 +117,19 @@ public class Task {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	public void setHasVenue(boolean hasVenue) {
+		this.hasVenue = hasVenue;
+	}
 
 	public void setVenue(String venue) {
 		this.venue = venue;
+		
+		if (venue != null) {
+			this.setHasVenue(true);
+		} else {
+			this.setHasVenue(false);
+		}
 	}
 
 	public void setHasStartDate(boolean hasStartDate) {
