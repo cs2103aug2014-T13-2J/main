@@ -1,11 +1,14 @@
 package main.logic;
 
+import main.TaskerLog;
+
+
 public class Logic {
 
 	private enum CommandType {
 		ADD, DELETE, DISPLAY, UPDATE, SEARCH, UNDO, REPEAT, REMIND, INVALID, EXIT
 	}
-
+	
 	public static String uiToLogic(String userCommand) {
 		String commandTypeString = getFirstWord(userCommand);
 		CommandType commandType = determineCommandType(commandTypeString);
@@ -13,7 +16,8 @@ public class Logic {
 		String message = executeCommand(commandType, details);
 		return message;
 	}
-
+	
+	
 	private static CommandType determineCommandType(String commandTypeString) {
 		if (commandTypeString.equalsIgnoreCase("add")) {
 			return CommandType.ADD;
@@ -34,11 +38,13 @@ public class Logic {
 		} else if (commandTypeString.equalsIgnoreCase("exit")) {
 			return CommandType.EXIT;
 		} else {
+			TaskerLog.logSystemInfo("Invalid command type detected.");
 			return CommandType.INVALID;
 		}
 	}
 
 	public static String executeCommand(CommandType commandType, String details) {
+		assert (commandType != null);
 		switch (commandType) {
 		case ADD:
 			return addTask(details);
@@ -59,6 +65,7 @@ public class Logic {
 		case EXIT:
 			System.exit(0);
 		default:
+			TaskerLog.logSystemInfo("Unable to execute invalid command type.");
 			return null;
 		}
 	}
