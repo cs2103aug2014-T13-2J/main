@@ -49,7 +49,7 @@ public class AddHandlerTest {
 		String s5 = "gathering on 3/10";
 		CommandHandler e5 = new AddHandler(s5);
 		assertEquals("Success message: ", "gathering on 2014-10-03 added!", e5.execute());
-	
+
 		String s6 = "gathering on 3 October";	
 		CommandHandler e6 = new AddHandler(s6);
 		assertEquals("Success message: ", "gathering on 2014-10-03 added!", e6.execute());

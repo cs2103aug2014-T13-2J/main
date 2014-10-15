@@ -31,6 +31,8 @@ public class UpdateHandler extends CommandHandler {
 
 			if (field.equals(UpdateParser.FIELD_DESCRIPTION)) {
 				task.setDescription(parser.getDescription());
+			} else if (field.equals(UpdateParser.FIELD_VENUE)) {
+				task.setVenue(parser.getVenue());
 			} else if (field.equals(UpdateParser.FIELD_START_DATE)) {
 				updateStartDate(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_START_TIME)) {
@@ -43,12 +45,14 @@ public class UpdateHandler extends CommandHandler {
 				updateRecurrence(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_REMINDER)) {
 				updateReminder(task, parser);
-			} else { // FIELD_COMPLETED
-				updateCompleted(task, parser);
+			} else if (field.equals(UpdateParser.FIELD_COMPLETE)) {
+				task.setCompleted(true);
+			} else {
+				task.setCompleted(false);
 			}
 			String successMessage = getSuccessMessage(parser);
 			return successMessage;
-			
+
 		} catch (IllegalArgumentException e) {
 			return e.getMessage();
 		} catch (IndexOutOfBoundsException e) {
@@ -56,7 +60,7 @@ public class UpdateHandler extends CommandHandler {
 		}
 	}
 
-	private static Task getTask(Integer number) {
+	public static Task getTask(Integer number) {
 		Storage storage = Storage.getInstance();
 		ArrayList<Task> tasks = storage.getTasks();
 		return tasks.get(number - 1);
@@ -92,12 +96,12 @@ public class UpdateHandler extends CommandHandler {
 	}
 
 	private static void updateEndTime(Task task, UpdateParser parser) {
-		Integer endTimeHour = Integer.parseInt(parser.getEndTimeHour());
-		Integer endTimeMinute = Integer.parseInt(parser.getEndTimeMinute());
+		int endTimeHour = Integer.parseInt(parser.getEndTimeHour());
+		int endTimeMinute = Integer.parseInt(parser.getEndTimeMinute());
 
 		LocalTime newEndTime = new LocalTime(endTimeHour, endTimeMinute);
 
-		task.setStartTime(newEndTime);
+		task.setEndTime(newEndTime);
 	}
 
 	private static void updateRecurrence(Task task, UpdateParser parser) {
@@ -108,20 +112,16 @@ public class UpdateHandler extends CommandHandler {
 		// don't know do what
 	}
 
-	// this function assumes that parser's completed attribute will only either
-	// be "true" or "false"
-	private static void updateCompleted(Task task, UpdateParser parser) {
-		String trueFalse = parser.getCompleted();
-		if (trueFalse.equals("true")) {
-			task.setCompleted(true);
-		} else {
-			task.setCompleted(false);
-		}
-	}
-	
 	private static String getSuccessMessage(UpdateParser parser) {
 		String result;
-		result = "Task " + parser.getTaskNumber().toString() + "'s" + parser.getField() + " updated!";
+		String field = parser.getField();
+		if(field.equals(UpdateParser.FIELD_COMPLETE)) {
+			result = "Task " + parser.getTaskNumber().toString() + " marked completed!"; 
+		} else if (field.equals(UpdateParser.FIELD_INCOMPLETE)) {
+			result = "Task " + parser.getTaskNumber().toString() + " marked incomplete!";
+		} else {
+			result = "Task " + parser.getTaskNumber().toString() + "'s " + parser.getField() + " updated!";
+		}
 		return result;
 	}
 }
