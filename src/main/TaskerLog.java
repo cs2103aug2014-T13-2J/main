@@ -23,6 +23,7 @@ public class TaskerLog {
 		try {
 			fh = new FileHandler(fileName, false);
 			logger.addHandler(fh);
+			logger.setUseParentHandlers(false);
 		} catch (SecurityException e) {
 			logger.severe("TaskerLog securityException " + e.getMessage());
 		} catch (IOException e) {

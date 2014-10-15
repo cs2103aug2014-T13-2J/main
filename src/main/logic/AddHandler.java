@@ -26,7 +26,7 @@ public class AddHandler extends CommandHandler {
 			parser.parse();
 		} catch (IllegalArgumentException e) {
 			TaskerLog.logSystemExceptionError(e.getMessage());
-			//return e.getMessage();
+			return e.getMessage();
 		}
 		
 		Task task = convertParsedDetailsToTask();
