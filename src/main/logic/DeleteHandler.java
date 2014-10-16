@@ -2,9 +2,12 @@ package main.logic;
 
 import java.util.ArrayList;
 
+import main.storage.Storage;
+
 public class DeleteHandler extends CommandHandler {
 	
 	private DeleteParser parser;
+	private static Storage storage = Storage.getInstance();
 
 	public DeleteHandler(String details) {
 		super(details);
