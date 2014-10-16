@@ -2,6 +2,7 @@ package main.logic;
 
 import java.util.ArrayList;
 
+import main.storage.Storage;
 import main.storage.Task;
 
 import org.joda.time.DateTime;
@@ -20,6 +21,7 @@ public class DisplayHandler extends CommandHandler {
 	public static final String MESSAGE_ADDED = " added!";
 	
 	private static String result;
+	private static Storage storage = Storage.getInstance();
 
 	public DisplayHandler(String details) {
 		super(details);
@@ -27,7 +29,7 @@ public class DisplayHandler extends CommandHandler {
 
 	@Override
 	public String execute() {
-		ArrayList<Task> tasks = getCurrentTaskList();
+		ArrayList<Task> tasks = storage.getTasks();
 		result = "";
 		if (tasks.isEmpty()) {
 			System.out.println(MESSAGE_EMPTY);

@@ -1,6 +1,10 @@
 package main.logic;
 
+import main.storage.Storage;
+
 public class RemindHandler extends CommandHandler {
+	
+	private static Storage storage = Storage.getInstance();
 
 	public RemindHandler(String details) {
 		super(details);

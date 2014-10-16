@@ -1,6 +1,7 @@
 package main.logic;
 
 import main.TaskerLog;
+import main.storage.Storage;
 import main.storage.Task;
 import main.storage.TaskBuilder;
 
@@ -12,6 +13,7 @@ public class AddHandler extends CommandHandler {
 	final static String TASK_ADDED_MESSAGE = "Task added!";
 	
 	private AddParser parser;
+	private static Storage storage = Storage.getInstance();
 
 	public AddHandler(String details) {
 		super(details);

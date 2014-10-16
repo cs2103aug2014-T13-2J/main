@@ -13,6 +13,7 @@ public class UpdateHandler extends CommandHandler {
 	private final static String MESSAGE_TASK_NOT_FOUND = "Sorry we couldn't find that task. Please try again.";
 
 	private UpdateParser parser;
+	private static Storage storage = Storage.getInstance();
 
 	public UpdateHandler(String details) {
 		super(details);
