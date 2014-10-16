@@ -2,6 +2,7 @@ package main.ui;
 import java.util.Scanner;
 import java.io.IOException;
 
+import main.TaskerLog;
 import main.logic.Logic;
 
 public class UI {
@@ -12,6 +13,7 @@ public class UI {
 	public static final String MESSAGE_EMPTY = "File is empty.";
 	
 	public static void initializeEnvironment() {
+		TaskerLog.logSystemInfo("Tasker initialized.");
 		System.out.println(MESSAGE_WELCOME);
 	}
 	
@@ -20,6 +22,7 @@ public class UI {
 		while(true){
 			System.out.println(MESSAGE_PROMPT);
 			String userCommand = scanner.nextLine();
+			TaskerLog.logSystemInfo("User entered:" + userCommand);
 			System.out.println(Logic.uiToLogic(userCommand));
 		}
 	}
