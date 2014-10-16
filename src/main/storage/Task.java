@@ -40,7 +40,7 @@ public class Task {
 		this.setEndTime(endTime);
 
 		if (endIsEarlierThanStart(startDate, startTime, endDate, endTime)) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Sorry, end time cannot be earlier than start time.");
 		}
 
 		this.setReminder(reminder);

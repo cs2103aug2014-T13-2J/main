@@ -24,14 +24,13 @@ public class AddHandler extends CommandHandler {
 			//parser will analyze the user input and store each piece of information into its respective
 			//attributes
 			parser.parse();
+			Task task = convertParsedDetailsToTask();
+			storage.addTask(task);
+			return DisplayHandler.displayTaskForAdd(task);
 		} catch (IllegalArgumentException e) {
 			TaskerLog.logSystemExceptionError(e.getMessage());
 			return e.getMessage();
 		}
-		
-		Task task = convertParsedDetailsToTask();
-		storage.addTask(task);
-		return DisplayHandler.displayTaskForAdd(task);
 	}
 	
 	public Task convertParsedDetailsToTask() {

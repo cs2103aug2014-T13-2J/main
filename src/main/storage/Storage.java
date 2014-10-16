@@ -41,7 +41,7 @@ public class Storage {
 	private static Storage theOne = null;
 	
 	/***************************** Constructors ************************/
-	public Storage () {
+	private Storage () {
 		tasks = new ArrayList<Task>();
 	}
 	
