@@ -54,7 +54,7 @@ public class Logic {
 	}
 
 	public static String executeCommand(CommandType commandType, String details) {
-		assert (false);
+//		assert (false);
 		TaskerLog.logSystemInfo("executeCommand received commandType");
 		switch (commandType) {
 		case ADD:
