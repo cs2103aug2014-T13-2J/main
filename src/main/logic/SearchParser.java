@@ -52,7 +52,6 @@ public class SearchParser extends CommandParser {
 
 	}
 
-	@SuppressWarnings("unused")
 	public boolean isWithin(String input) {
 
 		lowerCaseKey = userInput.toLowerCase();
@@ -60,14 +59,9 @@ public class SearchParser extends CommandParser {
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
 				return true;
-
-			}
-
-			else {
-				return false;
 			}
 		}
 
-		return true;
+		return false;
 	}
 }
