@@ -9,6 +9,8 @@ public class SearchParser extends CommandParser {
 	public static final String MESSAGE_ERROR = "No search term specified.";
 	public static final String MESSAGE_NULL = "There is nothing to search.";
 	public static final String MESSAGE_UNAVAILABLE = "Search term cannot be found in task list.";
+	public static String returnMessage = "";
+	public static String lowerCaseKey = "";
 
 	private String userInput;
 	private ArrayList<Task> list;
@@ -22,8 +24,6 @@ public class SearchParser extends CommandParser {
 
 	@Override
 	public String parse() {
-		String returnMessage = "";
-		String lowerCaseKey = "";
 
 		if (list.isEmpty()) {
 			return MESSAGE_NULL;
@@ -33,19 +33,41 @@ public class SearchParser extends CommandParser {
 			return MESSAGE_ERROR;
 		}
 
+		else if (!isWithin(userInput)) {
+			return MESSAGE_UNAVAILABLE;
+		}
+
 		else {
 			lowerCaseKey = userInput.toLowerCase();
 
 			for (int i = 0; i < list.size(); i++) {
 				if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
-					System.out.println(DisplayHandler.displayTaskInTable(i, list.get(i)));
+					System.out.println(DisplayHandler.displayTaskInTable(i,
+							list.get(i)));
 				}
-				else System.out.println(MESSAGE_UNAVAILABLE);
 			}
 
 			return returnMessage;
-
 		}
 
+	}
+
+	@SuppressWarnings("unused")
+	public boolean isWithin(String input) {
+
+		lowerCaseKey = userInput.toLowerCase();
+
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
+				return true;
+
+			}
+
+			else {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

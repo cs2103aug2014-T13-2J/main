@@ -10,16 +10,23 @@ import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalDate;
 
 public class DisplayHandler extends CommandHandler {
-	
+
 	public static final String DISPLAY_NUM_OF_TASKS = "Total number of tasks: %d\n";
-	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-5s %-25s %-15s %-15s %-10s\n";
+	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-10s %-50s %-30s %-30s %-20s\n";
+	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT_EXTRA = "%-3s %-50s %-30s %-15s %-10s\n";
 	public static final String MESSAGE_EMPTY = "There is nothing to display";
 	public static final String MESSAGE_DISPLAY_SUCCESS = "Display successful.";
 	public static final Integer TIME_STRING_START_INDEX = 0;
 	public static final Integer TIME_STRING_END_INDEX = 5;
 	public static final String STRING_SPACE = " ";
 	public static final String MESSAGE_ADDED = " added!";
-	
+	public static final String RED = "\u001B[0;31m";
+	public static final String GREEN = "\u001B[0;32m";
+	public static final String BLUE = "\u001B[0;34m";
+	public static final String MAGENTA = "\u001B[0;35m";
+	public static final String CYAN = "\u001B[0;36m";
+	public static final String BLACK = "\u001B[0;30m";
+
 	private static String result;
 	private static Storage storage = Storage.getInstance();
 
@@ -36,7 +43,9 @@ public class DisplayHandler extends CommandHandler {
 		} else {
 			int numberOfTasks = tasks.size();
 			result = String.format(DISPLAY_NUM_OF_TASKS, numberOfTasks);
-			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, "ID", "DESCRIPTION", "VENUE", "TIME", "DATE");
+			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, RED + "ID"
+					+ BLACK, MAGENTA + " DESCRIPTION" + BLACK, CYAN + " VENUE"
+					+ BLACK, BLUE + " TIME" + BLACK, GREEN + " DATE" + BLACK);
 			result += displayLineSeparator();
 			for (int j = 0; j < tasks.size(); j++) {
 				result += displayTaskInTable(j, tasks.get(j));
@@ -54,27 +63,27 @@ public class DisplayHandler extends CommandHandler {
 		lineString += "\n";
 		return lineString;
 	}
-	
+
 	public static String displayTaskInTable(int number, Task task) {
 		result = "";
 		String taskNumber = getTaskNumber(number);
 		String taskDescription = task.getDescription();
 		String taskDescriptionExtra = "";
-		if (taskDescription.length() >= 25) {
-			taskDescriptionExtra = taskDescription.substring(24);
-			taskDescription = taskDescription.substring(0, 24);
+		if (taskDescription.length() >= 30) {
+			taskDescriptionExtra = taskDescription.substring(30);
+			taskDescription = taskDescription.substring(0, 30);
 		}
-		
+
 		String taskVenue = "-";
 		String taskVenueExtra = "";
 		if (task.getHasVenue()) {
 			taskVenue = task.getVenue();
 			if (taskVenue.length() >= 15) {
-				taskVenueExtra = taskVenue.substring(14);
-				taskVenue = taskVenue.substring(0, 14);
+				taskVenueExtra = taskVenue.substring(15);
+				taskVenue = taskVenue.substring(0, 15);
 			}
 		}
-		
+
 		String taskTime = "-";
 		if (task.getHasStartTime()) {
 			taskTime = addStartTime(task);
@@ -82,7 +91,7 @@ public class DisplayHandler extends CommandHandler {
 				taskTime += "to " + addEndTime(task);
 			}
 		}
-		
+
 		String taskDate = "-";
 		if (task.getHasStartDate()) {
 			taskDate = addStartDate(task);
@@ -90,27 +99,33 @@ public class DisplayHandler extends CommandHandler {
 				taskDate += "to " + addEndDate(task);
 			}
 		}
-		
-		result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, taskNumber, taskDescription, taskVenue, taskTime, taskDate);
+
+		result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, RED
+				+ taskNumber + BLACK, MAGENTA + taskDescription + BLACK, CYAN
+				+ taskVenue + BLACK, BLUE + taskTime + BLACK, GREEN + taskDate
+				+ BLACK);
 		if (!taskDescriptionExtra.isEmpty() || !taskVenueExtra.isEmpty()) {
-			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, "", taskDescriptionExtra, taskVenueExtra, "", "");
+			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT_EXTRA, "",
+					MAGENTA + taskDescriptionExtra + BLACK, CYAN
+							+ taskVenueExtra + BLACK, "", "");
 		}
 		return result;
 	}
-	
+
 	public static String displayTaskForAdd(Task task) {
 		result = "";
 		result = result + displayTask(task) + MESSAGE_ADDED;
 		return result;
 	}
-	
+
 	public static String displayTask(Task task) {
 		result = "";
 		result += getDescription(task);
 		result += getVenue(task);
 		// if a task has a start date, it will definitely have an end date, it
 		// just depends whether they are equal
-		if (task.getHasStartDate() && !startDateEqualsEndDate(task)) { // append "from.. ..to"
+		if (task.getHasStartDate() && !startDateEqualsEndDate(task)) { // append
+																		// "from.. ..to"
 			result += addFrom();
 			result += addStartDate(task);
 			if (task.getHasStartTime()) {
@@ -148,8 +163,8 @@ public class DisplayHandler extends CommandHandler {
 		return number + 1 + "." + STRING_SPACE;
 	}
 
-		private static String getDescription(Task task) {
-		return task.getDescription() + STRING_SPACE;
+	private static String getDescription(Task task) {
+		return (task.getDescription() + STRING_SPACE);
 	}
 
 	private static String getVenue(Task task) {
