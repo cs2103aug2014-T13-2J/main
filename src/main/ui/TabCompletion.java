@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import main.logic.Logic;
+import jline.ArgumentCompletor;
 import jline.ConsoleReader;
 import jline.MultiCompletor;
 import jline.SimpleCompletor;
@@ -26,11 +27,11 @@ public class TabCompletion {
 	public void run() throws IOException {
 		ConsoleReader reader = new ConsoleReader();
 		reader.addCompletor(new SimpleCompletor(new String[] {
-				"These are the commands available:\n",
-				"help  add  delete  display  search  update  exit" }));
+				"\nThese are the commands available:",
+				" help  add  delete  display  search  update  exit" }));
 		
 		completors.add(new SimpleCompletor(new String[] { "add" , "search", "update", "exit", "help", "display", "delete" }));
-		reader.addCompletor(new MultiCompletor(completors));
+		reader.addCompletor(new ArgumentCompletor(completors));
 		
 		while ((line = readLine(reader, "")) != null) {
 			if ("help".equals(line)) {
