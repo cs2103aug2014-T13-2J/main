@@ -7,7 +7,7 @@ import main.logic.DisplayHandler;
 
 public class SearchParser extends CommandParser {
 	public static final String MESSAGE_ERROR = "No search term specified.";
-	public static final String MESSAGE_NULL = "There is nothing to search.";
+	public static final String MESSAGE_NULL = "Task list is empty. There is nothing to search from.";
 	public static final String MESSAGE_UNAVAILABLE = "Search term cannot be found in task list.";
 	public static String returnMessage = "";
 	public static String lowerCaseKey = "";
