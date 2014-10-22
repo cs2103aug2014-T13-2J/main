@@ -107,7 +107,7 @@ public class UpdateParser extends CommandParser {
 			this.setField(FIELD_VENUE);
 		} else if (field.equals(UpdateParser.FIELD_START)) {
 			if (representsTime(details)) {
-				String startTime = getTime(wordsList);
+				String startTime = getTimeAndTrimUserInput(wordsList);
 				setStartTime(startTime);
 				this.setField(FIELD_START_TIME);
 			} else {
@@ -117,7 +117,7 @@ public class UpdateParser extends CommandParser {
 			}
 		} else if (field.equals(UpdateParser.FIELD_END)) {
 			if (representsTime(details)) {
-				String endTime = getTime(wordsList);
+				String endTime = getTimeAndTrimUserInput(wordsList);
 				setEndTime(endTime);
 				this.setField(FIELD_END_TIME);
 			} else {

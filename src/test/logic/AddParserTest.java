@@ -241,6 +241,54 @@ public class AddParserTest {
 		assertEquals("endDateYear: ", "2014", p13.getEndDateYear());
 		assertEquals("endDateMonth: ", "12", p13.getEndDateMonth());
 		assertEquals("endDateDay: ", "4", p13.getEndDateDay());
+		
+		String s14 = "meeting with Prof on 22/10 from 10am to 12pm";
+		AddParser p14 = new AddParser(s14);
+		p14.parse();
+		assertEquals("Description: ", "meeting with Prof", p14.getDescription());
+		assertEquals("Venue: ", null, p14.getVenue());
+		assertEquals("startTimeHour: ", "10", p14.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p14.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "12", p14.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p14.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p14.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p14.getStartDateMonth());
+		assertEquals("startDateDay: ", "22", p14.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p14.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p14.getEndDateMonth());
+		assertEquals("endDateDay: ", "22", p14.getEndDateDay());
+		
+		String s15 = "meeting with Prof on Sunday";
+		AddParser p15 = new AddParser(s15);
+		p15.parse();
+		assertEquals("Description: ", "meeting with Prof", p15.getDescription());
+		assertEquals("Venue: ", null, p15.getVenue());
+		assertEquals("startTimeHour: ", null, p15.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p15.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p15.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p15.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p15.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p15.getStartDateMonth());
+		assertEquals("startDateDay: ", "26", p15.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p15.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p15.getEndDateMonth());
+		assertEquals("endDateDay: ", "26", p15.getEndDateDay());
+		
+		String s16 = "meeting with Prof next Friday from 11am to 2pm";
+		AddParser p16 = new AddParser(s16);
+		p16.parse();
+		assertEquals("Description: ", "meeting with Prof", p16.getDescription());
+		assertEquals("Venue: ", null, p16.getVenue());
+		assertEquals("startTimeHour: ", "11", p16.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p16.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "14", p16.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p16.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p16.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p16.getStartDateMonth());
+		assertEquals("startDateDay: ", "31", p16.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p16.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p16.getEndDateMonth());
+		assertEquals("endDateDay: ", "31", p16.getEndDateDay());
 	}
 	
 	@Test
@@ -330,10 +378,10 @@ public class AddParserTest {
 		String s4 = "9.30pm at CLB";
 		LinkedList<String> l4 = new LinkedList<String>(Arrays.asList(s4.split(" ")));
 		
-		assertEquals("Time: ", "9.0", AddParser.getTime(l1));
-		assertEquals("Time: ", "12.0", AddParser.getTime(l2));
-		assertEquals("Time: ", "0.30", AddParser.getTime(l3));
-		assertEquals("Time: ", "21.30", AddParser.getTime(l4));
+		assertEquals("Time: ", "9.0", AddParser.getTimeAndTrimUserInput(l1));
+		assertEquals("Time: ", "12.0", AddParser.getTimeAndTrimUserInput(l2));
+		assertEquals("Time: ", "0.30", AddParser.getTimeAndTrimUserInput(l3));
+		assertEquals("Time: ", "21.30", AddParser.getTimeAndTrimUserInput(l4));
 	}
 
 	@Test
