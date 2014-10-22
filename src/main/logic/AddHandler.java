@@ -1,6 +1,10 @@
 package main.logic;
 
+import java.io.IOException;
+import java.text.ParseException;
+
 import main.TaskerLog;
+import main.googlecalendar.GoogleCalendar;
 import main.storage.Storage;
 import main.storage.Task;
 import main.storage.TaskBuilder;
@@ -28,6 +32,17 @@ public class AddHandler extends CommandHandler {
 			parser.parse();
 			Task task = convertParsedDetailsToTask();
 			storage.addTask(task);
+			try {
+				if (task.getHasStartDate()) {
+					GoogleCalendar.syncAddNonFloatingTask(GoogleCalendar.convertNonFloatingTaskToEvent(task));
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return DisplayHandler.displayTaskForAdd(task);
 		} catch (IllegalArgumentException e) {
 			TaskerLog.logSystemExceptionError(e.getMessage());

@@ -67,7 +67,7 @@ public class SearchTest {
 		String searchStringFive = "2014";
 		SearchHandler searchFive = new SearchHandler(searchStringFive);
 		String resultFive = searchFive.execute();
-		String expectedFive = "There is nothing to search.";
+		String expectedFive = "Task list is empty. There is nothing to search from.";
 		assertEquals(resultFive, expectedFive);
 
 		// Equivalence Partitioning: this test case is in the 'false' partition.
