@@ -10,7 +10,6 @@ public class TabCompletion {
 	private static String line;
 	public static final String MESSAGE_PROMPT = "Enter Command: ";
 	public static final String MESSAGE_EXITED = "Exited from Tasker.";
-	public static final String MESSAGE_HELP = "help		- Show help";
 	public static final String MESSAGE_ADD = "add         	- Add task to Tasker.";
 	public static final String MESSAGE_DELETE = "delete      	- Delete task(s) from Tasker.";
 	public static final String MESSAGE_DISPLAY = "display		- Display task(s) to user.";
@@ -39,7 +38,6 @@ public class TabCompletion {
 	}
 
 	private void printHelp() {
-		System.out.println(MESSAGE_HELP);
 		System.out.println(MESSAGE_ADD);
 		System.out.println(MESSAGE_DELETE);
 		System.out.println(MESSAGE_DISPLAY);

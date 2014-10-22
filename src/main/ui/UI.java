@@ -1,4 +1,5 @@
 package main.ui;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -9,15 +10,16 @@ public class UI {
 	public static String filename;
 
 	public static final String MESSAGE_WELCOME = "Welcome to Tasker!";
-	private static TabComplete tab = new TabComplete();
-	
-	public static void initializeEnvironment() throws IOException, URISyntaxException {
+	private static TabCompletion tab = new TabCompletion();
+
+	public static void initializeEnvironment() throws IOException,
+			URISyntaxException {
 		TaskerLog.logSystemInfo("Tasker initialized.");
-		//WelcomeScreen.screen();
+		// WelcomeScreen.screen();
 		System.out.println(MESSAGE_WELCOME);
 		System.out.println(GoogleCalendar.logInToGoogleCalendar());
 	}
-	
+
 	public static void readAndExecuteCommands() throws IOException {
 		tab.run();
 	}
