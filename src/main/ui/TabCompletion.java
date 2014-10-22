@@ -1,9 +1,12 @@
 package main.ui;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import main.logic.Logic;
 import jline.ConsoleReader;
+import jline.MultiCompletor;
 import jline.SimpleCompletor;
 
 public class TabCompletion {
@@ -16,23 +19,27 @@ public class TabCompletion {
 	public static final String MESSAGE_SEARCH = "search 		- Search for specified terms in task list.";
 	public static final String MESSAGE_UPDATE = "update          - Update task list with new details.";
 	public static final String MESSAGE_EXIT = "exit 		- Exit Tasker.";
-	
+	@SuppressWarnings("rawtypes")
+	List completors = new LinkedList();
+
+	@SuppressWarnings("unchecked")
 	public void run() throws IOException {
 		ConsoleReader reader = new ConsoleReader();
 		reader.addCompletor(new SimpleCompletor(new String[] {
-				"These are the commands available:\n", "help  add  delete  display  search  update  exit" }));
-
-		System.out.print(MESSAGE_PROMPT);
-		while ((line = reader.readLine()) != null) {
+				"These are the commands available:\n",
+				"help  add  delete  display  search  update  exit" }));
+		
+		completors.add(new SimpleCompletor(new String[] { "add" , "search", "update", "exit", "help", "display", "delete" }));
+		reader.addCompletor(new MultiCompletor(completors));
+		
+		while ((line = readLine(reader, "")) != null) {
 			if ("help".equals(line)) {
 				printHelp();
-				System.out.print(MESSAGE_PROMPT);
 			} else if ("exit".equals(line)) {
 				System.out.println(MESSAGE_EXITED);
 				return;
 			} else {
 				System.out.println(Logic.uiToLogic(line));
-				System.out.print(MESSAGE_PROMPT);
 			}
 		}
 	}
@@ -44,7 +51,15 @@ public class TabCompletion {
 		System.out.println(MESSAGE_SEARCH);
 		System.out.println(MESSAGE_UPDATE);
 		System.out.println(MESSAGE_EXIT);
+
+	}
+
+	private String readLine(ConsoleReader reader, String promtMessage)
+			throws IOException {
+
+		String line = reader.readLine(promtMessage + MESSAGE_PROMPT);
 		
+		return line.trim();
 	}
 
 	public static void main(String[] args) throws IOException {
