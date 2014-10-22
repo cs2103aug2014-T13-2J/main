@@ -31,7 +31,6 @@ public class TaskTest {
 	public void tearDown() throws Exception {
 	}
 
-/**
 	@Test
 	public void testSetVenue() {
 		TaskBuilder builder = new TaskBuilder();
@@ -48,7 +47,7 @@ public class TaskTest {
 		assertEquals("Venue: ", "COM1", task.getVenue());
 	}
 
-	@Test
+	@Test(expected=IllegalArgumentException.class)
 	public void testSetStartDate() {
 		TaskBuilder builder = new TaskBuilder();
 		builder.setDescription("meeting");
@@ -62,6 +61,12 @@ public class TaskTest {
 		
 		task.setStartDate(new LocalDate(2014, 9, 13));
 		assertEquals("Start date: ", "2014-09-13", task.getStartDate().toString());
+		
+		//this case should throw an exception
+		task.setStartDate(new LocalDate(2014, 11, 24));
+		//this case should throw an exception
+		task.setEndDate(new LocalDate(2013, 11, 24));
+	
 	}
 	
 	@Test
@@ -181,10 +186,10 @@ public class TaskTest {
 		//System.out.println(task.convertToCSVFormat());
 		
 	}
-	**/
+	
 	@Test
 	public void testEndIsEarlierThanStart() {
-/**		LocalDate startDate = new LocalDate(2014, 10, 13);
+		LocalDate startDate = new LocalDate(2014, 10, 13);
 		LocalDate endDate = new LocalDate(2014, 10, 14);
 		LocalTime startTime = new LocalTime(10, 0);
 		LocalTime endTime = new LocalTime(12, 0);
@@ -224,12 +229,12 @@ public class TaskTest {
 		startTime = null;
 		endTime = null;
 		//user did not specify a startTime and endTime and startDate is later than endDate
-		assertEquals("End earlier than start: ", true, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime)); **/
+		assertEquals("End earlier than start: ", true, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime)); 
 		
-		LocalDate startDate = new LocalDate(2014, 10, 20);
-		LocalDate endDate = new LocalDate(2014, 10, 20);
-		LocalTime startTime = new LocalTime(10, 0);
-		LocalTime endTime = new LocalTime(10, 0);
+		startDate = new LocalDate(2014, 10, 20);
+		endDate = new LocalDate(2014, 10, 20);
+		startTime = new LocalTime(10, 0);
+		endTime = new LocalTime(10, 0);
 		//both times are equal
 		assertEquals("End earlier than start: ", false, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
 	}
