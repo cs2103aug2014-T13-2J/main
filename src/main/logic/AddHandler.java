@@ -33,7 +33,9 @@ public class AddHandler extends CommandHandler {
 			Task task = convertParsedDetailsToTask();
 			storage.addTask(task);
 			try {
-				GoogleCalendar.syncAddNonFloatingTask(GoogleCalendar.convertNonFloatingTaskToEvent(task));
+				if (task.getHasStartDate()) {
+					GoogleCalendar.syncAddNonFloatingTask(GoogleCalendar.convertNonFloatingTaskToEvent(task));
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
