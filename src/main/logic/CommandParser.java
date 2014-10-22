@@ -3,6 +3,7 @@ package main.logic;
 import java.util.LinkedList;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 public abstract class CommandParser {
 
@@ -11,6 +12,7 @@ public abstract class CommandParser {
 	protected final static String MESSAGE_INVALID_TIME_FORMAT = "Sorry we did not manage to capture the time. Please ensure you entered it in the correct format.";
 	protected final static String MESSAGE_INVALID_VENUE = "Sorry we did not manage to capture the venue. Please try again.";
 	protected final static String MESSAGE_INVALID_DATE_FORMAT = "Sorry we did not manage to capture the date. Please ensure you entered it in the correct format.";
+	protected final static String MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS = "If the task falls on next week, you need to have the word \"next\" before the day.";
 	protected final static String MESSAGE_PARSE_SUCCESS = "Parse successful.";
 	protected final static String INVALID_RECURRENCE_FORMAT = "Sorry we did not manage to capture the recurrence. Please try again.";
 	protected final static String INVALID_COMPLETED_FORMAT = "Sorry we did not manage to capture the completion of the task. Please try again.";
@@ -19,6 +21,7 @@ public abstract class CommandParser {
 	protected final static Integer INDEX_DAY = 0;
 	protected final static Integer INDEX_MONTH = 1;
 	protected final static Integer INDEX_YEAR = 2;
+	protected final static Integer DAYS_IN_WEEK = 7;
 
 	protected String userInput;
 	private String description = null;
@@ -209,16 +212,17 @@ public abstract class CommandParser {
 
 	public void setRecurrence(String recurrence) {
 		recurrence = recurrence.toLowerCase();
-		if(recurrence.equals("weekly") || recurrence.equals("monthly") || recurrence.equals("yearly")) {
+		if (recurrence.equals("weekly") || recurrence.equals("monthly")
+				|| recurrence.equals("yearly")) {
 			this.recurrence = recurrence;
 		} else {
 			throw new IllegalArgumentException(INVALID_RECURRENCE_FORMAT);
-		}		
+		}
 	}
 
 	public void setCompleted(String completed) {
 		completed = completed.toLowerCase();
-		if(completed.equals("true") || completed.equals("false")) {
+		if (completed.equals("true") || completed.equals("false")) {
 			this.completed = completed;
 		} else {
 			throw new IllegalArgumentException(INVALID_COMPLETED_FORMAT);
@@ -244,7 +248,7 @@ public abstract class CommandParser {
 	private void setHasEndTime(boolean hasEndTime) {
 		this.hasEndTime = hasEndTime;
 	}
-	
+
 	/****************************************************************/
 	public abstract String parse();
 
@@ -324,7 +328,7 @@ public abstract class CommandParser {
 		}
 	}
 
-	public static String getTime(LinkedList<String> wordList) {
+	public static String getTimeAndTrimUserInput(LinkedList<String> wordList) {
 		String result = "";
 		String word = wordList.poll();
 
@@ -416,7 +420,41 @@ public abstract class CommandParser {
 			Integer year = current.getYear();
 			date = currentWord + "/" + year.toString();
 			return date;
-		} else { // if the format is D M or D M Y
+		} else if (isDayOfWeek(currentWord)) {
+			String inputDayString = currentWord;
+			int inputDayInt = convertDayToInt(inputDayString);
+
+			LocalDate todayLocalDate = new LocalDate();
+			int todayInt = todayLocalDate.getDayOfWeek();
+
+			int differenceInDays = inputDayInt - todayInt;
+			if (differenceInDays < 0) {
+				throw new IllegalArgumentException(MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS);
+			}
+			todayLocalDate = todayLocalDate.plusDays(differenceInDays);
+			Integer yearInt = todayLocalDate.getYear();
+			Integer monthInt = todayLocalDate.getMonthOfYear();
+			Integer dayInt = todayLocalDate.getDayOfMonth();
+			date = dayInt.toString() + "/" + monthInt.toString() + "/" + yearInt.toString();
+			return date;
+		} else if (currentWord.equals("next")) {
+			String inputDayString = wordsList.poll();
+			int inputDayInt = convertDayToInt(inputDayString);
+
+			LocalDate todayLocalDate = new LocalDate();
+			int todayInt = todayLocalDate.getDayOfWeek();
+
+			int differenceInDays = inputDayInt - todayInt + DAYS_IN_WEEK;
+			if (differenceInDays < 0) {
+				throw new IllegalArgumentException(MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS);
+			}
+			todayLocalDate = todayLocalDate.plusDays(differenceInDays);
+			Integer yearInt = todayLocalDate.getYear();
+			Integer monthInt = todayLocalDate.getMonthOfYear();
+			Integer dayInt = todayLocalDate.getDayOfMonth();
+			date = dayInt.toString() + "/" + monthInt.toString() + "/" + yearInt.toString();
+			return date;
+		} else { // if the format is D M Y
 			// get day
 			if (isInteger(currentWord)) {
 				date += currentWord;
@@ -458,8 +496,39 @@ public abstract class CommandParser {
 			}
 			return date;
 		}
-		// if the format is along the lines of Thursday or next Thursday (to be
-		// implemented)
+	}
+
+	private static boolean isDayOfWeek(String day) {
+		day = day.toLowerCase();
+		if (day.equals("monday") || day.equals("tuesday")
+				|| day.equals("wednesday") || day.equals("thursday")
+				|| day.equals("friday") || day.equals("saturday")
+				|| day.equals("sunday")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// This function assumes that day will be valid, i.e. one of the days of the
+	// week
+	private static Integer convertDayToInt(String day) {
+		day = day.toLowerCase();
+		if (day.equals("monday")) {
+			return 1;
+		} else if (day.equals("tuesday")) {
+			return 2;
+		} else if (day.equals("wednesday")) {
+			return 3;
+		} else if (day.equals("thursday")) {
+			return 4;
+		} else if (day.equals("friday")) {
+			return 5;
+		} else if (day.equals("saturday")) {
+			return 6;
+		} else { // for sunday
+			return 7;
+		}
 	}
 
 	// This function assumes startTime is of the format H.M, where H and M can
