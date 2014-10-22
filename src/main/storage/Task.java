@@ -7,7 +7,10 @@ import org.joda.time.LocalTime;
 
 public class Task {
 
-	static final String DELIMITER = "#!";
+	private static final String DELIMITER = "#!";
+	private static final String MESSAGE_UPDATE_END_DATE_WITHOUT_START_DATE = "Can't update end date if there is no start date";
+	private static final String MESSAGE_END_EARLIER_THAN_START = "Sorry, the end time can't be earlier than the start time.";
+	private static final String MESSAGE_HAS_TIME_WITHOUT_DATE = "Sorry, can't have time without date.";
 
 	/***************************** Data Members ************************/
 	private String description;
@@ -35,12 +38,18 @@ public class Task {
 		this.setDescription(description);
 		this.setVenue(venue);
 		this.setStartDate(startDate);
-		this.setStartTime(startTime);
 		this.setEndDate(endDate);
+		//we put setStartTime after setEndDate because of endIsEarlierThanStart function
+		//requires that if startTime is not null, endTime must not be null
+		this.setStartTime(startTime);
 		this.setEndTime(endTime);
+		
+		if(startDate == null && endDate == null && (startTime != null || endTime != null) ) {
+			throw new IllegalArgumentException(MESSAGE_HAS_TIME_WITHOUT_DATE);
+		}
 
 		if (endIsEarlierThanStart(startDate, startTime, endDate, endTime)) {
-			throw new IllegalArgumentException("Sorry, end time cannot be earlier than start time.");
+			throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
 		}
 
 		this.setReminder(reminder);
@@ -137,12 +146,16 @@ public class Task {
 	}
 
 	public void setStartDate(LocalDate startDate) {
-		this.startDate = startDate;
-
-		if (startDate != null) {
-			this.setHasStartDate(true);
-		} else {
+		if (startDate == null) {
+			this.startDate = startDate;
 			this.setHasStartDate(false);
+		} else {
+			if(endDate != null && endIsEarlierThanStart(startDate, this.getStartTime(), this.getEndDate(), this.getEndTime())) {
+				throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
+			} else {
+				this.startDate = startDate;
+				this.setHasStartDate(true);
+			}
 		}
 	}
 
@@ -151,12 +164,16 @@ public class Task {
 	}
 
 	public void setStartTime(LocalTime startTime) {
-		this.startTime = startTime;
-
-		if (startTime != null) {
-			this.setHasStartTime(true);
-		} else {
+		if (startTime == null) {
+			this.startTime = startTime;
 			this.setHasStartTime(false);
+		} else {
+			if(endTime != null && endIsEarlierThanStart(this.getStartDate(), startTime, this.getEndDate(), this.getEndTime())) {
+				throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
+			} else {
+				this.startTime = startTime;
+				this.setHasStartTime(true);
+			}
 		}
 	}
 
@@ -165,14 +182,17 @@ public class Task {
 	}
 
 	public void setEndDate(LocalDate endDate) {
-		this.endDate = endDate;
-
-		if (endDate != null) {
-			this.setHasEndDate(true);
-		} else {
+		if (endDate == null) {
+			this.endDate = endDate;
 			this.setHasEndDate(false);
+		} else {
+			if(endIsEarlierThanStart(this.getStartDate(), this.getStartTime(), endDate, this.getEndTime())) {
+				throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
+			} else {
+				this.endDate = endDate;
+				this.setHasEndDate(true);
+			}
 		}
-
 	}
 
 	public void setHasEndTime(boolean hasEndTime) {
@@ -180,12 +200,16 @@ public class Task {
 	}
 
 	public void setEndTime(LocalTime endTime) {
-		this.endTime = endTime;
-
-		if (endTime != null) {
-			this.setHasEndTime(true);
-		} else {
+		if (endTime == null) {
+			this.endTime = endTime;
 			this.setHasEndTime(false);
+		} else {
+			if(endIsEarlierThanStart(this.getStartDate(), this.getStartTime(), this.getEndDate(), endTime)) {
+				throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
+			} else {
+				this.endTime = endTime;
+				this.setHasEndTime(true);
+			}
 		}
 	}
 
@@ -270,6 +294,8 @@ public class Task {
 			LocalTime startTime, LocalDate endDate, LocalTime endTime)throws IllegalArgumentException {
 		if (startDate == null && endDate == null) {
 			return false;
+		} else if (startDate == null && endDate != null) {
+			throw new IllegalArgumentException(MESSAGE_UPDATE_END_DATE_WITHOUT_START_DATE);
 		}
 		DateTime d1 = startDate.toDateTimeAtStartOfDay();
 		DateTime d2 = endDate.toDateTimeAtStartOfDay();
