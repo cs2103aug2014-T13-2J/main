@@ -45,7 +45,7 @@ public class UpdateHandlerTest {
 		String ss2 = "2 venue Reeds cafe";
 		UpdateHandler u2 = new UpdateHandler(ss2);
 		u2.execute();
-		assertEquals("New description:", "Reeds cafe", UpdateHandler.getTask(2).getVenue());
+		assertEquals("New venue:", "Reeds cafe", UpdateHandler.getTask(2).getVenue());
 		
 		String s3 = "meeting with Prof at CLB on 4/12 at 11pm";
 		CommandHandler e3 = new AddHandler(s3);
@@ -53,7 +53,7 @@ public class UpdateHandlerTest {
 		String ss3 = "3 start 9 October";
 		UpdateHandler u3 = new UpdateHandler(ss3);
 		u3.execute();
-		assertEquals("New description:", "2014-10-09", UpdateHandler.getTask(3).getStartDate().toString());
+		assertEquals("New start date:", "2014-10-09", UpdateHandler.getTask(3).getStartDate().toString());
 		
 		String s4 = "gathering on 3/10/2014";
 		CommandHandler e4 = new AddHandler(s4);
@@ -61,7 +61,7 @@ public class UpdateHandlerTest {
 		String ss4 = "4 end 9/10";
 		UpdateHandler u4 = new UpdateHandler(ss4);
 		u4.execute();
-		assertEquals("New description:", "2014-10-09", UpdateHandler.getTask(4).getEndDate().toString());
+		assertEquals("New start date:", "2014-10-09", UpdateHandler.getTask(4).getEndDate().toString());
 
 		String s5 = "gathering on 3/10";
 		CommandHandler e5 = new AddHandler(s5);
@@ -69,7 +69,7 @@ public class UpdateHandlerTest {
 		String ss5 = "5 start 11am";
 		UpdateHandler u5 = new UpdateHandler(ss5);
 		u5.execute();
-		assertEquals("New description:", "11:00:00.000", UpdateHandler.getTask(5).getStartTime().toString());
+		assertEquals("New start time:", "11:00:00.000", UpdateHandler.getTask(5).getStartTime().toString());
 
 		String s6 = "meeting from 3/10/2014 11pm to 4/10/2014 1am at Utown";	
 		CommandHandler e6 = new AddHandler(s6);
@@ -77,7 +77,7 @@ public class UpdateHandlerTest {
 		String ss6 = "6 end 2am";
 		UpdateHandler u6 = new UpdateHandler(ss6);
 		u6.execute();
-		assertEquals("New description:", "02:00:00.000", UpdateHandler.getTask(6).getEndTime().toString());
+		assertEquals("New end time:", "02:00:00.000", UpdateHandler.getTask(6).getEndTime().toString());
 		
 		String s7 = "gathering on 3 October 2014";
 		CommandHandler e7 = new AddHandler(s7);
@@ -85,7 +85,7 @@ public class UpdateHandlerTest {
 		String ss7 = "7 recurrence weekly";
 		UpdateHandler u7 = new UpdateHandler(ss7);
 		u7.execute();
-		assertEquals("New description:", "weekly", UpdateHandler.getTask(7).getRecurrence());
+		assertEquals("New recurrence:", "weekly", UpdateHandler.getTask(7).getRecurrence());
 		
 		String s8 = "meeting from 3/10/2014 11pm to 4/10/2014 1am at Utown";
 		CommandHandler e8 = new AddHandler(s8);
@@ -93,12 +93,12 @@ public class UpdateHandlerTest {
 		String ss8 = "8 complete";
 		UpdateHandler u8 = new UpdateHandler(ss8);
 		u8.execute();
-		assertEquals("New description:", true, UpdateHandler.getTask(8).getCompleted());
+		assertEquals("New completed:", true, UpdateHandler.getTask(8).getCompleted());
 		
 		String ss9 = "8 incomplete";
 		UpdateHandler u9 = new UpdateHandler(ss9);
 		u9.execute();		
-		assertEquals("New description:", false, UpdateHandler.getTask(8).getCompleted());
+		assertEquals("New completed:", false, UpdateHandler.getTask(8).getCompleted());
 	}
 
 }
