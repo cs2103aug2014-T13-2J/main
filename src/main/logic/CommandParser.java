@@ -9,13 +9,13 @@ public abstract class CommandParser {
 
 	/***************************** Data Members ************************/
 	protected final static String MESSAGE_INVALID_DESCRIPTION = "Sorry, we did not capture your description. Please try again.";
-	protected final static String MESSAGE_INVALID_TIME_FORMAT = "Sorry we did not manage to capture the time. Please ensure you entered it in the correct format.";
-	protected final static String MESSAGE_INVALID_VENUE = "Sorry we did not manage to capture the venue. Please try again.";
-	protected final static String MESSAGE_INVALID_DATE_FORMAT = "Sorry we did not manage to capture the date. Please ensure you entered it in the correct format.";
+	protected final static String MESSAGE_INVALID_TIME_FORMAT = "Sorry, we did not manage to capture the time. Please ensure you entered it in the correct format.";
+	protected final static String MESSAGE_INVALID_VENUE = "Sorry, we did not manage to capture the venue. Please try again.";
+	protected final static String MESSAGE_INVALID_DATE_FORMAT = "Sorry, we did not manage to capture the date. Please ensure you entered it in the correct format.";
 	protected final static String MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS = "If the task falls on next week, you need to have the word \"next\" before the day.";
 	protected final static String MESSAGE_PARSE_SUCCESS = "Parse successful.";
-	protected final static String INVALID_RECURRENCE_FORMAT = "Sorry we did not manage to capture the recurrence. Please try again.";
-	protected final static String INVALID_COMPLETED_FORMAT = "Sorry we did not manage to capture the completion of the task. Please try again.";
+	protected final static String INVALID_RECURRENCE_FORMAT = "Sorry, we did not manage to capture the recurrence. Please try again.";
+	protected final static String INVALID_COMPLETED_FORMAT = "Sorry, we did not manage to capture the completion of the task. Please try again.";
 	protected final static Integer INDEX_HOUR = 0;
 	protected final static Integer INDEX_MINUTE = 1;
 	protected final static Integer INDEX_DAY = 0;
