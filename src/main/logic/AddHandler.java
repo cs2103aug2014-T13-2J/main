@@ -18,6 +18,7 @@ public class AddHandler extends CommandHandler {
 	
 	private AddParser parser;
 	private static Storage storage = Storage.getInstance();
+	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
 
 	public AddHandler(String details) {
 		super(details);
@@ -33,8 +34,8 @@ public class AddHandler extends CommandHandler {
 			Task task = convertParsedDetailsToTask();
 			storage.addTask(task);
 			try {
-				if (task.getHasStartDate()) {
-					GoogleCalendar.syncAddNonFloatingTask(GoogleCalendar.convertNonFloatingTaskToEvent(task));
+				if (googleCalendar.isLoggedIn() && task.getHasStartDate()) {
+					googleCalendar.syncAddNonFloatingTask(googleCalendar.convertNonFloatingTaskToEvent(task));
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

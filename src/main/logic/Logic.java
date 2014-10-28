@@ -5,6 +5,8 @@ import main.googlecalendar.GoogleCalendar;
 
 
 public class Logic {
+	
+	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
 
 	private enum CommandType {
 		ADD, DELETE, DISPLAY, UPDATE, SEARCH, UNDO, REPEAT, REMIND, LOGIN, INVALID, EXIT
@@ -77,7 +79,7 @@ public class Logic {
 		case REMIND:
 			return remindTask(details);
 		case LOGIN:
-			return GoogleCalendar.initialiseGoogleCalendar(false);
+			return googleCalendar.initialiseGoogleCalendar(false);
 		case EXIT:
 			System.exit(0);
 		default:
