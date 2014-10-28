@@ -2,11 +2,8 @@ package main.logic;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import jline.ConsoleReader;
-import jline.Terminal;
 import main.storage.Storage;
 import main.storage.Task;
 
@@ -204,10 +201,100 @@ public class DisplayHandler extends CommandHandler {
 				ansi().fg(CYAN).a(taskVenueExtraTwo).reset(),ansi().fg(YELLOW).a(endTaskTime).reset(), ansi().fg(GREEN).a(endTaskDate).reset());
 		
 		if (!taskDescriptionExtra.isEmpty() || !taskVenueExtra.isEmpty()) {
-
-			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
-					.fg(MAGENTA).a(taskDescriptionExtra).reset(),
-					ansi().fg(CYAN).a(taskVenueExtra).reset(), "", "");
+			double descriptionLines = Math.ceil(taskDescriptionExtra.length()/25.0);
+			double venueLines = Math.ceil(taskVenueExtra.length()/12.0);
+			
+			System.out.println(venueLines);
+			System.out.println(descriptionLines);
+			
+			if(venueLines == descriptionLines){
+				for(int i=0;i<venueLines-1;i++){
+					String displayVenue = taskVenueExtra.substring(0,12);
+					String displayDescription = taskDescriptionExtra.substring(0,25);
+					taskVenueExtra = taskVenueExtra.substring(12);
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+					
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+							.fg(MAGENTA).a(displayDescription).reset(),
+							ansi().fg(CYAN).a(displayVenue).reset(), "", "");
+				}
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+						.fg(MAGENTA).a(taskDescriptionExtra).reset(),
+						ansi().fg(CYAN).a(taskVenueExtra).reset(), "", "");
+			}
+			
+			else if(venueLines>descriptionLines){
+				for(int i=0;i<descriptionLines-1;i++){
+					String displayVenue = taskVenueExtra.substring(0,12);
+					String displayDescription = taskDescriptionExtra.substring(0,25);
+					taskVenueExtra = taskVenueExtra.substring(12);
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+					
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+							.fg(MAGENTA).a(displayDescription).reset(),
+							ansi().fg(CYAN).a(displayVenue).reset(), "", "");
+				}
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+						.fg(MAGENTA).a(taskDescriptionExtra).reset(),
+						ansi().fg(CYAN).a(taskVenueExtra.substring(0,12)).reset(), "", "");
+				
+				taskVenueExtra = taskVenueExtra.substring(12);
+				if(venueLines-descriptionLines-1 == 0) {
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+							.fg(MAGENTA).a("").reset(),
+							ansi().fg(CYAN).a(taskVenueExtra).reset(), "", "");
+				}
+				else {
+				for (int j=0; j<(venueLines-descriptionLines)-1;j++){
+					String displayVenue = taskVenueExtra.substring(0,12);
+					taskVenueExtra = taskVenueExtra.substring(12);
+					
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+							.fg(MAGENTA).a("").reset(),
+							ansi().fg(CYAN).a(displayVenue).reset(), "", "");
+				}
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+						.fg(MAGENTA).a("").reset(),
+						ansi().fg(CYAN).a(taskVenueExtra).reset(), "", "");
+				}
+			}
+			
+			else if(descriptionLines>venueLines) {
+				for(int i=0;i<venueLines-1;i++){
+					String displayVenue = taskVenueExtra.substring(0,12);
+					String displayDescription = taskDescriptionExtra.substring(0,25);
+					taskVenueExtra = taskVenueExtra.substring(12);
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+					
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+							.fg(MAGENTA).a(displayDescription).reset(),
+							ansi().fg(CYAN).a(displayVenue).reset(), "", "");
+				}
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+						.fg(MAGENTA).a(taskDescriptionExtra.substring(0,25)).reset(),
+						ansi().fg(CYAN).a(taskVenueExtra).reset(), "", "");
+				
+				taskDescriptionExtra = taskDescriptionExtra.substring(25);
+				if(descriptionLines-venueLines-1 == 0) {
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+							.fg(MAGENTA).a(taskDescriptionExtra).reset(),
+							ansi().fg(CYAN).a("").reset(), "", "");
+				}
+				else {
+				for (int j=0; j<(descriptionLines-venueLines)-1;j++){
+					String displayDescription = taskDescriptionExtra.substring(0,25);
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+							.fg(MAGENTA).a(displayDescription).reset(),
+							ansi().fg(CYAN).a("").reset(), "", "");
+				}
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
+						.fg(MAGENTA).a(taskDescriptionExtra).reset(),
+						ansi().fg(CYAN).a("").reset(), "", "");
+				}
+				
+			}
+			
 		}
 		
 		return result;
