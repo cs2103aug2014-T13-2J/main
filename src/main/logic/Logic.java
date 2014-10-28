@@ -1,12 +1,13 @@
 package main.logic;
 
 import main.TaskerLog;
+import main.googlecalendar.GoogleCalendar;
 
 
 public class Logic {
 
 	private enum CommandType {
-		ADD, DELETE, DISPLAY, UPDATE, SEARCH, UNDO, REPEAT, REMIND, INVALID, EXIT
+		ADD, DELETE, DISPLAY, UPDATE, SEARCH, UNDO, REPEAT, REMIND, LOGIN, INVALID, EXIT
 	}
 	
 	public static String uiToLogic(String userCommand) {
@@ -44,6 +45,9 @@ public class Logic {
 		} else if (commandTypeString.equalsIgnoreCase("remind")) {
 			TaskerLog.logSystemInfo("remind command detected");
 			return CommandType.REMIND;
+		} else if (commandTypeString.equalsIgnoreCase("login")) {
+			TaskerLog.logSystemInfo("login command detected");
+			return CommandType.LOGIN;
 		} else if (commandTypeString.equalsIgnoreCase("exit")) {
 			TaskerLog.logSystemInfo("exit command detected");
 			return CommandType.EXIT;
@@ -54,7 +58,6 @@ public class Logic {
 	}
 
 	public static String executeCommand(CommandType commandType, String details) {
-//		assert (false);
 		TaskerLog.logSystemInfo("executeCommand received commandType");
 		switch (commandType) {
 		case ADD:
@@ -73,6 +76,8 @@ public class Logic {
 			return repeatTask(details);
 		case REMIND:
 			return remindTask(details);
+		case LOGIN:
+			return GoogleCalendar.initialiseGoogleCalendar(false);
 		case EXIT:
 			System.exit(0);
 		default:

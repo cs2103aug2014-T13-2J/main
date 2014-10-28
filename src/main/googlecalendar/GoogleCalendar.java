@@ -28,19 +28,51 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 
 public class GoogleCalendar {
-	
-	private static String MESSAGE_PRE_LOGIN = "Logging in to Google Calendar...\n\n"
-			+ "Tasker will now open your default browser and direct you to a page for an authorisation code.\n\n"
-			+ "Copy the authorisation code and paste it back here once you are done!\n\n"
+
+	private static String MESSAGE_ASK_TO_LOGIN = "Log in to Google Calendar? [Y/N]";
+	private static String MESSAGE_NO_LOGIN = "Cancelled logging in to Google Calendar.";
+	private static String MESSAGE_PRE_LOGIN = "Tasker will now open your default browser and direct you to a page for an authorisation code.\n\n"
+			+ "Please copy the authorisation code and paste it back here.\n\n"
 			+ "Press ENTER to continue...";
-	private static String NAME_APPLICATION = "Tasker";
 	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google Calendar!";
 	private static String MESSAGE_SYNC_SUCCESS = "Task successfully synchronised!";
-	
-	private static Calendar service;
+	private static String MESSAGE_INVALID_COMMAND = "Invalid command!";
+	private static String NAME_APPLICATION = "Tasker";
 
-	@SuppressWarnings("resource")
-	public static String logInToGoogleCalendar() throws IOException, URISyntaxException {
+	private static Calendar service;
+	private static Scanner scanner = new Scanner(System.in);
+
+	public static String initialiseGoogleCalendar(boolean isFirstTime) {
+		String message = "";
+		try {
+			if (isFirstTime) {
+				if (isLoggingInToGoogleCalendar()) {
+					message = logInToGoogleCalendar();
+				}
+			} else {
+				message = logInToGoogleCalendar();
+			}
+		} catch (IllegalArgumentException e) {
+			System.out.println(e.getMessage());
+			message = initialiseGoogleCalendar(isFirstTime);
+		}
+		return message;
+	}
+
+	private static boolean isLoggingInToGoogleCalendar() {
+		System.out.println(MESSAGE_ASK_TO_LOGIN);
+		String userReplyToLogIn = scanner.nextLine();
+		if (userReplyToLogIn.equalsIgnoreCase("y")) {
+			return true;
+		} else if (userReplyToLogIn.equalsIgnoreCase("n")) {
+			System.out.println(MESSAGE_NO_LOGIN);
+			return false;
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_COMMAND);
+		}
+	}
+
+	private static String logInToGoogleCalendar() {
 		HttpTransport httpTransport = new NetHttpTransport();
 		JacksonFactory jsonFactory = new JacksonFactory();
 
@@ -61,19 +93,29 @@ public class GoogleCalendar {
 		String url = flow.newAuthorizationUrl().setRedirectUri(redirectUrl)
 				.build();
 		System.out.println(MESSAGE_PRE_LOGIN);
-		Scanner scanner = new Scanner(System.in);
 		scanner.nextLine();
 
 		if (Desktop.isDesktopSupported()) {
 			Desktop desktop = Desktop.getDesktop();
-			desktop.browse(new URI(url));
+			try {
+				desktop.browse(new URI(url));
+			} catch (IOException e) {
+				return e.getMessage();
+			} catch (URISyntaxException e) {
+				return e.getMessage();
+			}
 		}
-		
+
 		System.out.print("Authorisation code: ");
 		String code = scanner.nextLine();
-		
-		GoogleTokenResponse response = flow.newTokenRequest(code)
-				.setRedirectUri(redirectUrl).execute();
+
+		GoogleTokenResponse response;
+		try {
+			response = flow.newTokenRequest(code).setRedirectUri(redirectUrl)
+					.execute();
+		} catch (IOException e) {
+			return e.getMessage();
+		}
 		GoogleCredential googleCredential = new GoogleCredential()
 				.setFromTokenResponse(response);
 		// Create a new authorized API client
@@ -82,35 +124,40 @@ public class GoogleCalendar {
 
 		return MESSAGE_LOGIN_SUCCESS;
 	}
-	
+
 	public static String syncAddNonFloatingTask(Event event) throws IOException {
 		service.events().insert("primary", event).execute();
 		return MESSAGE_SYNC_SUCCESS;
 	}
-	
-	public static Event convertNonFloatingTaskToEvent(Task task) throws ParseException {
+
+	public static Event convertNonFloatingTaskToEvent(Task task)
+			throws ParseException {
 		Event event = new Event();
 		event.setSummary(task.getDescription());
 		event.setLocation(task.getVenue());
-		
+
 		LocalDate taskStartDate = task.getStartDate();
 		LocalTime taskStartTime = task.getStartTime();
-		org.joda.time.DateTime jodaStartDateTime = taskStartDate.toDateTime(taskStartTime);
+		org.joda.time.DateTime jodaStartDateTime = taskStartDate
+				.toDateTime(taskStartTime);
 		Date startDate = jodaStartDateTime.toDate();
-		DateTime startDateTime = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
+		DateTime startDateTime = new DateTime(startDate,
+				TimeZone.getTimeZone("UTC"));
 		EventDateTime eventStartDateTime = new EventDateTime();
 		eventStartDateTime.setDateTime(startDateTime);
 		event.setStart(eventStartDateTime);
-		
+
 		LocalDate taskEndDate = task.getEndDate();
 		LocalTime taskEndTime = task.getEndTime();
-		org.joda.time.DateTime jodaEndDateTime = taskEndDate.toDateTime(taskEndTime);
+		org.joda.time.DateTime jodaEndDateTime = taskEndDate
+				.toDateTime(taskEndTime);
 		Date endDate = jodaEndDateTime.toDate();
-		DateTime endDateTime = new DateTime(endDate, TimeZone.getTimeZone("UTC"));
+		DateTime endDateTime = new DateTime(endDate,
+				TimeZone.getTimeZone("UTC"));
 		EventDateTime eventEndDateTime = new EventDateTime();
 		eventEndDateTime.setDateTime(endDateTime);
 		event.setEnd(eventEndDateTime);
-		
+
 		return event;
 	}
 }
