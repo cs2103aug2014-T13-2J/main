@@ -1,20 +1,26 @@
 package main.logic;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
+import jline.ConsoleReader;
+import jline.Terminal;
 import main.storage.Storage;
 import main.storage.Task;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalDate;
+
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 
 public class DisplayHandler extends CommandHandler {
 
 	public static final String DISPLAY_NUM_OF_TASKS = "Total number of tasks: %d\n";
-	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-10s %-35s %-30s %-25s %-20s\n";
+	//public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-10s %-35s %-30s %-25s %-20s\n";
 	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT_EXTRA = "%-3s %-35s %-30s %-15s %-10s\n";
 	public static final String MESSAGE_EMPTY = "There is nothing to display";
 	public static final String MESSAGE_DISPLAY_SUCCESS = "Display successful.";
@@ -25,7 +31,8 @@ public class DisplayHandler extends CommandHandler {
 
 	private static String result;
 	private static Storage storage = Storage.getInstance();
-
+	static ConsoleReader console;
+	
 	public DisplayHandler(String details) {
 		super(details);
 	}
@@ -34,6 +41,7 @@ public class DisplayHandler extends CommandHandler {
 	public String execute() {
 		ArrayList<Task> tasks = storage.getTasks();
 		result = "";
+		String DISPLAY_TABLE_ROW_STRING_FORMAT = displayFormat();
 		if (tasks.isEmpty()) {
 			System.out.println(MESSAGE_EMPTY);
 		} else {
@@ -44,73 +52,164 @@ public class DisplayHandler extends CommandHandler {
 					ansi().fg(RED).a("ID").reset(),
 					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi()
 							.fg(CYAN).a(" VENUE").reset(),
-					ansi().fg(BLUE).a(" TIME").reset(),
+					ansi().fg(YELLOW).a(" TIME").reset(),
 					ansi().fg(GREEN).a(" DATE").reset());
 			result += displayLineSeparator();
 			for (int j = 0; j < tasks.size(); j++) {
 				result += displayTaskInTable(j, tasks.get(j));
 			}
 			result += displayLineSeparator();
+			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+					ansi().fg(RED).a("ID").reset(),
+					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi()
+							.fg(CYAN).a(" VENUE").reset(),
+					ansi().fg(YELLOW).a(" TIME").reset(),
+					ansi().fg(GREEN).a(" DATE").reset());
 		}
 		return result;
 	}
 
 	private static String displayLineSeparator() {
 		String lineString = "";
-		for (int i = 0; i < 88; i++) {
+		int terminalWidth = getTerminalWidth();
+		for (int i = 0; i < terminalWidth; i++) {
 			lineString += "-";
 		}
 		lineString += "\n";
 		return lineString;
 	}
+	
+	
+	private static String displayFormat() {
+		String displayFormat = "";
+		int terminalWidth = getTerminalWidth();
+		int id = terminalWidth/10;
+		int description = terminalWidth/10*5;
+		int venue = terminalWidth/10*3;
+		int time = terminalWidth/10*2;
+		int date = terminalWidth/10*2;
+		String ID = "%-"+id+"s";
+		String DESCRIPTION = "%-"+description+"s";
+		String VENUE = "%-"+venue+"s";
+		String TIME = "%-"+time+"s";
+		String DATE = "%-"+date+"s";
+		displayFormat = ID+""+DESCRIPTION+""+VENUE+""+TIME+""+DATE+"\n";
+		return displayFormat;
+	}
 
+	
+	private static int getTerminalWidth() {
+		try {
+			console = new ConsoleReader();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int terminalWidth = console.getTermwidth();
+		return terminalWidth;
+	}
+	
 	public static String displayTaskInTable(int number, Task task) {
+		String DISPLAY_TABLE_ROW_STRING_FORMAT = displayFormat();
 		result = "";
 		String taskNumber = getTaskNumber(number);
 		String taskDescription = task.getDescription();
 		String taskDescriptionExtra = "";
-		if (taskDescription.length() >= 25) {
-			taskDescriptionExtra = taskDescription.substring(24);
-			taskDescription = taskDescription.substring(0, 24);
+		String taskDescriptionExtraOne = "";
+		String taskDescriptionExtraTwo = "";
+		//Queue<String> queueDescription = new LinkedList<String>();
+		//double numLines = Math.ceil(taskDescription.length()/descriptionWidth);
+		
+		if(taskDescription.length() >= 25 && taskDescription.length() < 50) {
+			taskDescriptionExtraOne = taskDescription.substring(25);
+			taskDescription = taskDescription.substring(0,25);
 		}
-
+		
+		else if(taskDescription.length() >= 50 && taskDescription.length() < 75) {
+			taskDescriptionExtraTwo = taskDescription.substring(50);
+			taskDescriptionExtraOne = taskDescription.substring(25,50);
+			taskDescription = taskDescription.substring(0,25);
+		}
+		
+		else if(taskDescription.length()>=75){
+			taskDescriptionExtra = taskDescription.substring(75);
+			taskDescriptionExtraTwo = taskDescription.substring(50,75);
+			taskDescriptionExtraOne = taskDescription.substring(25,50);
+			taskDescription = taskDescription.substring(0,25);
+		}
+		
+		
 		String taskVenue = "-";
 		String taskVenueExtra = "";
+		String taskVenueExtraOne = "";
+		String taskVenueExtraTwo = "";
 		if (task.getHasVenue()) {
 			taskVenue = task.getVenue();
-			if (taskVenue.length() >= 15) {
-				taskVenueExtra = taskVenue.substring(14);
-				taskVenue = taskVenue.substring(0, 14);
+			if (taskVenue.length() >= 12 && taskVenue.length() <24) {
+				taskVenueExtraOne = taskVenue.substring(12);
+				taskVenue = taskVenue.substring(0, 12);
+			}
+			else if(taskVenue.length() >=24 && taskVenue.length() <36) {
+				taskVenueExtraTwo = taskVenue.substring(24);
+				taskVenueExtraOne = taskVenue.substring(12,24);
+				taskVenue = taskVenue.substring(0,12);
+			}
+			else if(taskVenue.length()>=36){
+				taskVenueExtra = taskVenue.substring(36);
+				taskVenueExtraTwo = taskVenue.substring(24,36);
+				taskVenueExtraOne = taskVenue.substring(12,24);
+				taskVenue = taskVenue.substring(0,12);
 			}
 		}
 
-		String taskTime = "-";
+		String startTaskTime = "-";
+		String endTaskTime = "-";
 		if (task.getHasStartTime()) {
-			taskTime = addStartTime(task);
+			startTaskTime = addStartTime(task);
 			if (!task.getEndTime().equals(task.getStartTime())) {
-				taskTime += "to " + addEndTime(task);
+				//taskTime += "to " + addEndTime(task);
+				endTaskTime = addEndTime(task);
 			}
 		}
 
-		String taskDate = "-";
+		String startTaskDate = "-";
+		String endTaskDate = "-";
 		if (task.getHasStartDate()) {
-			taskDate = addStartDate(task);
+			startTaskDate = addStartDate(task);
 			if (!task.getEndDate().equals(task.getStartDate())) {
-				taskDate += "to " + addEndDate(task);
+				//taskDate += "to " + addEndDate(task);
+				endTaskDate = addEndDate(task);
 			}
 		}
-
+		
+		String nullSpace = "";
+		int nullSpaceLength = taskNumber.length();
+		for (int i = 0; i < nullSpaceLength; i++) {
+			nullSpace += " ";
+		}
+		
+		String to = "to";
 		result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
 				.a(taskNumber).reset(), ansi().fg(MAGENTA).a(taskDescription)
-				.reset(), ansi().fg(CYAN).a(taskVenue).reset(), ansi().fg(BLUE)
-				.a(taskTime).reset(), ansi().fg(GREEN).a(taskDate).reset());
+				.reset(), ansi().fg(CYAN).a(taskVenue).reset(), ansi().fg(YELLOW)
+				.a(startTaskTime).reset(), ansi().fg(GREEN).a(startTaskDate).reset());		
 
+		result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,ansi().fg(RED).a(nullSpace).reset(),ansi()
+				.fg(MAGENTA).a(taskDescriptionExtraOne).reset(),
+				ansi().fg(CYAN).a(taskVenueExtraOne).reset(),ansi().fg(YELLOW).a(to).reset(), ansi().fg(GREEN).a(to).reset());
+		
+		
+		result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,ansi().fg(RED).a(nullSpace).reset(),ansi()
+				.fg(MAGENTA).a(taskDescriptionExtraTwo).reset(),
+				ansi().fg(CYAN).a(taskVenueExtraTwo).reset(),ansi().fg(YELLOW).a(endTaskTime).reset(), ansi().fg(GREEN).a(endTaskDate).reset());
+		
 		if (!taskDescriptionExtra.isEmpty() || !taskVenueExtra.isEmpty()) {
 
-			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT_EXTRA, "", ansi()
+			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a(nullSpace).reset(), ansi()
 					.fg(MAGENTA).a(taskDescriptionExtra).reset(),
 					ansi().fg(CYAN).a(taskVenueExtra).reset(), "", "");
 		}
+		
 		return result;
 	}
 
@@ -141,10 +240,18 @@ public class DisplayHandler extends CommandHandler {
 		} else if (task.getHasStartDate()) {
 			result += addOn(task);
 			result += addStartDate(task);
-			if (task.getHasStartTime()) {
+			
+			if (task.getHasStartTime() && task.getHasEndTime()){
+				result += addFrom();
+				result += addStartTime(task);
+				result += addTo();
+				result += addEndTime(task);
+			}
+			else {
 				result += addAt(task);
 				result += addStartTime(task);
 			}
+			
 		} else if (task.getHasStartTime()) {
 			result += addAt(task);
 			result += addStartTime(task);
