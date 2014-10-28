@@ -7,10 +7,8 @@ import static org.fusesource.jansi.Ansi.Color.MAGENTA;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-import jline.ConsoleReader;
 import main.storage.Storage;
 import main.storage.Task;
 
@@ -18,7 +16,6 @@ public class DeleteHandler extends CommandHandler {
 	private static String MESSAGE_DELETE = "List of deleted tasks: ";
 	private DeleteParser parser;
 	private static Storage storage = Storage.getInstance();
-	private static ConsoleReader console;
 	
 
 	public DeleteHandler(String details) {
@@ -33,7 +30,7 @@ public class DeleteHandler extends CommandHandler {
 		String returnMessage = "";
 		String resultTop = "";
 		String resultBottom = "";
-		String DISPLAY_TABLE_ROW_STRING_FORMAT = displayFormat();
+		String DISPLAY_TABLE_ROW_STRING_FORMAT = DisplayHandler.displayFormat();
 		System.out.println();
 		System.out.println(MESSAGE_DELETE);
 		resultTop += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
@@ -42,7 +39,7 @@ public class DeleteHandler extends CommandHandler {
 				ansi().fg(CYAN).a(" VENUE").reset(),
 				ansi().fg(YELLOW).a(" TIME").reset(),
 				ansi().fg(GREEN).a(" DATE").reset());
-		resultTop += displayLineSeparator();
+		resultTop += DisplayHandler.displayLineSeparator();
 		System.out.print(resultTop);
 
 		for (int index : listOfIndexes) {
@@ -52,7 +49,7 @@ public class DeleteHandler extends CommandHandler {
 			storage.deleteTask(index);
 		}
 		
-		resultBottom += displayLineSeparator();
+		resultBottom += DisplayHandler.displayLineSeparator();
 		resultBottom += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 				ansi().fg(RED).a("ID").reset(),
 				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
@@ -62,45 +59,6 @@ public class DeleteHandler extends CommandHandler {
 		System.out.print(resultBottom);
 		
 		return returnMessage;
-	}
-	
-	private static String displayFormat() {
-		String displayFormat = "";
-		int terminalWidth = getTerminalWidth();
-		int id = terminalWidth / 10;
-		int description = terminalWidth / 10 * 5;
-		int venue = terminalWidth / 10 * 3;
-		int time = terminalWidth / 10 * 2;
-		int date = terminalWidth / 10 * 2;
-		String ID = "%-" + id + "s";
-		String DESCRIPTION = "%-" + description + "s";
-		String VENUE = "%-" + venue + "s";
-		String TIME = "%-" + time + "s";
-		String DATE = "%-" + date + "s";
-		displayFormat = ID + "" + DESCRIPTION + "" + VENUE + "" + TIME + ""
-				+ DATE + "\n";
-		return displayFormat;
-	}
-	
-	private static int getTerminalWidth() {
-		try {
-			console = new ConsoleReader();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		int terminalWidth = console.getTermwidth();
-		return terminalWidth;
-	}
-	
-	private static String displayLineSeparator() {
-		String lineString = "";
-		int terminalWidth = getTerminalWidth();
-		for (int i = 0; i < terminalWidth; i++) {
-			lineString += "-";
-		}
-		lineString += "\n";
-		return lineString;
 	}
 
 }

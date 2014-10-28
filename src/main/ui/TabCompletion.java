@@ -27,17 +27,21 @@ public class TabCompletion {
 		ConsoleReader reader = new ConsoleReader();
 		reader.addCompletor(new SimpleCompletor(new String[] {
 				"\nThese are the commands available:",
-				" help  add  delete  display  search  update  exit" }));
-		
-		completors.add(new SimpleCompletor(new String[] { "add" , "search", "update", "exit", "help", "display", "delete" }));
+				" add  delete  display  search  update help exit" }));
+
+		completors.add(new SimpleCompletor(new String[] { "add",
+				"search", "update", "exit", "display", "delete"}));
 		reader.addCompletor(new ArgumentCompletor(completors));
-		
+
 		while ((line = readLine(reader, "")) != null) {
-			if ("help".equals(line)) {
-				printHelp();
-			} else if ("exit".equals(line)) {
+
+			if ("exit".equals(line)) {
 				System.out.println(MESSAGE_EXITED);
 				return;
+				
+			} else if ("help".equals(line)) {
+				printHelp();
+
 			} else {
 				System.out.println(Logic.uiToLogic(line));
 			}
@@ -58,7 +62,7 @@ public class TabCompletion {
 			throws IOException {
 
 		String line = reader.readLine(promtMessage + MESSAGE_PROMPT);
-		
+
 		return line;
 	}
 
