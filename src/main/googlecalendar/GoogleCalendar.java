@@ -29,6 +29,7 @@ import com.google.api.services.calendar.model.EventDateTime;
 
 public class GoogleCalendar {
 
+	private static String MESSAGE_ALREADY_LOGGED_IN = "Sorry, you are already logged in to Google Calendar.";
 	private static String MESSAGE_ASK_TO_LOGIN = "Log in to Google Calendar? [Y/N]";
 	private static String MESSAGE_NO_LOGIN = "Cancelled logging in to Google Calendar.";
 	private static String MESSAGE_PRE_LOGIN = "Tasker will now open your default browser and direct you to a page for an authorisation code.\n\n"
@@ -36,7 +37,7 @@ public class GoogleCalendar {
 			+ "Press ENTER to continue...";
 	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google Calendar!";
 	private static String MESSAGE_SYNC_SUCCESS = "Task successfully synchronised!";
-	private static String MESSAGE_INVALID_COMMAND = "Invalid command!";
+	private static String MESSAGE_INVALID_ARGUMENT = "Sorry, the argument must either be 'Y' or 'N'.";
 	private static String NAME_APPLICATION = "Tasker";
 
 	private static GoogleCalendar theOne = null;
@@ -57,17 +58,21 @@ public class GoogleCalendar {
 
 	public String initialiseGoogleCalendar(boolean isFirstTime) {
 		String message = "";
-		try {
-			if (isFirstTime) {
-				if (isLoggingInToGoogleCalendar()) {
+		if (!isLoggedIn) {	
+			try {
+				if (isFirstTime) {
+					if (isLoggingInToGoogleCalendar()) {
+						message = logInToGoogleCalendar();
+					}
+				} else {
 					message = logInToGoogleCalendar();
 				}
-			} else {
-				message = logInToGoogleCalendar();
+			} catch (IllegalArgumentException e) {
+				System.out.println(e.getMessage());
+				message = initialiseGoogleCalendar(isFirstTime);
 			}
-		} catch (IllegalArgumentException e) {
-			System.out.println(e.getMessage());
-			message = initialiseGoogleCalendar(isFirstTime);
+		} else {
+			message = MESSAGE_ALREADY_LOGGED_IN;
 		}
 		return message;
 	}
@@ -82,7 +87,7 @@ public class GoogleCalendar {
 			isLoggedIn = false;
 			return false;
 		} else {
-			throw new IllegalArgumentException(MESSAGE_INVALID_COMMAND);
+			throw new IllegalArgumentException(MESSAGE_INVALID_ARGUMENT);
 		}
 	}
 
