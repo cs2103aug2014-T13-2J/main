@@ -7,7 +7,6 @@ import java.util.List;
 import main.logic.Logic;
 import jline.ArgumentCompletor;
 import jline.ConsoleReader;
-import jline.MultiCompletor;
 import jline.SimpleCompletor;
 
 public class TabCompletion {
@@ -60,7 +59,7 @@ public class TabCompletion {
 
 		String line = reader.readLine(promtMessage + MESSAGE_PROMPT);
 		
-		return line.trim();
+		return line;
 	}
 
 	public static void main(String[] args) throws IOException {

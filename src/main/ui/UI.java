@@ -15,7 +15,6 @@ public class UI {
 	public static void initializeEnvironment() throws IOException,
 			URISyntaxException {
 		TaskerLog.logSystemInfo("Tasker initialized.");
-		// WelcomeScreen.screen();
 		System.out.println(MESSAGE_WELCOME);
 		System.out.println(GoogleCalendar.logInToGoogleCalendar());
 	}
