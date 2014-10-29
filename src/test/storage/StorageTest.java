@@ -49,7 +49,6 @@ public class StorageTest {
 
 	@Test
 	public void testWriteToFileAndReadFromFile() {
-		String fileName = "data.csv";
 		Storage s1 = Storage.getInstance();
 		TaskBuilder builder = new TaskBuilder();
 		builder.setDescription("meeting");
@@ -76,11 +75,11 @@ public class StorageTest {
 		
 		s1.addTask(task2);
 		
-		assertEquals("writeToFile: ", "Tasks added.", s1.writeToFile(fileName));
+		assertEquals("writeToFile: ", "Tasks added.", Storage.writeToFile());
 		
 		s1.clearAllTasks();
 		
-		assertEquals("readFromFile: ", "Data read from storage.", s1.readFromFile(fileName));
+		assertEquals("readFromFile: ", "Data read from storage.", Storage.readFromFile());
 		
 	}
 
