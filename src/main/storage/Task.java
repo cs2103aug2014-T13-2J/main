@@ -270,6 +270,7 @@ public class Task {
 
 	public String convertToCSVFormat() {
 		String result = "";
+		result = result + this.getEventId() + DELIMITER;
 		result = result + this.getDescription() + DELIMITER;
 		result = result + this.getVenue() + DELIMITER;
 		result = result + this.getStartDate() + DELIMITER;
