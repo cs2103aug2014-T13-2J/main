@@ -17,6 +17,7 @@ public class SearchParser extends CommandParser {
 	public static final String MESSAGE_NULL = "Task list is empty. There is nothing to search from.";
 	public static final String MESSAGE_UNAVAILABLE = "Search term cannot be found in task list.";
 	public static final String MESSAGE_SEARCH = "List of tasks containing";
+	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-10s %-35s %-30s %-25s %-20s\n";
 
 	public static String returnMessage = "";
 	public static String lowerCaseKey = "";
@@ -50,7 +51,6 @@ public class SearchParser extends CommandParser {
 			lowerCaseKey = userInput.toLowerCase();
 			String resultTop = "";
 			String resultBottom = "";
-			String DISPLAY_TABLE_ROW_STRING_FORMAT = DisplayHandler.displayFormat();
 			System.out.println();
 			System.out.println(MESSAGE_SEARCH + " " + "'"
 					+ ansi().fg(RED).a(userInput).reset() + "'" + ": ");

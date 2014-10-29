@@ -16,7 +16,7 @@ public class DeleteHandler extends CommandHandler {
 	private static String MESSAGE_DELETE = "List of deleted tasks: ";
 	private DeleteParser parser;
 	private static Storage storage = Storage.getInstance();
-	
+	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-10s %-35s %-30s %-25s %-20s\n";
 
 	public DeleteHandler(String details) {
 		super(details);
@@ -30,15 +30,13 @@ public class DeleteHandler extends CommandHandler {
 		String returnMessage = "";
 		String resultTop = "";
 		String resultBottom = "";
-		String DISPLAY_TABLE_ROW_STRING_FORMAT = DisplayHandler.displayFormat();
 		System.out.println();
 		System.out.println(MESSAGE_DELETE);
-		resultTop += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-				.fg(RED).a("ID").reset(),
-				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
-				ansi().fg(CYAN).a(" VENUE").reset(),
-				ansi().fg(YELLOW).a(" TIME").reset(),
-				ansi().fg(GREEN).a(" DATE").reset());
+		resultTop += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+				ansi().fg(RED).a("ID").reset(),
+				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi().fg(CYAN)
+						.a(" VENUE").reset(), ansi().fg(YELLOW).a(" TIME")
+						.reset(), ansi().fg(GREEN).a(" DATE").reset());
 		resultTop += DisplayHandler.displayLineSeparator();
 		System.out.print(resultTop);
 
@@ -48,16 +46,15 @@ public class DeleteHandler extends CommandHandler {
 					list.get(index)));
 			storage.deleteTask(index);
 		}
-		
+
 		resultBottom += DisplayHandler.displayLineSeparator();
-		resultBottom += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-				ansi().fg(RED).a("ID").reset(),
-				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
-				ansi().fg(CYAN).a(" VENUE").reset(),
-				ansi().fg(YELLOW).a(" TIME").reset(),
-				ansi().fg(GREEN).a(" DATE").reset());
+		resultBottom += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+				.fg(RED).a("ID").reset(), ansi().fg(MAGENTA).a(" DESCRIPTION")
+				.reset(), ansi().fg(CYAN).a(" VENUE").reset(), ansi()
+				.fg(YELLOW).a(" TIME").reset(), ansi().fg(GREEN).a(" DATE")
+				.reset());
 		System.out.print(resultBottom);
-		
+
 		return returnMessage;
 	}
 
