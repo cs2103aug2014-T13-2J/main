@@ -15,6 +15,7 @@ public class Task {
 	private static final String MESSAGE_HAS_TIME_WITHOUT_DATE = "Sorry, can't have time without date.";
 
 	/***************************** Data Members ************************/
+	private String eventId=null;
 	private String description;
 	private boolean hasVenue = false;
 	private String venue = null;
@@ -33,7 +34,7 @@ public class Task {
 	private boolean completed = false;
 
 	/***************************** Constructors ************************/
-	public Task(String description, String venue, LocalDate startDate,
+	public Task(String eventId, String description, String venue, LocalDate startDate,
 			LocalTime startTime, LocalDate endDate, LocalTime endTime,
 			DateTime reminder, String recurrence, boolean completed)
 			throws IllegalArgumentException {
@@ -62,6 +63,10 @@ public class Task {
 	}
 
 	/***************************** Accessors ************************/
+	public String getEventId() {
+		return eventId;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -127,6 +132,10 @@ public class Task {
 	}
 
 	/***************************** Mutators ************************/
+	public void setEventId(String eventId) {
+		this.eventId = eventId;
+	}
+	
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -386,4 +395,6 @@ public class Task {
 			throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
 		}
 	}
+
+
 }

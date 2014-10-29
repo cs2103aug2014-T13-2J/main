@@ -40,6 +40,7 @@ public class AddHandler extends CommandHandler {
 				if (googleCalendar.isLoggedIn() && task.getHasStartDate()) {
 					Event event = googleCalendar.convertNonFloatingTaskToEvent(task);
 					String eventId = googleCalendar.syncAddNonFloatingTask(event);
+					task.setEventId(eventId);
 				}
 			} catch (IOException e ) {
 				return MESSAGE_SYNC_FAILURE;
