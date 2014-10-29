@@ -7,6 +7,7 @@ import jline.ConsoleReader;
 import main.storage.Storage;
 import main.storage.Task;
 
+import org.fusesource.jansi.AnsiConsole;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalDate;
@@ -33,6 +34,7 @@ public class DisplayHandler extends CommandHandler {
 
 	public DisplayHandler(String details) {
 		super(details);
+		AnsiConsole.systemInstall();
 	}
 
 	@Override
