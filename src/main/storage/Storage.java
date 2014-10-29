@@ -18,17 +18,16 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 public class Storage {
-
-	private static final int DESCRIPTION_INDEX = 0;
-	private static final int VENUE_INDEX = 1;
-	private static final int START_DATE_INDEX = 2;
-	private static final int START_TIME_INDEX = 3;
-	private static final int END_DATE_INDEX = 4;
-	private static final int END_TIME_INDEX = 5;
-	private static final int REMINDER_INDEX = 6;
-	private static final int RECURRENCE_INDEX = 7;
-	private static final int COMPLETED_INDEX = 8;
-	private static final String MESSAGE_DATA_OVERWRITTEN = "Storage arraylist is not empty. Data will be overwritten. Operation discontinued.";
+	private static final int EVENT_ID_INDEX = 0;
+	private static final int DESCRIPTION_INDEX = 1;
+	private static final int VENUE_INDEX = 2;
+	private static final int START_DATE_INDEX = 3;
+	private static final int START_TIME_INDEX = 4;
+	private static final int END_DATE_INDEX = 5;
+	private static final int END_TIME_INDEX = 6;
+	private static final int REMINDER_INDEX = 7;
+	private static final int RECURRENCE_INDEX = 8;
+	private static final int COMPLETED_INDEX = 9;
 	private static final String MESSAGE_READ_FROM_FILE_SUCCESS = "Data read from storage.";
 	private static final String MESSAGE_WRITE_FROM_FILE_SUCCESS = "Tasks added.";
 	private static final String MESSAGE_NO_MORE_COMMANDS_TO_UNDO = "There are no more commands to undo.";
@@ -113,7 +112,8 @@ public class Storage {
 		try {
 			String[] nextLine;
 			CSVReader reader = new CSVReader(new FileReader(FILENAME));
-
+			
+			String eventId;
 			String description;
 			String venue;
 			LocalDate startDate;
@@ -125,6 +125,7 @@ public class Storage {
 			boolean completed;
 
 			while ((nextLine = reader.readNext()) != null) {
+				eventId = nextLine[EVENT_ID_INDEX];
 				description = nextLine[DESCRIPTION_INDEX];
 				venue = nextLine[VENUE_INDEX];
 				startDate = convertToDate(nextLine[START_DATE_INDEX]);
@@ -135,7 +136,7 @@ public class Storage {
 				recurrence = nextLine[RECURRENCE_INDEX];
 				completed = convertToBoolean(nextLine[COMPLETED_INDEX]);
 
-				tasks.add(new Task(description, venue, startDate, startTime,
+				tasks.add(new Task(eventId, description, venue, startDate, startTime,
 						endDate, endTime, reminder, recurrence, completed));
 			}
 
