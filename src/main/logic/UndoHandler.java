@@ -3,7 +3,9 @@ package main.logic;
 import main.storage.Storage;
 
 public class UndoHandler extends CommandHandler {
-
+	
+	private final static String MESSAGE_UNDO_SUCCESS = "Undo successful.";
+	
 	private static Storage storage = Storage.getInstance();
 	
 	public UndoHandler(String details) {
@@ -13,7 +15,13 @@ public class UndoHandler extends CommandHandler {
 
 	@Override
 	public String execute() {
-		return null;
+		try {
+			storage.revertTaskHistory();
+		} catch(IllegalArgumentException e) {
+			return e.getMessage();
+		}
+		
+		return MESSAGE_UNDO_SUCCESS;
 	}
 
 }

@@ -47,7 +47,7 @@ public class TaskTest {
 		assertEquals("Venue: ", "COM1", task.getVenue());
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void testSetStartDate() {
 		TaskBuilder builder = new TaskBuilder();
 		builder.setDescription("meeting");
@@ -59,14 +59,39 @@ public class TaskTest {
 		builder.setCompleted(false);
 		Task task = builder.buildTask();
 		
-		task.setStartDate(new LocalDate(2014, 9, 13));
+		task.setStartDate(new LocalDate(2014, 10, 19));
 		assertEquals("Start date: ", "2014-09-13", task.getStartDate().toString());
-		
-		//this case should throw an exception
-		task.setStartDate(new LocalDate(2014, 11, 24));
-		//this case should throw an exception
-		task.setEndDate(new LocalDate(2013, 11, 24));
+	}
 	
+	//This is the case for the start later than end equivalence partition
+	@Test(expected=IllegalArgumentException.class)
+	public void testSetStartDateWithStartLaterThanEnd() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		//this case should throw an exception because we set start to be later than end
+		task.setStartDate(new LocalDate(2014, 11, 24));
+	}
+	//This is the case for the end earlier than start equivalence partition	
+	@Test(expected=IllegalArgumentException.class)
+	public void testSetStartDateWithEndEarlierThanStart() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		//this case should throw an exception because we set end to be earlier than start
+		task.setEndDate(new LocalDate(2013, 11, 24));
 	}
 	
 	@Test

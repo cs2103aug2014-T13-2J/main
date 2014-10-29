@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import main.storage.Storage;
 import main.storage.Task;
 
+import org.fusesource.jansi.AnsiConsole;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalDate;
@@ -29,6 +30,7 @@ public class DisplayHandler extends CommandHandler {
 
 	public DisplayHandler(String details) {
 		super(details);
+		AnsiConsole.systemInstall();
 	}
 
 	@Override
@@ -264,7 +266,7 @@ public class DisplayHandler extends CommandHandler {
 		result += getVenue(task);
 		// if a task has a start date, it will definitely have an end date, it
 		// just depends whether they are equal
-		if (task.getHasStartDate() && !startDateEqualsEndDate(task)) { // append
+		if (task.getHasStartDate() && !task.startDateEqualsEndDate()) { // append
 																		// "from.. ..to"
 			result += addFrom();
 			result += addStartDate(task);
@@ -277,21 +279,22 @@ public class DisplayHandler extends CommandHandler {
 				result += addEndTime(task);
 			}
 		} else if (task.getHasStartDate()) {
-			result += addOn(task);
+			result += addOn();
 			result += addStartDate(task);
 
-			if (task.getHasStartTime() && task.getHasEndTime()) {
+			if (task.getHasStartTime() && task.getHasEndTime()
+					&& !task.startTimeEqualsEndTime()) {
 				result += addFrom();
 				result += addStartTime(task);
 				result += addTo();
 				result += addEndTime(task);
-			} else {
-				result += addAt(task);
+			} else if (task.getHasStartTime()) {
+				result += addAt();
 				result += addStartTime(task);
 			}
 
 		} else if (task.getHasStartTime()) {
-			result += addAt(task);
+			result += addAt();
 			result += addStartTime(task);
 		}
 
@@ -331,26 +334,6 @@ public class DisplayHandler extends CommandHandler {
 		return "to" + STRING_SPACE;
 	}
 
-	// this function assumes that startDate and endDate will never be null
-	private static boolean startDateEqualsEndDate(Task task)
-			throws IllegalArgumentException {
-		LocalDate startDate = task.getStartDate();
-		LocalDate endDate = task.getEndDate();
-		DateTime d1 = startDate.toDateTimeAtStartOfDay();
-		DateTime d2 = endDate.toDateTimeAtStartOfDay();
-		int compareResult = DateTimeComparator.getDateOnlyInstance().compare(
-				d1, d2);
-		switch (compareResult) {
-		case -1: // startDate is earlier than endDate
-			return false;
-		case 0: // startDate equals endDate
-			return true;
-		default: // we should never reach this case
-			throw new IllegalArgumentException(
-					"Unexpected outcome in startDateEqualsEndDate function in DisplayHandler.");
-		}
-	}
-
 	private static String addStartDate(Task task) {
 		return task.getStartDate() + STRING_SPACE;
 	}
@@ -371,11 +354,11 @@ public class DisplayHandler extends CommandHandler {
 				+ STRING_SPACE;
 	}
 
-	private static String addOn(Task task) {
+	private static String addOn() {
 		return "on" + STRING_SPACE;
 	}
 
-	private static String addAt(Task task) {
+	private static String addAt() {
 		return "at" + STRING_SPACE;
 	}
 

@@ -5,10 +5,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+
+import com.rits.cloning.Cloner;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -25,9 +28,10 @@ public class Storage {
 	private static final int REMINDER_INDEX = 6;
 	private static final int RECURRENCE_INDEX = 7;
 	private static final int COMPLETED_INDEX = 8;
-	private static final String DATA_OVERWRITTEN_MESSAGE = "Storage arraylist is not empty. Data will be overwritten. Operation discontinued.";
-	private static final String READ_FROM_FILE_SUCCESS_MESSAGE = "Data read from storage.";
-	private static final String WRITE_FROM_FILE_SUCCESS_MESSAGE = "Tasks added."; 
+	private static final String MESSAGE_DATA_OVERWRITTEN = "Storage arraylist is not empty. Data will be overwritten. Operation discontinued.";
+	private static final String MESSAGE_READ_FROM_FILE_SUCCESS = "Data read from storage.";
+	private static final String MESSAGE_WRITE_FROM_FILE_SUCCESS = "Tasks added."; 
+	private static final String MESSAGE_NO_MORE_COMMANDS_TO_UNDO = "There are no more commands to undo.";
 	private static final int DATE_INDEX = 0;
 	private static final int TIME_INDEX = 1;
 	private static final int YEAR_INDEX = 0;
@@ -39,10 +43,12 @@ public class Storage {
 	/***************************** Data Members ************************/
 	private ArrayList<Task> tasks;
 	private static Storage theOne = null;
+	private LinkedList<ArrayList<Task>> taskHistory;
 	
 	/***************************** Constructors ************************/
 	private Storage () {
 		tasks = new ArrayList<Task>();
+		taskHistory = new LinkedList<ArrayList<Task>>();
 	}
 	
 	public static Storage getInstance() {
@@ -55,6 +61,10 @@ public class Storage {
 	/***************************** Accessors ************************/
 	public ArrayList<Task> getTasks() {
 		return this.tasks;
+	}
+	
+	public LinkedList<ArrayList<Task>> getTaskHistory() {
+		return this.taskHistory;
 	}
 	
 	/****************************************************************/
@@ -70,9 +80,30 @@ public class Storage {
 		tasks.clear();
 	}
 	
+	private void setTasks(ArrayList<Task> tasks) {
+		this.tasks = tasks;
+	}
+
+	public void updateTaskHistory() {
+		Cloner cloner = new Cloner();
+		ArrayList<Task> currentTasks = this.getTasks();
+		ArrayList<Task> clone = cloner.deepClone(currentTasks);
+		this.getTaskHistory().push(clone);
+	}
+	
+	public void revertTaskHistory() {
+		if(this.taskHistory.isEmpty()) {
+			throw new IllegalArgumentException(MESSAGE_NO_MORE_COMMANDS_TO_UNDO);
+		} else {
+			LinkedList<ArrayList<Task>> taskHistory = this.getTaskHistory();
+			taskHistory.pop();
+			this.setTasks(taskHistory.peek());
+		}
+	}
+	
 	public String readFromFile(String fileName) {
 		if(!tasks.isEmpty()) {
-			return DATA_OVERWRITTEN_MESSAGE;
+			return MESSAGE_DATA_OVERWRITTEN;
 		} else {
 		    try {
 		    	String[] nextLine;
@@ -109,7 +140,7 @@ public class Storage {
 				e.printStackTrace();
 			}
 		    
-		    return READ_FROM_FILE_SUCCESS_MESSAGE;
+		    return MESSAGE_READ_FROM_FILE_SUCCESS;
 		}
 	}
 	
@@ -209,7 +240,7 @@ public class Storage {
 			e.printStackTrace();
 		}
 		
-		return WRITE_FROM_FILE_SUCCESS_MESSAGE;
+		return MESSAGE_WRITE_FROM_FILE_SUCCESS;
 	}
 
 }

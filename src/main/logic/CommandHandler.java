@@ -1,5 +1,11 @@
 package main.logic;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+import main.storage.Storage;
+import main.storage.Task;
+
 
 public abstract class CommandHandler {
 	
@@ -10,4 +16,8 @@ public abstract class CommandHandler {
 	}
 
 	public abstract String execute();
+	
+	protected void saveCurrentState() {
+		Storage.getInstance().updateTaskHistory();
+	}
 }

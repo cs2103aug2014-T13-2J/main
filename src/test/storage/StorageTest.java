@@ -2,8 +2,6 @@ package test.storage;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-
 import main.storage.Storage;
 import main.storage.Task;
 import main.storage.TaskBuilder;

@@ -13,10 +13,11 @@ import main.storage.Storage;
 import main.storage.Task;
 
 public class DeleteHandler extends CommandHandler {
-	private static String MESSAGE_DELETE = "List of deleted tasks: ";
+	private static String MESSAGE_DELETE = "List of deleted tasks: \n";
+	private static String MESSAGE_INDEX_OUT_OF_BOUNDS = "Sorry, the arguments are out of bounds of the task list. Please try again.";
+	
 	private DeleteParser parser;
 	private static Storage storage = Storage.getInstance();
-	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-10s %-35s %-30s %-25s %-20s\n";
 
 	public DeleteHandler(String details) {
 		super(details);
@@ -25,35 +26,44 @@ public class DeleteHandler extends CommandHandler {
 
 	@Override
 	public String execute() {
-		parser.parse();
-		ArrayList<Integer> listOfIndexes = parser.getListOfIndexes();
-		String returnMessage = "";
-		String resultTop = "";
-		String resultBottom = "";
-		System.out.println();
-		System.out.println(MESSAGE_DELETE);
-		resultTop += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-				ansi().fg(RED).a("ID").reset(),
-				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi().fg(CYAN)
-						.a(" VENUE").reset(), ansi().fg(YELLOW).a(" TIME")
-						.reset(), ansi().fg(GREEN).a(" DATE").reset());
-		resultTop += DisplayHandler.displayLineSeparator();
-		System.out.print(resultTop);
-
-		for (int index : listOfIndexes) {
-			ArrayList<Task> list = storage.getTasks();
-			System.out.println(DisplayHandler.displayTaskInTable(index,
-					list.get(index)));
-			storage.deleteTask(index);
+		String returnMessage = parser.parse();
+		if (returnMessage.equals(CommandParser.MESSAGE_PARSE_SUCCESS)) {
+			try {
+				ArrayList<Integer> listOfIndexes = parser.getListOfIndexes();
+				String resultTop = "";
+				String resultBottom = "";
+				String DISPLAY_TABLE_ROW_STRING_FORMAT = DisplayHandler
+						.displayFormat();
+				returnMessage += "\n";
+				returnMessage += MESSAGE_DELETE;
+				resultTop += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(RED).a("ID").reset(),
+						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
+						ansi().fg(CYAN).a(" VENUE").reset(),
+						ansi().fg(YELLOW).a(" TIME").reset(),
+						ansi().fg(GREEN).a(" DATE").reset());
+				resultTop += DisplayHandler.displayLineSeparator();
+				returnMessage += resultTop;
+	
+				for (int index : listOfIndexes) {
+					ArrayList<Task> list = storage.getTasks();
+					returnMessage += DisplayHandler.displayTaskInTable(index,
+							list.get(index)) + "\n";
+					storage.deleteTask(index);
+				}
+				saveCurrentState();
+				resultBottom += DisplayHandler.displayLineSeparator();
+				resultBottom += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+						ansi().fg(RED).a("ID").reset(),
+						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
+						ansi().fg(CYAN).a(" VENUE").reset(),
+						ansi().fg(YELLOW).a(" TIME").reset(),
+						ansi().fg(GREEN).a(" DATE").reset());
+				returnMessage += resultBottom;
+			} catch (IndexOutOfBoundsException e) {
+				returnMessage = MESSAGE_INDEX_OUT_OF_BOUNDS;
+			}
 		}
-
-		resultBottom += DisplayHandler.displayLineSeparator();
-		resultBottom += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-				.fg(RED).a("ID").reset(), ansi().fg(MAGENTA).a(" DESCRIPTION")
-				.reset(), ansi().fg(CYAN).a(" VENUE").reset(), ansi()
-				.fg(YELLOW).a(" TIME").reset(), ansi().fg(GREEN).a(" DATE")
-				.reset());
-		System.out.print(resultBottom);
 
 		return returnMessage;
 	}

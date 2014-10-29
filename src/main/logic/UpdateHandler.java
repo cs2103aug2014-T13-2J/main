@@ -51,6 +51,7 @@ public class UpdateHandler extends CommandHandler {
 			} else {
 				task.setCompleted(false);
 			}
+			saveCurrentState();
 			String successMessage = getSuccessMessage(parser);
 			return successMessage;
 

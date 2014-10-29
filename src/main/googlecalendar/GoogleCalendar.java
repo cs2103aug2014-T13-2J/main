@@ -29,6 +29,7 @@ import com.google.api.services.calendar.model.EventDateTime;
 
 public class GoogleCalendar {
 
+	private static String MESSAGE_ALREADY_LOGGED_IN = "Sorry, you are already logged in to Google Calendar.";
 	private static String MESSAGE_ASK_TO_LOGIN = "Log in to Google Calendar? [Y/N]";
 	private static String MESSAGE_NO_LOGIN = "Cancelled logging in to Google Calendar.";
 	private static String MESSAGE_PRE_LOGIN = "Tasker will now open your default browser and direct you to a page for an authorisation code.\n\n"
@@ -36,43 +37,61 @@ public class GoogleCalendar {
 			+ "Press ENTER to continue...";
 	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google Calendar!";
 	private static String MESSAGE_SYNC_SUCCESS = "Task successfully synchronised!";
-	private static String MESSAGE_INVALID_COMMAND = "Invalid command!";
+	private static String MESSAGE_INVALID_ARGUMENT = "Sorry, the argument must either be 'Y' or 'N'.";
 	private static String NAME_APPLICATION = "Tasker";
 
+	private static GoogleCalendar theOne = null;
+	private static boolean isLoggedIn;
 	private static Calendar service;
 	private static Scanner scanner = new Scanner(System.in);
+	
+	private GoogleCalendar() {
+		
+	}
+	
+	public static GoogleCalendar getInstance() {
+		if (theOne == null) {
+			theOne = new GoogleCalendar();
+		}
+		return theOne;
+	}
 
-	public static String initialiseGoogleCalendar(boolean isFirstTime) {
+	public String initialiseGoogleCalendar(boolean isFirstTime) {
 		String message = "";
-		try {
-			if (isFirstTime) {
-				if (isLoggingInToGoogleCalendar()) {
+		if (!isLoggedIn) {	
+			try {
+				if (isFirstTime) {
+					if (isLoggingInToGoogleCalendar()) {
+						message = logInToGoogleCalendar();
+					}
+				} else {
 					message = logInToGoogleCalendar();
 				}
-			} else {
-				message = logInToGoogleCalendar();
+			} catch (IllegalArgumentException e) {
+				System.out.println(e.getMessage());
+				message = initialiseGoogleCalendar(isFirstTime);
 			}
-		} catch (IllegalArgumentException e) {
-			System.out.println(e.getMessage());
-			message = initialiseGoogleCalendar(isFirstTime);
+		} else {
+			message = MESSAGE_ALREADY_LOGGED_IN;
 		}
 		return message;
 	}
 
-	private static boolean isLoggingInToGoogleCalendar() {
+	private boolean isLoggingInToGoogleCalendar() {
 		System.out.println(MESSAGE_ASK_TO_LOGIN);
 		String userReplyToLogIn = scanner.nextLine();
 		if (userReplyToLogIn.equalsIgnoreCase("y")) {
 			return true;
 		} else if (userReplyToLogIn.equalsIgnoreCase("n")) {
 			System.out.println(MESSAGE_NO_LOGIN);
+			isLoggedIn = false;
 			return false;
 		} else {
-			throw new IllegalArgumentException(MESSAGE_INVALID_COMMAND);
+			throw new IllegalArgumentException(MESSAGE_INVALID_ARGUMENT);
 		}
 	}
 
-	private static String logInToGoogleCalendar() {
+	private String logInToGoogleCalendar() {
 		HttpTransport httpTransport = new NetHttpTransport();
 		JacksonFactory jsonFactory = new JacksonFactory();
 
@@ -121,16 +140,22 @@ public class GoogleCalendar {
 		// Create a new authorized API client
 		service = new Calendar.Builder(httpTransport, jsonFactory,
 				googleCredential).setApplicationName(NAME_APPLICATION).build();
+		
+		isLoggedIn = true;
 
 		return MESSAGE_LOGIN_SUCCESS;
 	}
 
-	public static String syncAddNonFloatingTask(Event event) throws IOException {
+	public boolean isLoggedIn() {
+		return isLoggedIn;
+	}
+
+	public String syncAddNonFloatingTask(Event event) throws IOException {
 		service.events().insert("primary", event).execute();
 		return MESSAGE_SYNC_SUCCESS;
 	}
 
-	public static Event convertNonFloatingTaskToEvent(Task task)
+	public Event convertNonFloatingTaskToEvent(Task task)
 			throws ParseException {
 		Event event = new Event();
 		event.setSummary(task.getDescription());
