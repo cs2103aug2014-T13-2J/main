@@ -1,7 +1,6 @@
 package main.logic;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 import main.TaskerLog;
 import main.googlecalendar.GoogleCalendar;
@@ -34,8 +33,6 @@ public class AddHandler extends CommandHandler {
 			//attributes
 			parser.parse();
 			Task task = convertParsedDetailsToTask();
-			storage.addTask(task);
-			saveCurrentState();
 			try {
 				if (googleCalendar.isLoggedIn() && task.getHasStartDate()) {
 					Event event = googleCalendar.convertNonFloatingTaskToEvent(task);
@@ -45,6 +42,8 @@ public class AddHandler extends CommandHandler {
 			} catch (IOException e ) {
 				return MESSAGE_SYNC_FAILURE;
 			}
+			storage.addTask(task);
+			saveCurrentState();
 			return DisplayHandler.displayTaskForAdd(task);
 		} catch (IllegalArgumentException e) {
 			TaskerLog.logSystemExceptionError(e.getMessage());

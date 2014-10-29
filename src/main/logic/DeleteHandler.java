@@ -7,8 +7,10 @@ import static org.fusesource.jansi.Ansi.Color.MAGENTA;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import main.googlecalendar.GoogleCalendar;
 import main.storage.Storage;
 import main.storage.Task;
 
@@ -19,6 +21,7 @@ public class DeleteHandler extends CommandHandler {
 
 	private DeleteParser parser;
 	private static Storage storage = Storage.getInstance();
+	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
 
 	public DeleteHandler(String details) {
 		super(details);
@@ -35,29 +38,36 @@ public class DeleteHandler extends CommandHandler {
 				String resultBottom = "";
 				returnMessage += "\n";
 				returnMessage += MESSAGE_DELETE;
-				resultTop += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-						.fg(RED).a("ID").reset(),
-						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
-						ansi().fg(CYAN).a(" VENUE").reset(),
-						ansi().fg(YELLOW).a(" TIME").reset(),
-						ansi().fg(GREEN).a(" DATE").reset());
+				resultTop += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+						ansi().fg(RED).a("ID").reset(),
+						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi()
+								.fg(CYAN).a(" VENUE").reset(), ansi()
+								.fg(YELLOW).a(" TIME").reset(), ansi()
+								.fg(GREEN).a(" DATE").reset());
 				resultTop += DisplayHandler.displayLineSeparator();
 				returnMessage += resultTop;
-	
+
 				for (int index : listOfIndexes) {
 					ArrayList<Task> list = storage.getTasks();
+					Task task = list.get(index);
+					String eventId = task.getEventId();
 					returnMessage += DisplayHandler.displayTaskInTable(index,
-							list.get(index)) + "\n";
+							task) + "\n";
 					storage.deleteTask(index);
+					try {
+						googleCalendar.syncDeleteTask(eventId);
+					} catch (IOException e) {
+						return MESSAGE_SYNC_FAILURE;
+					}
 				}
 				saveCurrentState();
 				resultBottom += DisplayHandler.displayLineSeparator();
 				resultBottom += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 						ansi().fg(RED).a("ID").reset(),
-						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
-						ansi().fg(CYAN).a(" VENUE").reset(),
-						ansi().fg(YELLOW).a(" TIME").reset(),
-						ansi().fg(GREEN).a(" DATE").reset());
+						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi()
+								.fg(CYAN).a(" VENUE").reset(), ansi()
+								.fg(YELLOW).a(" TIME").reset(), ansi()
+								.fg(GREEN).a(" DATE").reset());
 				returnMessage += resultBottom;
 			} catch (IndexOutOfBoundsException e) {
 				returnMessage = MESSAGE_INDEX_OUT_OF_BOUNDS;
