@@ -12,6 +12,7 @@ import java.util.TimeZone;
 import main.storage.Task;
 
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -158,16 +159,62 @@ public class GoogleCalendar {
 	public void syncDeleteTask(String eventId) throws IOException {
 		service.events().delete("primary", eventId).execute();
 	}
-	
-	public void syncUpdateTaskDescription(String eventId, String newDescription) throws IOException {
+
+	public void syncUpdateTaskDescription(String eventId, String newDescription)
+			throws IOException {
 		Event event = service.events().get("primary", eventId).execute();
 		event.setSummary(newDescription);
 		service.events().update("primary", eventId, event).execute();
 	}
-	
-	public void syncUpdateTaskVenue(String eventId, String newVenue) throws IOException {
+
+	public void syncUpdateTaskVenue(String eventId, String newVenue)
+			throws IOException {
 		Event event = service.events().get("primary", eventId).execute();
 		event.setLocation(newVenue);
+		service.events().update("primary", eventId, event).execute();
+	}
+
+	public void syncUpdateTaskStartDate(String eventId, LocalDate newStartDate)
+			throws IOException {
+		Event event = service.events().get("primary", eventId).execute();
+		EventDateTime eventDateTime = event.getStart(); 
+		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
+		LocalTime localTime = localDateTime.toLocalTime();
+		eventDateTime = convertToEventDateTime(newStartDate, localTime);
+		event.setStart(eventDateTime);
+		service.events().update("primary", eventId, event).execute();
+	}
+	
+	public void syncUpdateTaskStartTime(String eventId, LocalTime newStartTime)
+			throws IOException {
+		Event event = service.events().get("primary", eventId).execute();
+		EventDateTime eventDateTime = event.getStart(); 
+		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
+		LocalDate localDate = localDateTime.toLocalDate();
+		eventDateTime = convertToEventDateTime(localDate, newStartTime);
+		event.setStart(eventDateTime);
+		service.events().update("primary", eventId, event).execute();
+	}
+	
+	public void syncUpdateTaskEndDate(String eventId, LocalDate newEndDate)
+			throws IOException {
+		Event event = service.events().get("primary", eventId).execute();
+		EventDateTime eventDateTime = event.getEnd(); 
+		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
+		LocalTime localTime = localDateTime.toLocalTime();
+		eventDateTime = convertToEventDateTime(newEndDate, localTime);
+		event.setEnd(eventDateTime);
+		service.events().update("primary", eventId, event).execute();
+	}
+	
+	public void syncUpdateTaskEndTime(String eventId, LocalTime newEndTime)
+			throws IOException {
+		Event event = service.events().get("primary", eventId).execute();
+		EventDateTime eventDateTime = event.getEnd(); 
+		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
+		LocalDate localDate = localDateTime.toLocalDate();
+		eventDateTime = convertToEventDateTime(localDate, newEndTime);
+		event.setEnd(eventDateTime);
 		service.events().update("primary", eventId, event).execute();
 	}
 
@@ -193,13 +240,17 @@ public class GoogleCalendar {
 
 	private EventDateTime convertToEventDateTime(LocalDate taskDate,
 			LocalTime taskTime) {
-		org.joda.time.DateTime jodaStartDateTime = taskDate
-				.toDateTime(taskTime);
-		Date startDate = jodaStartDateTime.toDate();
-		DateTime startDateTime = new DateTime(startDate,
-				TimeZone.getTimeZone("UTC"));
-		EventDateTime eventStartDateTime = new EventDateTime();
-		eventStartDateTime.setDateTime(startDateTime);
-		return eventStartDateTime;
+		org.joda.time.DateTime jodaDateTime = taskDate.toDateTime(taskTime);
+		Date date = jodaDateTime.toDate();
+		DateTime dateTime = new DateTime(date, TimeZone.getTimeZone("UTC"));
+		EventDateTime eventDateTime = new EventDateTime();
+		eventDateTime.setDateTime(dateTime);
+		return eventDateTime;
+	}
+
+	private LocalDateTime convertToLocalDateTime(EventDateTime eventDateTime) {
+		DateTime dateTime = eventDateTime.getDateTime();
+		LocalDateTime localDateTime = new LocalDateTime(dateTime.getValue());
+		return localDateTime;
 	}
 }
