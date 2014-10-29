@@ -64,7 +64,7 @@ public class DisplayHandler extends CommandHandler {
 		return result;
 	}
 
-	static String displayLineSeparator() {
+	public static String displayLineSeparator() {
 		String lineString = "";
 		int terminalWidth = 79;
 		for (int i = 0; i < terminalWidth; i++) {

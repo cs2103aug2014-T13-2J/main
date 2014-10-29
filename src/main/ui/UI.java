@@ -21,6 +21,7 @@ public class UI {
 	}
 
 	public static void readAndExecuteCommands() throws IOException {
+		@SuppressWarnings("resource")
 		Scanner scanner = new Scanner(System.in);
 		while (true) {
 			System.out.println(MESSAGE_PROMPT);
