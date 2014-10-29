@@ -97,7 +97,11 @@ public class Storage {
 		} else {
 			LinkedList<ArrayList<Task>> taskHistory = this.getTaskHistory();
 			taskHistory.pop();
-			this.setTasks(taskHistory.peek());
+			if(taskHistory.peek() == null) {
+				this.setTasks(new ArrayList<Task>());
+			} else {
+				this.setTasks(taskHistory.peek());
+			}
 		}
 	}
 	
