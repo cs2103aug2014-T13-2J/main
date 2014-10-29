@@ -38,6 +38,7 @@ public class Task {
 			LocalTime startTime, LocalDate endDate, LocalTime endTime,
 			DateTime reminder, String recurrence, boolean completed)
 			throws IllegalArgumentException {
+		this.setEventId(eventId);
 		this.setDescription(description);
 		this.setVenue(venue);
 		this.setStartDate(startDate);
