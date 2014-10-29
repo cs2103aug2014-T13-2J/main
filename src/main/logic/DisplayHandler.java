@@ -1,9 +1,7 @@
 package main.logic;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-import jline.ConsoleReader;
 import main.storage.Storage;
 import main.storage.Task;
 
@@ -18,8 +16,7 @@ import static org.fusesource.jansi.Ansi.Color.*;
 public class DisplayHandler extends CommandHandler {
 
 	public static final String DISPLAY_NUM_OF_TASKS = "Total number of tasks: %d\n";
-	// public static final String DISPLAY_TABLE_ROW_STRING_FORMAT =
-	// "%-10s %-35s %-30s %-25s %-20s\n";
+	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-10s %-35s %-30s %-20s %-20s\n";
 	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT_EXTRA = "%-3s %-35s %-30s %-15s %-10s\n";
 	public static final String MESSAGE_EMPTY = "There is nothing to display";
 	public static final String MESSAGE_DISPLAY_SUCCESS = "Display successful.";
@@ -30,7 +27,6 @@ public class DisplayHandler extends CommandHandler {
 
 	private static String result;
 	private static Storage storage = Storage.getInstance();
-	static ConsoleReader console;
 
 	public DisplayHandler(String details) {
 		super(details);
@@ -41,7 +37,6 @@ public class DisplayHandler extends CommandHandler {
 	public String execute() {
 		ArrayList<Task> tasks = storage.getTasks();
 		result = "";
-		String DISPLAY_TABLE_ROW_STRING_FORMAT = displayFormat();
 		if (tasks.isEmpty()) {
 			System.out.println(MESSAGE_EMPTY);
 		} else {
@@ -71,7 +66,7 @@ public class DisplayHandler extends CommandHandler {
 
 	static String displayLineSeparator() {
 		String lineString = "";
-		int terminalWidth = getTerminalWidth();
+		int terminalWidth = 79;
 		for (int i = 0; i < terminalWidth; i++) {
 			lineString += "-";
 		}
@@ -79,37 +74,7 @@ public class DisplayHandler extends CommandHandler {
 		return lineString;
 	}
 
-	static String displayFormat() {
-		String displayFormat = "";
-		int terminalWidth = getTerminalWidth();
-		int id = terminalWidth / 10;
-		int description = terminalWidth / 10 * 5;
-		int venue = terminalWidth / 10 * 3;
-		int time = terminalWidth / 10 * 2;
-		int date = terminalWidth / 10 * 2;
-		String ID = "%-" + id + "s";
-		String DESCRIPTION = "%-" + description + "s";
-		String VENUE = "%-" + venue + "s";
-		String TIME = "%-" + time + "s";
-		String DATE = "%-" + date + "s";
-		displayFormat = ID + "" + DESCRIPTION + "" + VENUE + "" + TIME + ""
-				+ DATE + "\n";
-		return displayFormat;
-	}
-
-	private static int getTerminalWidth() {
-		try {
-			console = new ConsoleReader();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		int terminalWidth = console.getTermwidth();
-		return terminalWidth;
-	}
-
 	public static String displayTaskInTable(int number, Task task) {
-		String DISPLAY_TABLE_ROW_STRING_FORMAT = displayFormat();
 		result = "";
 		String taskNumber = getTaskNumber(number);
 		String taskDescription = task.getDescription();
@@ -230,25 +195,7 @@ public class DisplayHandler extends CommandHandler {
 			}
 
 			else if (venueLines > descriptionLines) {
-				for (int i = 0; i < descriptionLines - 1; i++) {
-					String displayVenue = taskVenueExtra.substring(0, 12);
-					String displayDescription = taskDescriptionExtra.substring(
-							0, 25);
-					taskVenueExtra = taskVenueExtra.substring(12);
-					taskDescriptionExtra = taskDescriptionExtra.substring(25);
 
-					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-							ansi().fg(RED).a(nullSpace).reset(),
-							ansi().fg(MAGENTA).a(displayDescription).reset(),
-							ansi().fg(CYAN).a(displayVenue).reset(), "", "");
-				}
-				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-						.fg(RED).a(nullSpace).reset(),
-						ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),
-						ansi().fg(CYAN).a(taskVenueExtra.substring(0, 12))
-								.reset(), "", "");
-
-				taskVenueExtra = taskVenueExtra.substring(12);
 				if (venueLines - descriptionLines - 1 == 0) {
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 							ansi().fg(RED).a(nullSpace).reset(),
@@ -274,27 +221,7 @@ public class DisplayHandler extends CommandHandler {
 			}
 
 			else if (descriptionLines > venueLines) {
-				for (int i = 0; i < venueLines - 1; i++) {
-					String displayVenue = taskVenueExtra.substring(0, 12);
-					String displayDescription = taskDescriptionExtra.substring(
-							0, 25);
-					taskVenueExtra = taskVenueExtra.substring(12);
-					taskDescriptionExtra = taskDescriptionExtra.substring(25);
 
-					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-							ansi().fg(RED).a(nullSpace).reset(),
-							ansi().fg(MAGENTA).a(displayDescription).reset(),
-							ansi().fg(CYAN).a(displayVenue).reset(), "", "");
-				}
-				result += String.format(
-						DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a(nullSpace).reset(),
-						ansi().fg(MAGENTA)
-								.a(taskDescriptionExtra.substring(0, 25))
-								.reset(), ansi().fg(CYAN).a(taskVenueExtra)
-								.reset(), "", "");
-
-				taskDescriptionExtra = taskDescriptionExtra.substring(25);
 				if (descriptionLines - venueLines - 1 == 0) {
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 							ansi().fg(RED).a(nullSpace).reset(),
@@ -313,6 +240,7 @@ public class DisplayHandler extends CommandHandler {
 										.reset(),
 								ansi().fg(CYAN).a("").reset(), "", "");
 					}
+
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 							ansi().fg(RED).a(nullSpace).reset(),
 							ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),
