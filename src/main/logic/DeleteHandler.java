@@ -51,7 +51,7 @@ public class DeleteHandler extends CommandHandler {
 							list.get(index)) + "\n";
 					storage.deleteTask(index);
 				}
-	
+				saveCurrentState();
 				resultBottom += DisplayHandler.displayLineSeparator();
 				resultBottom += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 						ansi().fg(RED).a("ID").reset(),

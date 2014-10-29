@@ -33,6 +33,7 @@ public class AddHandler extends CommandHandler {
 			parser.parse();
 			Task task = convertParsedDetailsToTask();
 			storage.addTask(task);
+			saveCurrentState();
 			try {
 				if (googleCalendar.isLoggedIn() && task.getHasStartDate()) {
 					googleCalendar.syncAddNonFloatingTask(googleCalendar.convertNonFloatingTaskToEvent(task));
