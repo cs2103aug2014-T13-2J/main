@@ -1,13 +1,12 @@
 package main.logic;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-
 import main.storage.Storage;
-import main.storage.Task;
 
 
 public abstract class CommandHandler {
+	
+	public static String MESSAGE_SYNC_SUCCESS = "Task successfully synchronised.";
+	public static String MESSAGE_SYNC_FAILURE = "Task failed to synchronise.";
 	
 	final static Integer DEFAULT_SECOND = 0;
 	final static Integer DEFAULT_MILLISECOND = 0;
