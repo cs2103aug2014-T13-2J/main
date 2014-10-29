@@ -12,6 +12,8 @@ import main.storage.TaskBuilder;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
+import com.google.api.services.calendar.model.Event;
+
 public class AddHandler extends CommandHandler {
 
 	final static String TASK_ADDED_MESSAGE = "Task added!";
@@ -36,14 +38,11 @@ public class AddHandler extends CommandHandler {
 			saveCurrentState();
 			try {
 				if (googleCalendar.isLoggedIn() && task.getHasStartDate()) {
-					googleCalendar.syncAddNonFloatingTask(googleCalendar.convertNonFloatingTaskToEvent(task));
+					Event event = googleCalendar.convertNonFloatingTaskToEvent(task);
+					String eventId = googleCalendar.syncAddNonFloatingTask(event);
 				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (IOException e ) {
+				return MESSAGE_SYNC_FAILURE;
 			}
 			return DisplayHandler.displayTaskForAdd(task);
 		} catch (IllegalArgumentException e) {
