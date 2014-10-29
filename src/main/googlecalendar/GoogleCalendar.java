@@ -4,7 +4,6 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
@@ -36,7 +35,6 @@ public class GoogleCalendar {
 			+ "Please copy the authorisation code and paste it back here.\n\n"
 			+ "Press ENTER to continue...";
 	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google Calendar!";
-	private static String MESSAGE_SYNC_SUCCESS = "Task successfully synchronised!";
 	private static String MESSAGE_INVALID_ARGUMENT = "Sorry, the argument must either be 'Y' or 'N'.";
 	private static String NAME_APPLICATION = "Tasker";
 
@@ -44,11 +42,11 @@ public class GoogleCalendar {
 	private static boolean isLoggedIn;
 	private static Calendar service;
 	private static Scanner scanner = new Scanner(System.in);
-	
+
 	private GoogleCalendar() {
-		
+
 	}
-	
+
 	public static GoogleCalendar getInstance() {
 		if (theOne == null) {
 			theOne = new GoogleCalendar();
@@ -58,7 +56,7 @@ public class GoogleCalendar {
 
 	public String initialiseGoogleCalendar(boolean isFirstTime) {
 		String message = "";
-		if (!isLoggedIn) {	
+		if (!isLoggedIn) {
 			try {
 				if (isFirstTime) {
 					if (isLoggingInToGoogleCalendar()) {
@@ -140,7 +138,7 @@ public class GoogleCalendar {
 		// Create a new authorized API client
 		service = new Calendar.Builder(httpTransport, jsonFactory,
 				googleCredential).setApplicationName(NAME_APPLICATION).build();
-		
+
 		isLoggedIn = true;
 
 		return MESSAGE_LOGIN_SUCCESS;
@@ -151,12 +149,17 @@ public class GoogleCalendar {
 	}
 
 	public String syncAddNonFloatingTask(Event event) throws IOException {
-		service.events().insert("primary", event).execute();
-		return MESSAGE_SYNC_SUCCESS;
+		Event createdEvent = service.events().insert("primary", event)
+				.execute();
+		String eventId = createdEvent.getId();
+		return eventId;
 	}
 
-	public Event convertNonFloatingTaskToEvent(Task task)
-			throws ParseException {
+	public void syncDeleteTask(String eventId) throws IOException {
+		service.events().delete("primary", eventId).execute();
+	}
+
+	public Event convertNonFloatingTaskToEvent(Task task) {
 		Event event = new Event();
 		event.setSummary(task.getDescription());
 		event.setLocation(task.getVenue());
