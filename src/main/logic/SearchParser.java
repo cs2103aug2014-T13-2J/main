@@ -15,7 +15,7 @@ import main.logic.DisplayHandler;
 public class SearchParser extends CommandParser {
 	public static final String MESSAGE_ERROR = "No search term specified.";
 	public static final String MESSAGE_NULL = "Task list is empty. There is nothing to search from.";
-	public static final String MESSAGE_UNAVAILABLE = "Search term cannot be found in the task list. Enter 'display' command to consider refining search terms.";
+	public static final String MESSAGE_UNAVAILABLE = "Search term cannot be found in task list.";
 	public static final String MESSAGE_SEARCH = "List of tasks containing";
 	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-10s %-35s %-30s %-25s %-20s\n";
 
