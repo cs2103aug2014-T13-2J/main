@@ -15,7 +15,8 @@ import main.storage.Task;
 public class DeleteHandler extends CommandHandler {
 	private static String MESSAGE_DELETE = "List of deleted tasks: \n";
 	private static String MESSAGE_INDEX_OUT_OF_BOUNDS = "Sorry, the arguments are out of bounds of the task list. Please try again.";
-	
+	private static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-10s %-35s %-30s %-20s %-20s\n";
+
 	private DeleteParser parser;
 	private static Storage storage = Storage.getInstance();
 
@@ -32,8 +33,6 @@ public class DeleteHandler extends CommandHandler {
 				ArrayList<Integer> listOfIndexes = parser.getListOfIndexes();
 				String resultTop = "";
 				String resultBottom = "";
-				String DISPLAY_TABLE_ROW_STRING_FORMAT = DisplayHandler
-						.displayFormat();
 				returnMessage += "\n";
 				returnMessage += MESSAGE_DELETE;
 				resultTop += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
