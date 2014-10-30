@@ -22,8 +22,8 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
-import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 
@@ -37,6 +37,8 @@ public class GoogleCalendar {
 			+ "Press ENTER to continue...";
 	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google Calendar!";
 	private static String MESSAGE_INVALID_ARGUMENT = "Sorry, the argument must either be 'Y' or 'N'.";
+//	private static String MESSAGE_SYNC_SUCCESS = "Task successfully synced.";
+	private static String MESSAGE_SYNC_FAILURE = "Task failed to sync.";
 	private static String NAME_APPLICATION = "Tasker";
 
 	private static GoogleCalendar theOne = null;
@@ -77,20 +79,22 @@ public class GoogleCalendar {
 		setUserCalendarId();
 		return message;
 	}
-	
+
 	private void setUserCalendarId() {
 		try {
-			com.google.api.services.calendar.model.Calendar calendar = service.calendars().get("primary").execute();
-			calendarId = calendar.getId(); 
+			com.google.api.services.calendar.model.Calendar calendar = service
+					.calendars().get("primary").execute();
+			calendarId = calendar.getId();
 		} catch (IOException e) {
-			//do nothing
+			// do nothing
 		} catch (NullPointerException e) {
-			//do nothing, for the case that we aren't able to instantiate the calendar instance
+			// do nothing, for the case that we aren't able to instantiate the
+			// calendar instance
 		}
 	}
-	
+
 	private String getUserCalendarId() {
-		if(calendarId == null) {
+		if (calendarId == null) {
 			setUserCalendarId();
 			return calendarId;
 		} else {
@@ -167,80 +171,153 @@ public class GoogleCalendar {
 		return MESSAGE_LOGIN_SUCCESS;
 	}
 
-	public boolean isLoggedIn() {
-		return isLoggedIn;
+	public String syncAddTask(Task task) {
+		String id;
+		if (isLoggedIn) {
+			if (isNonFloatingTask(task)) {
+				try {
+					id = syncAddNonFloatingTask(task);
+				} catch (IOException e) {
+					id = MESSAGE_SYNC_FAILURE;
+				}
+			} else {
+				id = "Floating task"; // To be added: id =
+										// syncAddFloatingTask(task);
+			}
+		} else {
+			id = "Offline";
+		}
+		return id;
 	}
 
-	public String syncAddNonFloatingTask(Event event) throws IOException {
-		Event createdEvent = service.events().insert(getUserCalendarId(), event)
-				.execute();
+	private String syncAddNonFloatingTask(Task task) throws IOException {
+		Event event = convertNonFloatingTaskToEvent(task);
+		Event createdEvent = service.events()
+				.insert(getUserCalendarId(), event).execute();
 		String eventId = createdEvent.getId();
 		return eventId;
 	}
 
-	public void syncDeleteTask(String eventId) throws IOException {
-		service.events().delete(getUserCalendarId(), eventId).execute();
+	private boolean isNonFloatingTask(Task task) {
+		if (task.getHasStartDate()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	public void syncUpdateTaskDescription(String eventId, String newDescription)
-			throws IOException {
-		Event event = service.events().get(getUserCalendarId(), eventId).execute();
-		event.setSummary(newDescription);
-		service.events().update(getUserCalendarId(), eventId, event).execute();
+	public void syncDeleteTask(String eventId) {
+		if (isLoggedIn) {
+			try {
+				service.events().delete(getUserCalendarId(), eventId).execute();
+			} catch (IOException e) {
+				System.out.println(MESSAGE_SYNC_FAILURE);
+			}
+		}
 	}
 
-	public void syncUpdateTaskVenue(String eventId, String newVenue)
-			throws IOException {
-		Event event = service.events().get(getUserCalendarId(), eventId).execute();
-		event.setLocation(newVenue);
-		service.events().update(getUserCalendarId(), eventId, event).execute();
+	public void syncUpdateTaskDescription(String eventId, String newDescription) {
+		if (isLoggedIn) {
+			Event event;
+			try {
+				event = service.events().get(getUserCalendarId(), eventId)
+						.execute();
+				event.setSummary(newDescription);
+				service.events().update(getUserCalendarId(), eventId, event)
+						.execute();
+			} catch (IOException e) {
+				System.out.println(MESSAGE_SYNC_FAILURE);
+			}
+		}
 	}
 
-	public void syncUpdateTaskStartDate(String eventId, LocalDate newStartDate)
-			throws IOException {
-		Event event = service.events().get(getUserCalendarId(), eventId).execute();
-		EventDateTime eventDateTime = event.getStart(); 
-		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
-		LocalTime localTime = localDateTime.toLocalTime();
-		eventDateTime = convertToEventDateTime(newStartDate, localTime);
-		event.setStart(eventDateTime);
-		service.events().update(getUserCalendarId(), eventId, event).execute();
-	}
-	
-	public void syncUpdateTaskStartTime(String eventId, LocalTime newStartTime)
-			throws IOException {
-		Event event = service.events().get(getUserCalendarId(), eventId).execute();
-		EventDateTime eventDateTime = event.getStart(); 
-		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
-		LocalDate localDate = localDateTime.toLocalDate();
-		eventDateTime = convertToEventDateTime(localDate, newStartTime);
-		event.setStart(eventDateTime);
-		service.events().update(getUserCalendarId(), eventId, event).execute();
-	}
-	
-	public void syncUpdateTaskEndDate(String eventId, LocalDate newEndDate)
-			throws IOException {
-		Event event = service.events().get(getUserCalendarId(), eventId).execute();
-		EventDateTime eventDateTime = event.getEnd(); 
-		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
-		LocalTime localTime = localDateTime.toLocalTime();
-		eventDateTime = convertToEventDateTime(newEndDate, localTime);
-		event.setEnd(eventDateTime);
-		service.events().update(getUserCalendarId(), eventId, event).execute();
-	}
-	
-	public void syncUpdateTaskEndTime(String eventId, LocalTime newEndTime)
-			throws IOException {
-		Event event = service.events().get(getUserCalendarId(), eventId).execute();
-		EventDateTime eventDateTime = event.getEnd(); 
-		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
-		LocalDate localDate = localDateTime.toLocalDate();
-		eventDateTime = convertToEventDateTime(localDate, newEndTime);
-		event.setEnd(eventDateTime);
-		service.events().update(getUserCalendarId(), eventId, event).execute();
+	public void syncUpdateTaskVenue(String eventId, String newVenue) {
+		if (isLoggedIn) {
+			try {
+				Event event = service.events()
+						.get(getUserCalendarId(), eventId).execute();
+				event.setLocation(newVenue);
+				service.events().update(getUserCalendarId(), eventId, event)
+						.execute();
+			} catch (IOException e) {
+				System.out.println(MESSAGE_SYNC_FAILURE);
+			}
+		}
 	}
 
-	public Event convertNonFloatingTaskToEvent(Task task) {
+	public void syncUpdateTaskStartDate(String eventId, LocalDate newStartDate) {
+		if (isLoggedIn) {
+			try {
+				Event event = service.events().get(getUserCalendarId(), eventId)
+						.execute();
+				EventDateTime eventDateTime = event.getStart();
+				LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
+				LocalTime localTime = localDateTime.toLocalTime();
+				eventDateTime = convertToEventDateTime(newStartDate, localTime);
+				event.setStart(eventDateTime);
+				service.events().update(getUserCalendarId(), eventId, event)
+						.execute();
+			} catch (IOException e) {
+				System.out.println(MESSAGE_SYNC_FAILURE);
+			}
+		}
+	}
+
+	public void syncUpdateTaskStartTime(String eventId, LocalTime newStartTime) {
+		if (isLoggedIn) {
+			try {
+				Event event = service.events().get(getUserCalendarId(), eventId)
+						.execute();
+				EventDateTime eventDateTime = event.getStart();
+				LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
+				LocalDate localDate = localDateTime.toLocalDate();
+				eventDateTime = convertToEventDateTime(localDate, newStartTime);
+				event.setStart(eventDateTime);
+				service.events().update(getUserCalendarId(), eventId, event)
+						.execute();
+			} catch (IOException e) {
+				System.out.println(MESSAGE_SYNC_FAILURE);
+			}
+		}
+	}
+
+	public void syncUpdateTaskEndDate(String eventId, LocalDate newEndDate) {
+		if (isLoggedIn) {
+			try {
+				Event event = service.events().get(getUserCalendarId(), eventId)
+						.execute();
+				EventDateTime eventDateTime = event.getEnd();
+				LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
+				LocalTime localTime = localDateTime.toLocalTime();
+				eventDateTime = convertToEventDateTime(newEndDate, localTime);
+				event.setEnd(eventDateTime);
+				service.events().update(getUserCalendarId(), eventId, event)
+						.execute();
+			} catch (IOException e) {
+				System.out.println(MESSAGE_SYNC_FAILURE);
+			}
+		}
+	}
+
+	public void syncUpdateTaskEndTime(String eventId, LocalTime newEndTime) {
+		if (isLoggedIn) {
+			try {
+				Event event = service.events().get(getUserCalendarId(), eventId)
+						.execute();
+				EventDateTime eventDateTime = event.getEnd();
+				LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
+				LocalDate localDate = localDateTime.toLocalDate();
+				eventDateTime = convertToEventDateTime(localDate, newEndTime);
+				event.setEnd(eventDateTime);
+				service.events().update(getUserCalendarId(), eventId, event)
+						.execute();
+			} catch (IOException e) {
+				System.out.println(MESSAGE_SYNC_FAILURE);
+			}
+		}
+	}
+
+	private Event convertNonFloatingTaskToEvent(Task task) {
 		Event event = new Event();
 		event.setSummary(task.getDescription());
 		event.setLocation(task.getVenue());
