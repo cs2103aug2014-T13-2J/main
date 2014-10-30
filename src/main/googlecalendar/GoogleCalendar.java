@@ -1,10 +1,9 @@
 package main.googlecalendar;
 
-import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
+import java.security.GeneralSecurityException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.TimeZone;
@@ -15,13 +14,17 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
+import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
@@ -29,21 +32,28 @@ import com.google.api.services.calendar.model.EventDateTime;
 
 public class GoogleCalendar {
 
+	private static String CLIENT_ID = "101595183122-6l80mvk11dn0o476g77773fi73mev60c.apps.googleusercontent.com";
+	private static String CLIENT_SECRET = "0qES2e4j6ob4WlgekNRCESzR";
+
 	private static String MESSAGE_ALREADY_LOGGED_IN = "Sorry, you are already logged in to Google Calendar.";
 	private static String MESSAGE_ASK_TO_LOGIN = "Log in to Google Calendar? [Y/N]";
 	private static String MESSAGE_NO_LOGIN = "Cancelled logging in to Google Calendar.";
-	private static String MESSAGE_PRE_LOGIN = "Tasker will now open your default browser and direct you to a page for an authorisation code.\n\n"
-			+ "Please copy the authorisation code and paste it back here.\n\n"
-			+ "Press ENTER to continue...";
-	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google Calendar!";
+	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google Calendar.";
 	private static String MESSAGE_INVALID_ARGUMENT = "Sorry, the argument must either be 'Y' or 'N'.";
-//	private static String MESSAGE_SYNC_SUCCESS = "Task successfully synced.";
 	private static String MESSAGE_SYNC_FAILURE = "Task failed to sync.";
-	private static String NAME_APPLICATION = "Tasker";
+
+	private static String NAME_APPLICATION = "Tasker/0.4";
+	/** Directory to store user credentials. */
+	private static final File CREDENTIAL_STORE_DIR = new File(
+			System.getProperty("user.dir"), ".store/Tasker");
+	private static FileDataStoreFactory dataStoreFactory;
+	private static HttpTransport httpTransport;
+	private static final JsonFactory JSON_FACTORY = JacksonFactory
+			.getDefaultInstance();
+	private static Calendar client;
 
 	private static GoogleCalendar theOne = null;
 	private static boolean isLoggedIn;
-	private static Calendar service;
 	private static String calendarId = null;
 	private static Scanner scanner = new Scanner(System.in);
 
@@ -82,7 +92,7 @@ public class GoogleCalendar {
 
 	private void setUserCalendarId() {
 		try {
-			com.google.api.services.calendar.model.Calendar calendar = service
+			com.google.api.services.calendar.model.Calendar calendar = client
 					.calendars().get("primary").execute();
 			calendarId = calendar.getId();
 		} catch (IOException e) {
@@ -116,58 +126,42 @@ public class GoogleCalendar {
 		}
 	}
 
-	private String logInToGoogleCalendar() {
-		HttpTransport httpTransport = new NetHttpTransport();
-		JacksonFactory jsonFactory = new JacksonFactory();
-
-		// The clientId and clientSecret can be found in Google Developers
-		// Console
-		String clientId = "101595183122-6l80mvk11dn0o476g77773fi73mev60c.apps.googleusercontent.com";
-		String clientSecret = "0qES2e4j6ob4WlgekNRCESzR";
-
-		// Or your redirect URL for web based applications.
-		String redirectUrl = "urn:ietf:wg:oauth:2.0:oob";
-
-		// Step 1: Authorize -->
+	/** Authorizes the installed application to access user's protected data. */
+	private static Credential authorise() throws Exception {
+		// load client secrets
+		GoogleClientSecrets.Details installedDetails = new GoogleClientSecrets.Details();
+		installedDetails.setClientId(CLIENT_ID);
+		installedDetails.setClientSecret(CLIENT_SECRET);
+		GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
+		clientSecrets.setInstalled(installedDetails);
+		
+		// set up authorization code flow
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-				httpTransport, jsonFactory, clientId, clientSecret,
-				Arrays.asList(CalendarScopes.CALENDAR)).setAccessType("online")
-				.setApprovalPrompt("auto").build();
+				httpTransport, JSON_FACTORY, clientSecrets,
+				Collections.singleton(CalendarScopes.CALENDAR))
+				.setDataStoreFactory(dataStoreFactory).build();
+		
+		// authorise
+		return new AuthorizationCodeInstalledApp(flow,
+				new LocalServerReceiver()).authorize("user");
+	}
 
-		String url = flow.newAuthorizationUrl().setRedirectUri(redirectUrl)
-				.build();
-		System.out.println(MESSAGE_PRE_LOGIN);
-		scanner.nextLine();
-
-		if (Desktop.isDesktopSupported()) {
-			Desktop desktop = Desktop.getDesktop();
-			try {
-				desktop.browse(new URI(url));
-			} catch (IOException e) {
-				return e.getMessage();
-			} catch (URISyntaxException e) {
-				return e.getMessage();
-			}
-		}
-
-		System.out.print("Authorisation code: ");
-		String code = scanner.nextLine();
-
-		GoogleTokenResponse response;
+	private String logInToGoogleCalendar() {
 		try {
-			response = flow.newTokenRequest(code).setRedirectUri(redirectUrl)
-					.execute();
+			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+			dataStoreFactory = new FileDataStoreFactory(CREDENTIAL_STORE_DIR);
+			Credential credential = authorise();
+			client = new com.google.api.services.calendar.Calendar.Builder(
+					httpTransport, JSON_FACTORY, credential)
+					.setApplicationName(NAME_APPLICATION).build();
+			isLoggedIn = true;
+		} catch (GeneralSecurityException e) {
+			return e.getMessage();
 		} catch (IOException e) {
 			return e.getMessage();
+		} catch (Exception e) {
+			return e.getMessage();
 		}
-		GoogleCredential googleCredential = new GoogleCredential()
-				.setFromTokenResponse(response);
-		// Create a new authorized API client
-		service = new Calendar.Builder(httpTransport, jsonFactory,
-				googleCredential).setApplicationName(NAME_APPLICATION).build();
-
-		isLoggedIn = true;
-
 		return MESSAGE_LOGIN_SUCCESS;
 	}
 
@@ -192,8 +186,8 @@ public class GoogleCalendar {
 
 	private String syncAddNonFloatingTask(Task task) throws IOException {
 		Event event = convertNonFloatingTaskToEvent(task);
-		Event createdEvent = service.events()
-				.insert(getUserCalendarId(), event).execute();
+		Event createdEvent = client.events().insert(getUserCalendarId(), event)
+				.execute();
 		String eventId = createdEvent.getId();
 		return eventId;
 	}
@@ -209,7 +203,7 @@ public class GoogleCalendar {
 	public void syncDeleteTask(String eventId) {
 		if (isLoggedIn) {
 			try {
-				service.events().delete(getUserCalendarId(), eventId).execute();
+				client.events().delete(getUserCalendarId(), eventId).execute();
 			} catch (IOException e) {
 				System.out.println(MESSAGE_SYNC_FAILURE);
 			}
@@ -220,10 +214,10 @@ public class GoogleCalendar {
 		if (isLoggedIn) {
 			Event event;
 			try {
-				event = service.events().get(getUserCalendarId(), eventId)
+				event = client.events().get(getUserCalendarId(), eventId)
 						.execute();
 				event.setSummary(newDescription);
-				service.events().update(getUserCalendarId(), eventId, event)
+				client.events().update(getUserCalendarId(), eventId, event)
 						.execute();
 			} catch (IOException e) {
 				System.out.println(MESSAGE_SYNC_FAILURE);
@@ -234,10 +228,10 @@ public class GoogleCalendar {
 	public void syncUpdateTaskVenue(String eventId, String newVenue) {
 		if (isLoggedIn) {
 			try {
-				Event event = service.events()
-						.get(getUserCalendarId(), eventId).execute();
+				Event event = client.events().get(getUserCalendarId(), eventId)
+						.execute();
 				event.setLocation(newVenue);
-				service.events().update(getUserCalendarId(), eventId, event)
+				client.events().update(getUserCalendarId(), eventId, event)
 						.execute();
 			} catch (IOException e) {
 				System.out.println(MESSAGE_SYNC_FAILURE);
@@ -248,14 +242,14 @@ public class GoogleCalendar {
 	public void syncUpdateTaskStartDate(String eventId, LocalDate newStartDate) {
 		if (isLoggedIn) {
 			try {
-				Event event = service.events().get(getUserCalendarId(), eventId)
+				Event event = client.events().get(getUserCalendarId(), eventId)
 						.execute();
 				EventDateTime eventDateTime = event.getStart();
 				LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
 				LocalTime localTime = localDateTime.toLocalTime();
 				eventDateTime = convertToEventDateTime(newStartDate, localTime);
 				event.setStart(eventDateTime);
-				service.events().update(getUserCalendarId(), eventId, event)
+				client.events().update(getUserCalendarId(), eventId, event)
 						.execute();
 			} catch (IOException e) {
 				System.out.println(MESSAGE_SYNC_FAILURE);
@@ -266,14 +260,14 @@ public class GoogleCalendar {
 	public void syncUpdateTaskStartTime(String eventId, LocalTime newStartTime) {
 		if (isLoggedIn) {
 			try {
-				Event event = service.events().get(getUserCalendarId(), eventId)
+				Event event = client.events().get(getUserCalendarId(), eventId)
 						.execute();
 				EventDateTime eventDateTime = event.getStart();
 				LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
 				LocalDate localDate = localDateTime.toLocalDate();
 				eventDateTime = convertToEventDateTime(localDate, newStartTime);
 				event.setStart(eventDateTime);
-				service.events().update(getUserCalendarId(), eventId, event)
+				client.events().update(getUserCalendarId(), eventId, event)
 						.execute();
 			} catch (IOException e) {
 				System.out.println(MESSAGE_SYNC_FAILURE);
@@ -284,14 +278,14 @@ public class GoogleCalendar {
 	public void syncUpdateTaskEndDate(String eventId, LocalDate newEndDate) {
 		if (isLoggedIn) {
 			try {
-				Event event = service.events().get(getUserCalendarId(), eventId)
+				Event event = client.events().get(getUserCalendarId(), eventId)
 						.execute();
 				EventDateTime eventDateTime = event.getEnd();
 				LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
 				LocalTime localTime = localDateTime.toLocalTime();
 				eventDateTime = convertToEventDateTime(newEndDate, localTime);
 				event.setEnd(eventDateTime);
-				service.events().update(getUserCalendarId(), eventId, event)
+				client.events().update(getUserCalendarId(), eventId, event)
 						.execute();
 			} catch (IOException e) {
 				System.out.println(MESSAGE_SYNC_FAILURE);
@@ -302,14 +296,14 @@ public class GoogleCalendar {
 	public void syncUpdateTaskEndTime(String eventId, LocalTime newEndTime) {
 		if (isLoggedIn) {
 			try {
-				Event event = service.events().get(getUserCalendarId(), eventId)
+				Event event = client.events().get(getUserCalendarId(), eventId)
 						.execute();
 				EventDateTime eventDateTime = event.getEnd();
 				LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
 				LocalDate localDate = localDateTime.toLocalDate();
 				eventDateTime = convertToEventDateTime(localDate, newEndTime);
 				event.setEnd(eventDateTime);
-				service.events().update(getUserCalendarId(), eventId, event)
+				client.events().update(getUserCalendarId(), eventId, event)
 						.execute();
 			} catch (IOException e) {
 				System.out.println(MESSAGE_SYNC_FAILURE);
