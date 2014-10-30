@@ -15,7 +15,7 @@ public class Task {
 	private static final String MESSAGE_HAS_TIME_WITHOUT_DATE = "Sorry, can't have time without date.";
 
 	/***************************** Data Members ************************/
-	private String eventId=null;
+	private String eventId = null;
 	private String description;
 	private boolean hasVenue = false;
 	private String venue = null;
@@ -34,10 +34,10 @@ public class Task {
 	private boolean completed = false;
 
 	/***************************** Constructors ************************/
-	public Task(String eventId, String description, String venue, LocalDate startDate,
-			LocalTime startTime, LocalDate endDate, LocalTime endTime,
-			DateTime reminder, String recurrence, boolean completed)
-			throws IllegalArgumentException {
+	public Task(String eventId, String description, String venue,
+			LocalDate startDate, LocalTime startTime, LocalDate endDate,
+			LocalTime endTime, DateTime reminder, String recurrence,
+			boolean completed) throws IllegalArgumentException {
 		this.setEventId(eventId);
 		this.setDescription(description);
 		this.setVenue(venue);
@@ -136,7 +136,7 @@ public class Task {
 	public void setEventId(String eventId) {
 		this.eventId = eventId;
 	}
-	
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -164,11 +164,14 @@ public class Task {
 			this.startDate = startDate;
 			this.setHasStartDate(false);
 		} else {
-			if (endDate != null
-					&& endIsEarlierThanStart(startDate, this.getStartTime(),
+			if(endDate == null || startDateEqualsEndDate()) {
+				this.startDate = startDate;
+				this.setHasStartDate(true);
+				this.setEndDate(startDate);
+				this.setHasEndDate(true);
+			} else if (endDate != null && endIsEarlierThanStart(startDate, this.getStartTime(),
 							this.getEndDate(), this.getEndTime())) {
-				throw new IllegalArgumentException(
-						MESSAGE_END_EARLIER_THAN_START);
+				throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
 			} else {
 				this.startDate = startDate;
 				this.setHasStartDate(true);
@@ -183,13 +186,16 @@ public class Task {
 	public void setStartTime(LocalTime startTime) {
 		if (startTime == null) {
 			this.startTime = startTime;
-			this.setHasStartTime(false);
+			this.setHasStartDate(false);
 		} else {
-			if (endTime != null
-					&& endIsEarlierThanStart(this.getStartDate(), startTime,
+			if(endTime == null || startTimeEqualsEndTime()) {
+				this.startTime = startTime;
+				this.setHasStartTime(true);
+				this.setEndTime(startTime);
+				this.setHasEndTime(true);
+			} else if (endTime != null && endIsEarlierThanStart(this.getStartDate(), startTime,
 							this.getEndDate(), this.getEndTime())) {
-				throw new IllegalArgumentException(
-						MESSAGE_END_EARLIER_THAN_START);
+				throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
 			} else {
 				this.startTime = startTime;
 				this.setHasStartTime(true);
@@ -374,7 +380,8 @@ public class Task {
 		case 0: // startDate equals endDate
 			return true;
 		default: // we should never reach this case
-			TaskerLog.logSystemInfo("Entered unexpected case in startDateEqualsEndDate function in Task class");
+			TaskerLog
+					.logSystemInfo("Entered unexpected case in startDateEqualsEndDate function in Task class");
 			throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
 		}
 	}
@@ -393,10 +400,10 @@ public class Task {
 		case 0: // startTime equals endTime
 			return true;
 		default: // we should never reach this case
-			TaskerLog.logSystemInfo("Entered unexpected case in startTimeEqualsEndTime function in Task class");
+			TaskerLog
+					.logSystemInfo("Entered unexpected case in startTimeEqualsEndTime function in Task class");
 			throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
 		}
 	}
-
 
 }
