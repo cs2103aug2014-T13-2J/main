@@ -60,7 +60,8 @@ public class TaskTest {
 		Task task = builder.buildTask();
 		
 		task.setStartDate(new LocalDate(2014, 10, 19));
-		assertEquals("Start date: ", "2014-09-13", task.getStartDate().toString());
+		assertEquals("Start date: ", "2014-10-19", task.getStartDate().toString());
+		assertEquals("has start date: ", true, task.getHasStartDate());
 	}
 	
 	//This is the case for the start later than end equivalence partition
