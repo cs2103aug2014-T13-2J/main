@@ -37,12 +37,16 @@ public class UpdateHandler extends CommandHandler {
 			if (field.equals(UpdateParser.FIELD_DESCRIPTION)) {
 				String newDescription = parser.getDescription();
 				task.setDescription(newDescription);
-				googleCalendar.syncUpdateTaskDescription(eventId,
-						newDescription);
+				if (googleCalendar.isLoggedIn()) {
+					googleCalendar.syncUpdateTaskDescription(eventId,
+							newDescription);
+				}
 			} else if (field.equals(UpdateParser.FIELD_VENUE)) {
 				String newVenue = parser.getVenue();
 				task.setVenue(newVenue);
-				googleCalendar.syncUpdateTaskVenue(eventId, newVenue);
+				if (googleCalendar.isLoggedIn()) {
+					googleCalendar.syncUpdateTaskVenue(eventId, newVenue);
+				}
 			} else if (field.equals(UpdateParser.FIELD_START_DATE)) {
 				updateStartDate(task, parser, eventId);
 			} else if (field.equals(UpdateParser.FIELD_START_TIME)) {
@@ -87,7 +91,9 @@ public class UpdateHandler extends CommandHandler {
 		LocalDate newStartDate = new LocalDate(startDateYear, startDateMonth,
 				startDateDay);
 		task.setStartDate(newStartDate);
-		googleCalendar.syncUpdateTaskStartDate(eventId, newStartDate);
+		if (googleCalendar.isLoggedIn()) {
+			googleCalendar.syncUpdateTaskStartDate(eventId, newStartDate);
+		}
 	}
 
 	private static void updateEndDate(Task task, UpdateParser parser,
@@ -99,7 +105,9 @@ public class UpdateHandler extends CommandHandler {
 		LocalDate newEndDate = new LocalDate(endDateYear, endDateMonth,
 				endDateDay);
 		task.setEndDate(newEndDate);
-		googleCalendar.syncUpdateTaskStartDate(eventId, newEndDate);
+		if (googleCalendar.isLoggedIn()) {
+			googleCalendar.syncUpdateTaskStartDate(eventId, newEndDate);
+		}
 	}
 
 	private static void updateStartTime(Task task, UpdateParser parser,
@@ -110,7 +118,9 @@ public class UpdateHandler extends CommandHandler {
 		LocalTime newStartTime = new LocalTime(startTimeHour, startTimeMinute);
 
 		task.setStartTime(newStartTime);
-		googleCalendar.syncUpdateTaskStartTime(eventId, newStartTime);
+		if (googleCalendar.isLoggedIn()) {
+			googleCalendar.syncUpdateTaskStartTime(eventId, newStartTime);
+		}
 	}
 
 	private static void updateEndTime(Task task, UpdateParser parser,
@@ -121,7 +131,9 @@ public class UpdateHandler extends CommandHandler {
 		LocalTime newEndTime = new LocalTime(endTimeHour, endTimeMinute);
 
 		task.setEndTime(newEndTime);
-		googleCalendar.syncUpdateTaskEndTime(eventId, newEndTime);
+		if (googleCalendar.isLoggedIn()) {
+			googleCalendar.syncUpdateTaskEndTime(eventId, newEndTime);
+		}
 	}
 
 	private static void updateRecurrence(Task task, UpdateParser parser) {
