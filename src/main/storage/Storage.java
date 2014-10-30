@@ -110,11 +110,7 @@ public class Storage {
 	public static String readFromFile() {
 		Storage storage = Storage.getInstance();
 		ArrayList<Task> tasks = storage.getTasks();
-		File file = new File(FILENAME);
 
-		if (!file.exists()) {
-			return MESSAGE_READ_FROM_FILE_SUCCESS;
-		}
 		try {
 			String[] nextLine;
 			CSVReader reader = new CSVReader(new FileReader(FILENAME));
