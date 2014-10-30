@@ -99,7 +99,6 @@ public class AddHandler extends CommandHandler {
 			
 			builder.setEndTime(time);
 		}
-		
 		return builder.buildTask();
 		
 	}

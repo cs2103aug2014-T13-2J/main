@@ -186,7 +186,7 @@ public class Task {
 	public void setStartTime(LocalTime startTime) {
 		if (startTime == null) {
 			this.startTime = startTime;
-			this.setHasStartDate(false);
+			this.setHasStartTime(false);
 		} else {
 			if(endTime == null || startTimeEqualsEndTime()) {
 				this.startTime = startTime;
