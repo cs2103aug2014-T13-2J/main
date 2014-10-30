@@ -48,58 +48,55 @@ public class DisplayHandlerTest {
 	public void testDisplayTask() {
 		String s1 = "meeting with Prof at 11pm at CLB on 3/10/2014";
 		CommandHandler e1 = new AddHandler(s1);
-		e1.execute();
+		assertEquals("meeting with Prof at CLB on 2014-10-03 at 23:00 added!", e1.execute());
 		
 		String s2 = "meeting with Prof at CLB at 11pm on 3/10";
 		CommandHandler e2 = new AddHandler(s2);
-		e2.execute();
+		assertEquals("meeting with Prof at CLB on 2014-10-03 at 23:00 added!", e2.execute());
 		
 		String s3 = "meeting with Prof at CLB on 4/12 at 11pm";
 		CommandHandler e3 = new AddHandler(s3);
-		e3.execute();
+		assertEquals("meeting with Prof at CLB on 2014-12-04 at 23:00 added!", e3.execute());
 		
 		String s4 = "gathering on 3/10/2014";
 		CommandHandler e4 = new AddHandler(s4);
-		e4.execute();
+		assertEquals("1", e4.execute());
 		
 		String s5 = "gathering on 3/10";
 		CommandHandler e5 = new AddHandler(s5);
-		e5.execute();
+		assertEquals("1", e5.execute());
 		
 		String s6 = "gathering on 3 October";	
 		CommandHandler e6 = new AddHandler(s6);
-		e6.execute();
+		assertEquals("1", e6.execute());
 		
 		String s7 = "gathering on 3 October 2014";
 		CommandHandler e7 = new AddHandler(s7);
-		e7.execute(); 
+		assertEquals("1", e7.execute());
 		
 		String s8 = "meeting from 3/10/2014 11pm to 4/10/2014 1am at Utown";
 		CommandHandler e8 = new AddHandler(s8);
-		e8.execute();
+		assertEquals("1", e8.execute());
 		
 		String s9 = "meeting from 3/10 to 4/10 at Utown";
 		CommandHandler e9 = new AddHandler(s9);
-		e9.execute();
+		assertEquals("1", e9.execute());
 		
 		String s10 = "meeting from 3 October 11pm to 4 October 1am at Utown";
 		CommandHandler e10 = new AddHandler(s10);
-		e10.execute();
+		assertEquals("1", e10.execute());
 		
 		String s11 = "meeting from 3/10 to 18/10";
 		CommandHandler e11 = new AddHandler(s11);
-		e11.execute();
+		assertEquals("1", e11.execute());
 		
 		String s12 = "meeting with Prof on 4/12 at CLB at 11pm";
 		CommandHandler e12 = new AddHandler(s12);
-		e12.execute();
+		assertEquals("1", e12.execute());
 		
 		String s13 = "meeting with Prof on 4/12 at 11pm at CLB";
 		CommandHandler e13 = new AddHandler(s13);
-		e13.execute();
-		
-		DisplayHandler handler = new DisplayHandler("details");
-		handler.execute();
+		assertEquals("1", e13.execute());
 		
 	}
 
