@@ -42,7 +42,7 @@ public class GoogleCalendar {
 	private static GoogleCalendar theOne = null;
 	private static boolean isLoggedIn;
 	private static Calendar service;
-	private static String calendarId;
+	private static String calendarId = null;
 	private static Scanner scanner = new Scanner(System.in);
 
 	private GoogleCalendar() {
@@ -74,14 +74,28 @@ public class GoogleCalendar {
 		} else {
 			message = MESSAGE_ALREADY_LOGGED_IN;
 		}
+		setUserCalendarId();
+		return message;
+	}
+	
+	private void setUserCalendarId() {
 		try {
 			com.google.api.services.calendar.model.Calendar calendar = service.calendars().get("primary").execute();
 			calendarId = calendar.getId(); 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//do nothing
+		} catch (NullPointerException e) {
+			//do nothing, for the case that we aren't able to instantiate the calendar instance
 		}
-		return message;
+	}
+	
+	private String getUserCalendarId() {
+		if(calendarId == null) {
+			setUserCalendarId();
+			return calendarId;
+		} else {
+			return calendarId;
+		}
 	}
 
 	private boolean isLoggingInToGoogleCalendar() {
@@ -158,72 +172,72 @@ public class GoogleCalendar {
 	}
 
 	public String syncAddNonFloatingTask(Event event) throws IOException {
-		Event createdEvent = service.events().insert(calendarId, event)
+		Event createdEvent = service.events().insert(getUserCalendarId(), event)
 				.execute();
 		String eventId = createdEvent.getId();
 		return eventId;
 	}
 
 	public void syncDeleteTask(String eventId) throws IOException {
-		service.events().delete(calendarId, eventId).execute();
+		service.events().delete(getUserCalendarId(), eventId).execute();
 	}
 
 	public void syncUpdateTaskDescription(String eventId, String newDescription)
 			throws IOException {
-		Event event = service.events().get(calendarId, eventId).execute();
+		Event event = service.events().get(getUserCalendarId(), eventId).execute();
 		event.setSummary(newDescription);
-		service.events().update(calendarId, eventId, event).execute();
+		service.events().update(getUserCalendarId(), eventId, event).execute();
 	}
 
 	public void syncUpdateTaskVenue(String eventId, String newVenue)
 			throws IOException {
-		Event event = service.events().get(calendarId, eventId).execute();
+		Event event = service.events().get(getUserCalendarId(), eventId).execute();
 		event.setLocation(newVenue);
-		service.events().update(calendarId, eventId, event).execute();
+		service.events().update(getUserCalendarId(), eventId, event).execute();
 	}
 
 	public void syncUpdateTaskStartDate(String eventId, LocalDate newStartDate)
 			throws IOException {
-		Event event = service.events().get(calendarId, eventId).execute();
+		Event event = service.events().get(getUserCalendarId(), eventId).execute();
 		EventDateTime eventDateTime = event.getStart(); 
 		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
 		LocalTime localTime = localDateTime.toLocalTime();
 		eventDateTime = convertToEventDateTime(newStartDate, localTime);
 		event.setStart(eventDateTime);
-		service.events().update(calendarId, eventId, event).execute();
+		service.events().update(getUserCalendarId(), eventId, event).execute();
 	}
 	
 	public void syncUpdateTaskStartTime(String eventId, LocalTime newStartTime)
 			throws IOException {
-		Event event = service.events().get(calendarId, eventId).execute();
+		Event event = service.events().get(getUserCalendarId(), eventId).execute();
 		EventDateTime eventDateTime = event.getStart(); 
 		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
 		LocalDate localDate = localDateTime.toLocalDate();
 		eventDateTime = convertToEventDateTime(localDate, newStartTime);
 		event.setStart(eventDateTime);
-		service.events().update(calendarId, eventId, event).execute();
+		service.events().update(getUserCalendarId(), eventId, event).execute();
 	}
 	
 	public void syncUpdateTaskEndDate(String eventId, LocalDate newEndDate)
 			throws IOException {
-		Event event = service.events().get(calendarId, eventId).execute();
+		Event event = service.events().get(getUserCalendarId(), eventId).execute();
 		EventDateTime eventDateTime = event.getEnd(); 
 		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
 		LocalTime localTime = localDateTime.toLocalTime();
 		eventDateTime = convertToEventDateTime(newEndDate, localTime);
 		event.setEnd(eventDateTime);
-		service.events().update(calendarId, eventId, event).execute();
+		service.events().update(getUserCalendarId(), eventId, event).execute();
 	}
 	
 	public void syncUpdateTaskEndTime(String eventId, LocalTime newEndTime)
 			throws IOException {
-		Event event = service.events().get(calendarId, eventId).execute();
+		Event event = service.events().get(getUserCalendarId(), eventId).execute();
 		EventDateTime eventDateTime = event.getEnd(); 
 		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
 		LocalDate localDate = localDateTime.toLocalDate();
 		eventDateTime = convertToEventDateTime(localDate, newEndTime);
 		event.setEnd(eventDateTime);
-		service.events().update(calendarId, eventId, event).execute();
+		service.events().update(getUserCalendarId(), eventId, event).execute();
 	}
 
 	public Event convertNonFloatingTaskToEvent(Task task) {
