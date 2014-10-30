@@ -68,6 +68,8 @@ public class UpdateHandler extends CommandHandler {
 			return MESSAGE_TASK_NOT_FOUND;
 		} catch (IOException e) {
 			return MESSAGE_SYNC_FAILURE;
+		} catch (IllegalArgumentException e) {
+			return e.getMessage();
 		}
 	}
 
