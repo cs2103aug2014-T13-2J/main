@@ -55,7 +55,9 @@ public class DeleteHandler extends CommandHandler {
 							task) + "\n";
 					storage.deleteTask(index);
 					try {
-						googleCalendar.syncDeleteTask(eventId);
+						if (googleCalendar.isLoggedIn()) {
+							googleCalendar.syncDeleteTask(eventId);
+						}
 					} catch (IOException e) {
 						return MESSAGE_SYNC_FAILURE;
 					}
