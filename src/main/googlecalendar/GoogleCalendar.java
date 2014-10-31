@@ -3,6 +3,8 @@ package main.googlecalendar;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Scanner;
@@ -134,13 +136,13 @@ public class GoogleCalendar {
 		installedDetails.setClientSecret(CLIENT_SECRET);
 		GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
 		clientSecrets.setInstalled(installedDetails);
-		
+
 		// set up authorization code flow
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
 				httpTransport, JSON_FACTORY, clientSecrets,
 				Collections.singleton(CalendarScopes.CALENDAR))
 				.setDataStoreFactory(dataStoreFactory).build();
-		
+
 		// authorise
 		return new AuthorizationCodeInstalledApp(flow,
 				new LocalServerReceiver()).authorize("user");
@@ -318,17 +320,35 @@ public class GoogleCalendar {
 
 		LocalDate taskStartDate = task.getStartDate();
 		LocalTime taskStartTime = task.getStartTime();
-		EventDateTime eventStartDateTime = convertToEventDateTime(
-				taskStartDate, taskStartTime);
-		event.setStart(eventStartDateTime);
 
 		LocalDate taskEndDate = task.getEndDate();
 		LocalTime taskEndTime = task.getEndTime();
-		EventDateTime eventEndDateTime = convertToEventDateTime(taskEndDate,
-				taskEndTime);
-		event.setEnd(eventEndDateTime);
+
+		if (taskStartTime == null && taskEndTime == null) {
+			EventDateTime eventStartDateTime = convertToEventDateTime(taskStartDate);
+			event.setStart(eventStartDateTime);
+			EventDateTime eventEndDateTime = convertToEventDateTime(taskEndDate);
+			event.setEnd(eventEndDateTime);
+		} else {
+			EventDateTime eventStartDateTime = convertToEventDateTime(
+					taskStartDate, taskStartTime);
+			event.setStart(eventStartDateTime);
+
+			EventDateTime eventEndDateTime = convertToEventDateTime(
+					taskEndDate, taskEndTime);
+			event.setEnd(eventEndDateTime);
+		}
 
 		return event;
+
+	}
+
+	private EventDateTime convertToEventDateTime(LocalDate localDate) {
+		String temp = localDate.toString(); // of the format YYYY-MM-DD
+		DateTime date = new DateTime(temp);
+		EventDateTime eventDateTime = new EventDateTime();
+		eventDateTime.setDate(date);
+		return eventDateTime;
 	}
 
 	private EventDateTime convertToEventDateTime(LocalDate taskDate,
