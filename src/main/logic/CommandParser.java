@@ -415,10 +415,11 @@ public abstract class CommandParser {
 			return currentWord;
 		} else if (arr.length == 2) { // if the format is D/M, where D, M can be
 										// any integer, but cannot start with 0
-			// get current year and append to D/M
-			DateTime current = new DateTime();
-			Integer year = current.getYear();
-			date = currentWord + "/" + year.toString();
+			if (!isInteger(arr[INDEX_DAY]) || !isInteger(arr[INDEX_MONTH])) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_DATE_FORMAT);
+			}
+			String year = getYearForAppend(arr[INDEX_MONTH]);
+			date = currentWord + "/" + year;
 			return date;
 		} else if (isDayOfWeek(currentWord)) {
 			String inputDayString = currentWord;
@@ -462,10 +463,12 @@ public abstract class CommandParser {
 				throw new IllegalArgumentException(MESSAGE_INVALID_DATE_FORMAT);
 			}
 			// get month
+			String month = null;
 			if (!wordsList.isEmpty()) {
 				currentWord = wordsList.poll();
 				if (isMonth(currentWord)) {
-					date += "/" + convertMonthToNumberStringFormat(currentWord);
+					month = convertMonthToNumberStringFormat(currentWord);
+					date += "/" + month;
 				} else {
 					throw new IllegalArgumentException(
 							MESSAGE_INVALID_DATE_FORMAT);
@@ -481,21 +484,30 @@ public abstract class CommandParser {
 					date += "/" + currentWord;
 					wordsList.poll();
 				} else {
-					// append the current year
-					DateTime current = new DateTime();
-					Integer year = current.getYear();
-					date = date + "/" + year.toString();
-					return date;
+					String year = getYearForAppend(month);
+					date = currentWord + "/" + year;
 				}
 			} else {
-				// append the current year
-				DateTime current = new DateTime();
-				Integer year = current.getYear();
-				date = date + "/" + year.toString();
+				String year = getYearForAppend(month);
+				date = date + "/" + year;
 				return date;
 			}
 			return date;
 		}
+	}
+	
+	private static String getYearForAppend(String month) {
+		// get current year and append to D/M
+		DateTime current = new DateTime();
+		Integer year = current.getYear();
+		Integer currentMonth = current.getMonthOfYear();
+		Integer monthOfDate = Integer.valueOf(month);
+		
+		if(monthOfDate < currentMonth) {
+			year += 1;
+		}
+		
+		return year.toString();
 	}
 
 	private static boolean isDayOfWeek(String day) {
@@ -555,9 +567,7 @@ public abstract class CommandParser {
 	// can be any integer not starting with 0
 	public static String getYear(String dateFormat) {
 		if (dateFormat == null) {
-			DateTime current = new DateTime();
-			Integer year = current.getYear(); 
-			return year.toString();
+			return null;
 		}
 		String[] temp = dateFormat.split("/");
 		return temp[INDEX_YEAR];
@@ -567,9 +577,7 @@ public abstract class CommandParser {
 	// can be any integer not starting with 0
 	public static String getMonth(String dateFormat) {
 		if (dateFormat == null) {
-			DateTime current = new DateTime();
-			Integer month = current.getMonthOfYear(); 
-			return month.toString();
+			return null;
 		}
 		String[] temp = dateFormat.split("/");
 		return temp[INDEX_MONTH];
@@ -579,9 +587,7 @@ public abstract class CommandParser {
 	// can be any integer not starting with 0
 	public static String getDay(String dateFormat) {
 		if (dateFormat == null) {
-			DateTime current = new DateTime();
-			Integer day = current.getDayOfMonth(); 
-			return day.toString();
+			return null;
 		}
 		String[] temp = dateFormat.split("/");
 		return temp[INDEX_DAY];
