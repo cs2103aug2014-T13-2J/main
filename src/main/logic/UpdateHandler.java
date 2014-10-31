@@ -85,6 +85,11 @@ public class UpdateHandler extends CommandHandler {
 				startDateDay);
 		task.setStartDate(newStartDate);
 		googleCalendar.syncUpdateTaskStartDate(eventId, newStartDate);
+		
+		if(task.startDateEqualsEndDate()) {
+			task.setEndDate(newStartDate);
+			googleCalendar.syncUpdateTaskEndDate(eventId, newStartDate);
+		}
 	}
 
 	private static void updateEndDate(Task task, UpdateParser parser,
@@ -96,7 +101,7 @@ public class UpdateHandler extends CommandHandler {
 		LocalDate newEndDate = new LocalDate(endDateYear, endDateMonth,
 				endDateDay);
 		task.setEndDate(newEndDate);
-		googleCalendar.syncUpdateTaskStartDate(eventId, newEndDate);
+		googleCalendar.syncUpdateTaskEndDate(eventId, newEndDate);
 	}
 
 	private static void updateStartTime(Task task, UpdateParser parser,
@@ -105,9 +110,15 @@ public class UpdateHandler extends CommandHandler {
 		Integer startTimeMinute = Integer.parseInt(parser.getStartTimeMinute());
 
 		LocalTime newStartTime = new LocalTime(startTimeHour, startTimeMinute);
-
+		
 		task.setStartTime(newStartTime);
 		googleCalendar.syncUpdateTaskStartTime(eventId, newStartTime);
+
+		if(task.startTimeEqualsEndTime()) {
+			task.setEndTime(newStartTime);
+			googleCalendar.syncUpdateTaskEndTime(eventId, newStartTime);
+		}
+		
 	}
 
 	private static void updateEndTime(Task task, UpdateParser parser,
