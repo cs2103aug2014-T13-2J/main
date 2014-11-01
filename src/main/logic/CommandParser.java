@@ -567,7 +567,9 @@ public abstract class CommandParser {
 	// can be any integer not starting with 0
 	public static String getYear(String dateFormat) {
 		if (dateFormat == null) {
-			return null;
+			DateTime current = new DateTime();
+			Integer year = current.getYear(); 
+			return year.toString();
 		}
 		String[] temp = dateFormat.split("/");
 		return temp[INDEX_YEAR];
@@ -577,7 +579,9 @@ public abstract class CommandParser {
 	// can be any integer not starting with 0
 	public static String getMonth(String dateFormat) {
 		if (dateFormat == null) {
-			return null;
+			DateTime current = new DateTime();
+			Integer month = current.getMonthOfYear(); 
+			return month.toString();
 		}
 		String[] temp = dateFormat.split("/");
 		return temp[INDEX_MONTH];
@@ -587,7 +591,9 @@ public abstract class CommandParser {
 	// can be any integer not starting with 0
 	public static String getDay(String dateFormat) {
 		if (dateFormat == null) {
-			return null;
+			DateTime current = new DateTime();
+			Integer day = current.getDayOfMonth(); 
+			return day.toString();
 		}
 		String[] temp = dateFormat.split("/");
 		return temp[INDEX_DAY];
