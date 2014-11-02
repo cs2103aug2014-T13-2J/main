@@ -83,6 +83,10 @@ public class DisplayHandler extends CommandHandler {
 		String taskDescriptionExtraOne = "";
 		String taskDescriptionExtraTwo = "";
 
+		if (taskDescription == "null") {
+			taskDescription = "-";
+		}
+		
 		if (taskDescription.length() >= 25 && taskDescription.length() < 50) {
 			taskDescriptionExtraOne = taskDescription.substring(25);
 			taskDescription = taskDescription.substring(0, 25);
@@ -108,6 +112,9 @@ public class DisplayHandler extends CommandHandler {
 		String taskVenueExtraTwo = "";
 		if (task.getHasVenue()) {
 			taskVenue = task.getVenue();
+			
+			
+			
 			if (taskVenue.length() >= 12 && taskVenue.length() < 24) {
 				taskVenueExtraOne = taskVenue.substring(12);
 				taskVenue = taskVenue.substring(0, 12);
@@ -149,6 +156,10 @@ public class DisplayHandler extends CommandHandler {
 			nullSpace += " ";
 		}
 
+		if (taskVenue == "null"){
+			taskVenue = "-";
+		}
+		
 		String to = "to";
 		result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
 				.a(taskNumber).reset(), ansi().fg(MAGENTA).a(taskDescription)
