@@ -41,9 +41,10 @@ public class DisplayHandler extends CommandHandler {
 		if (tasks.isEmpty()) {
 			System.out.println(MESSAGE_EMPTY);
 		} else {
+			System.out.println();
 			int numberOfTasks = tasks.size();
 			result = String.format(DISPLAY_NUM_OF_TASKS, numberOfTasks);
-
+			result += displayLineSeparator();
 			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 					ansi().fg(RED).a("ID").reset(),
 					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
@@ -61,6 +62,8 @@ public class DisplayHandler extends CommandHandler {
 					ansi().fg(CYAN).a(" VENUE").reset(),
 					ansi().fg(YELLOW).a(" TIME").reset(),
 					ansi().fg(GREEN).a(" DATE").reset());
+			result += displayLineSeparator();
+
 		}
 		return result;
 	}
@@ -84,9 +87,6 @@ public class DisplayHandler extends CommandHandler {
 		String taskDescriptionExtraOne = "";
 		String taskDescriptionExtraTwo = "";
 
-		if (taskDescription == "null") {
-			taskDescription = "-";
-		}
 		
 		if (taskDescription.length() >= 25 && taskDescription.length() < 50) {
 			taskDescriptionExtraOne = taskDescription.substring(25);

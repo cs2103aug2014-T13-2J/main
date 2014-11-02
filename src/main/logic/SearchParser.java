@@ -54,6 +54,7 @@ public class SearchParser extends CommandParser {
 			System.out.println();
 			System.out.println(MESSAGE_SEARCH + " " + "'"
 					+ ansi().fg(RED).a(userInput).reset() + "'" + ": ");
+			resultTop += DisplayHandler.displayLineSeparator();
 			resultTop += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 					.fg(RED).a("ID").reset(),
 					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
@@ -65,18 +66,18 @@ public class SearchParser extends CommandParser {
 
 			for (int i = 0; i < list.size(); i++) {
 				if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
-					System.out.println(DisplayHandler.displayTaskInTable(i,
+					System.out.print(DisplayHandler.displayTaskInTable(i,
 							list.get(i)));
 				}
 			}
 
-			resultBottom += DisplayHandler.displayLineSeparator();
 			resultBottom += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 					ansi().fg(RED).a("ID").reset(),
 					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
 					ansi().fg(CYAN).a(" VENUE").reset(),
 					ansi().fg(YELLOW).a(" TIME").reset(),
 					ansi().fg(GREEN).a(" DATE").reset());
+			resultBottom += DisplayHandler.displayLineSeparator();
 			System.out.print(resultBottom);
 
 			return returnMessage;
