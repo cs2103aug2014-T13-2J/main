@@ -54,7 +54,7 @@ public class DisplayHandler extends CommandHandler {
 			for (int j = 0; j < tasks.size(); j++) {
 				result += displayTaskInTable(j, tasks.get(j));
 			}
-			result += displayLineSeparator();
+			//result += displayLineSeparator();
 			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 					ansi().fg(RED).a("ID").reset(),
 					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
@@ -114,7 +114,9 @@ public class DisplayHandler extends CommandHandler {
 		if (task.getHasVenue()) {
 			taskVenue = task.getVenue();
 			
-			
+			if (taskVenue == "null" || taskVenue == "" || taskVenue == "-"){
+				taskVenue = "-";
+			}
 			
 			if (taskVenue.length() >= 12 && taskVenue.length() < 24) {
 				taskVenueExtraOne = taskVenue.substring(12);
@@ -157,9 +159,6 @@ public class DisplayHandler extends CommandHandler {
 			nullSpace += " ";
 		}
 
-		if (taskVenue == "null"){
-			taskVenue = "-";
-		}
 		
 		String to = "to";
 		if(completed) {
@@ -183,6 +182,7 @@ public class DisplayHandler extends CommandHandler {
 							.fg(YELLOW).a(taskVenueExtraTwo).reset(),
 					ansi().fg(YELLOW).a(endTaskTime).reset(),
 					ansi().fg(YELLOW).a(endTaskDate).reset());
+
 		}
 		
 		else {
@@ -206,6 +206,10 @@ public class DisplayHandler extends CommandHandler {
 						.fg(CYAN).a(taskVenueExtraTwo).reset(),
 				ansi().fg(RED).a(endTaskTime).reset(),
 				ansi().fg(GREEN).a(endTaskDate).reset());
+		}
+		if(taskDescriptionExtra.isEmpty() && taskVenueExtra.isEmpty()){
+			result += displayLineSeparator();
+
 		}
 		
 		if (!taskDescriptionExtra.isEmpty() || !taskVenueExtra.isEmpty()) {
@@ -239,12 +243,16 @@ public class DisplayHandler extends CommandHandler {
 							.fg(YELLOW).a(nullSpace).reset(),
 							ansi().fg(YELLOW).a(taskDescriptionExtra).reset(),
 							ansi().fg(YELLOW).a(taskVenueExtra).reset(), "", "");
+					result += displayLineSeparator();
+
 				}
 				else{
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(RED).a(nullSpace).reset(),
 						ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),
 						ansi().fg(CYAN).a(taskVenueExtra).reset(), "", "");
+				result += displayLineSeparator();
+
 				}
 			}
 
@@ -256,12 +264,16 @@ public class DisplayHandler extends CommandHandler {
 								ansi().fg(YELLOW).a(nullSpace).reset(),
 								ansi().fg(YELLOW).a("").reset(), ansi().fg(YELLOW)
 										.a(taskVenueExtra).reset(), "", "");
+						result += displayLineSeparator();
+
 					}
 					else{
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 							ansi().fg(RED).a(nullSpace).reset(),
 							ansi().fg(MAGENTA).a("").reset(), ansi().fg(CYAN)
 									.a(taskVenueExtra).reset(), "", "");
+					result += displayLineSeparator();
+
 					}
 				} else {
 					for (int j = 0; j < (venueLines - descriptionLines) - 1; j++) {
@@ -291,12 +303,16 @@ public class DisplayHandler extends CommandHandler {
 								ansi().fg(YELLOW).a(nullSpace).reset(),
 								ansi().fg(YELLOW).a("").reset(), ansi().fg(YELLOW)
 										.a(taskVenueExtra).reset(), "", "");
+						result += displayLineSeparator();
+
 					}
 					else{
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 							ansi().fg(RED).a(nullSpace).reset(),
 							ansi().fg(MAGENTA).a("").reset(), ansi().fg(CYAN)
 									.a(taskVenueExtra).reset(), "", "");
+					result += displayLineSeparator();
+
 					}
 				}
 			}
@@ -309,6 +325,8 @@ public class DisplayHandler extends CommandHandler {
 								ansi().fg(YELLOW).a(nullSpace).reset(),
 								ansi().fg(YELLOW).a(taskDescriptionExtra).reset(),
 								ansi().fg(YELLOW).a("").reset(), "", "");
+						result += displayLineSeparator();
+
 
 					}
 					else{
@@ -316,6 +334,8 @@ public class DisplayHandler extends CommandHandler {
 							ansi().fg(RED).a(nullSpace).reset(),
 							ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),
 							ansi().fg(CYAN).a("").reset(), "", "");
+					result += displayLineSeparator();
+
 					}
 				} else {
 					for (int j = 0; j < (descriptionLines - venueLines) - 1; j++) {
@@ -347,12 +367,16 @@ public class DisplayHandler extends CommandHandler {
 								ansi().fg(YELLOW).a(nullSpace).reset(),
 								ansi().fg(YELLOW).a(taskDescriptionExtra).reset(),
 								ansi().fg(YELLOW).a("").reset(), "", "");
+						result += displayLineSeparator();
+
 					}
 					else{
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 							ansi().fg(RED).a(nullSpace).reset(),
 							ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),
 							ansi().fg(CYAN).a("").reset(), "", "");
+					result += displayLineSeparator();
+
 					}
 				}
 
