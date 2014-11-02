@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -13,10 +12,10 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
-import com.rits.cloning.Cloner;
-
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+
+import com.rits.cloning.Cloner;
 
 public class Storage {
 	private static final int EVENT_ID_INDEX = 0;
@@ -125,8 +124,9 @@ public class Storage {
 			DateTime reminder;
 			String recurrence;
 			boolean completed;
-
-			while ((nextLine = reader.readNext()) != null) {
+			
+			nextLine = reader.readNext();
+			while (nextLine != null) {
 				eventId = nextLine[EVENT_ID_INDEX];
 				description = nextLine[DESCRIPTION_INDEX];
 				venue = nextLine[VENUE_INDEX];
@@ -137,10 +137,10 @@ public class Storage {
 				reminder = convertToDateTime(nextLine[REMINDER_INDEX]);
 				recurrence = nextLine[RECURRENCE_INDEX];
 				completed = convertToBoolean(nextLine[COMPLETED_INDEX]);
-
 				tasks.add(new Task(eventId, description, venue, startDate,
 						startTime, endDate, endTime, reminder, recurrence,
 						completed));
+				nextLine = reader.readNext();
 			}
 
 			reader.close();

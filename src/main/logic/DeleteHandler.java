@@ -7,7 +7,6 @@ import static org.fusesource.jansi.Ansi.Color.MAGENTA;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import main.googlecalendar.GoogleCalendar;
@@ -54,13 +53,8 @@ public class DeleteHandler extends CommandHandler {
 					returnMessage += DisplayHandler.displayTaskInTable(index,
 							task) + "\n";
 					storage.deleteTask(index);
-					try {
-						if (googleCalendar.isLoggedIn()) {
-							googleCalendar.syncDeleteTask(eventId);
-						}
-					} catch (IOException e) {
-						return MESSAGE_SYNC_FAILURE;
-					}
+					googleCalendar.syncDeleteTask(eventId);
+
 				}
 				saveCurrentState();
 				resultBottom += DisplayHandler.displayLineSeparator();

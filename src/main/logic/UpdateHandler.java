@@ -1,14 +1,13 @@
 package main.logic;
 
-import java.io.IOException;
 import java.util.ArrayList;
-
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 
 import main.googlecalendar.GoogleCalendar;
 import main.storage.Storage;
 import main.storage.Task;
+
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 
 public class UpdateHandler extends CommandHandler {
 
@@ -37,16 +36,13 @@ public class UpdateHandler extends CommandHandler {
 			if (field.equals(UpdateParser.FIELD_DESCRIPTION)) {
 				String newDescription = parser.getDescription();
 				task.setDescription(newDescription);
-				if (googleCalendar.isLoggedIn()) {
-					googleCalendar.syncUpdateTaskDescription(eventId,
-							newDescription);
-				}
+				googleCalendar.syncUpdateTaskDescription(eventId,
+						newDescription);
 			} else if (field.equals(UpdateParser.FIELD_VENUE)) {
 				String newVenue = parser.getVenue();
 				task.setVenue(newVenue);
-				if (googleCalendar.isLoggedIn()) {
-					googleCalendar.syncUpdateTaskVenue(eventId, newVenue);
-				}
+				googleCalendar.syncUpdateTaskVenue(eventId, newVenue);
+
 			} else if (field.equals(UpdateParser.FIELD_START_DATE)) {
 				updateStartDate(task, parser, eventId);
 			} else if (field.equals(UpdateParser.FIELD_START_TIME)) {
@@ -67,11 +63,8 @@ public class UpdateHandler extends CommandHandler {
 			saveCurrentState();
 			String successMessage = getSuccessMessage(parser);
 			return successMessage;
-
 		} catch (IndexOutOfBoundsException e) {
 			return MESSAGE_TASK_NOT_FOUND;
-		} catch (IOException e) {
-			return MESSAGE_SYNC_FAILURE;
 		} catch (IllegalArgumentException e) {
 			return e.getMessage();
 		}
@@ -83,7 +76,7 @@ public class UpdateHandler extends CommandHandler {
 	}
 
 	private static void updateStartDate(Task task, UpdateParser parser,
-			String eventId) throws IOException {
+			String eventId) {
 		Integer startDateYear = Integer.parseInt(parser.getStartDateYear());
 		Integer startDateMonth = Integer.parseInt(parser.getStartDateMonth());
 		Integer startDateDay = Integer.parseInt(parser.getStartDateDay());
@@ -91,13 +84,16 @@ public class UpdateHandler extends CommandHandler {
 		LocalDate newStartDate = new LocalDate(startDateYear, startDateMonth,
 				startDateDay);
 		task.setStartDate(newStartDate);
-		if (googleCalendar.isLoggedIn()) {
-			googleCalendar.syncUpdateTaskStartDate(eventId, newStartDate);
+		googleCalendar.syncUpdateTaskStartDate(eventId, newStartDate);
+		
+		if(task.startDateEqualsEndDate()) {
+			task.setEndDate(newStartDate);
+			googleCalendar.syncUpdateTaskEndDate(eventId, newStartDate);
 		}
 	}
 
 	private static void updateEndDate(Task task, UpdateParser parser,
-			String eventId) throws IOException {
+			String eventId) {
 		Integer endDateYear = Integer.parseInt(parser.getEndDateYear());
 		Integer endDateMonth = Integer.parseInt(parser.getEndDateMonth());
 		Integer endDateDay = Integer.parseInt(parser.getEndDateDay());
@@ -105,35 +101,35 @@ public class UpdateHandler extends CommandHandler {
 		LocalDate newEndDate = new LocalDate(endDateYear, endDateMonth,
 				endDateDay);
 		task.setEndDate(newEndDate);
-		if (googleCalendar.isLoggedIn()) {
-			googleCalendar.syncUpdateTaskStartDate(eventId, newEndDate);
-		}
+		googleCalendar.syncUpdateTaskEndDate(eventId, newEndDate);
 	}
 
 	private static void updateStartTime(Task task, UpdateParser parser,
-			String eventId) throws IOException {
+			String eventId) {
 		Integer startTimeHour = Integer.parseInt(parser.getStartTimeHour());
 		Integer startTimeMinute = Integer.parseInt(parser.getStartTimeMinute());
 
 		LocalTime newStartTime = new LocalTime(startTimeHour, startTimeMinute);
-
+		
 		task.setStartTime(newStartTime);
-		if (googleCalendar.isLoggedIn()) {
-			googleCalendar.syncUpdateTaskStartTime(eventId, newStartTime);
+		googleCalendar.syncUpdateTaskStartTime(eventId, newStartTime);
+
+		if(task.startTimeEqualsEndTime()) {
+			task.setEndTime(newStartTime);
+			googleCalendar.syncUpdateTaskEndTime(eventId, newStartTime);
 		}
+		
 	}
 
 	private static void updateEndTime(Task task, UpdateParser parser,
-			String eventId) throws IOException {
+			String eventId) {
 		int endTimeHour = Integer.parseInt(parser.getEndTimeHour());
 		int endTimeMinute = Integer.parseInt(parser.getEndTimeMinute());
 
 		LocalTime newEndTime = new LocalTime(endTimeHour, endTimeMinute);
 
 		task.setEndTime(newEndTime);
-		if (googleCalendar.isLoggedIn()) {
-			googleCalendar.syncUpdateTaskEndTime(eventId, newEndTime);
-		}
+		googleCalendar.syncUpdateTaskEndTime(eventId, newEndTime);
 	}
 
 	private static void updateRecurrence(Task task, UpdateParser parser) {

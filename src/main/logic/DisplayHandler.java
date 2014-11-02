@@ -1,17 +1,18 @@
 package main.logic;
 
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.CYAN;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.MAGENTA;
+import static org.fusesource.jansi.Ansi.Color.RED;
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
+
 import java.util.ArrayList;
 
 import main.storage.Storage;
 import main.storage.Task;
 
 import org.fusesource.jansi.AnsiConsole;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeComparator;
-import org.joda.time.LocalDate;
-
-import static org.fusesource.jansi.Ansi.*;
-import static org.fusesource.jansi.Ansi.Color.*;
 
 public class DisplayHandler extends CommandHandler {
 

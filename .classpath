@@ -49,5 +49,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="libs/jline-1.0.jar"/>
 	<classpathentry kind="lib" path="libs/jansi-1.11.jar"/>
+	<classpathentry kind="lib" path="libs/javax.servlet-api-3.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
