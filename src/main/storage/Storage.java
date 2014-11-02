@@ -148,6 +148,8 @@ public class Storage {
 			return MESSAGE_FILE_NOT_FOUND;
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
 		}
 
 		return MESSAGE_READ_FROM_FILE_SUCCESS;
