@@ -77,6 +77,7 @@ public class DisplayHandler extends CommandHandler {
 
 	public static String displayTaskInTable(int number, Task task) {
 		result = "";
+		boolean completed = task.getCompleted();
 		String taskNumber = getTaskNumber(number);
 		String taskDescription = task.getDescription();
 		String taskDescriptionExtra = "";
@@ -161,10 +162,34 @@ public class DisplayHandler extends CommandHandler {
 		}
 		
 		String to = "to";
+		if(completed) {
+			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(YELLOW)
+					.a(taskNumber).reset(), ansi().fg(YELLOW).a(taskDescription)
+					.reset(), ansi().fg(YELLOW).a(taskVenue).reset(),
+					ansi().fg(YELLOW).a(startTaskTime).reset(),
+					ansi().fg(YELLOW).a(startTaskDate).reset());
+
+			result += String
+					.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+							ansi().fg(YELLOW).a(nullSpace).reset(), ansi().fg(YELLOW)
+									.a(taskDescriptionExtraOne).reset(),
+							ansi().fg(YELLOW).a(taskVenueExtraOne).reset(), ansi()
+									.fg(YELLOW).a(to).reset(),
+							ansi().fg(YELLOW).a(to).reset());
+
+			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(YELLOW)
+					.a(nullSpace).reset(),
+					ansi().fg(YELLOW).a(taskDescriptionExtraTwo).reset(), ansi()
+							.fg(YELLOW).a(taskVenueExtraTwo).reset(),
+					ansi().fg(YELLOW).a(endTaskTime).reset(),
+					ansi().fg(YELLOW).a(endTaskDate).reset());
+		}
+		
+		else {
 		result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
 				.a(taskNumber).reset(), ansi().fg(MAGENTA).a(taskDescription)
 				.reset(), ansi().fg(CYAN).a(taskVenue).reset(),
-				ansi().fg(YELLOW).a(startTaskTime).reset(),
+				ansi().fg(RED).a(startTaskTime).reset(),
 				ansi().fg(GREEN).a(startTaskDate).reset());
 
 		result += String
@@ -172,16 +197,17 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(RED).a(nullSpace).reset(), ansi().fg(MAGENTA)
 								.a(taskDescriptionExtraOne).reset(),
 						ansi().fg(CYAN).a(taskVenueExtraOne).reset(), ansi()
-								.fg(YELLOW).a(to).reset(),
+								.fg(RED).a(to).reset(),
 						ansi().fg(GREEN).a(to).reset());
 
 		result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
 				.a(nullSpace).reset(),
 				ansi().fg(MAGENTA).a(taskDescriptionExtraTwo).reset(), ansi()
 						.fg(CYAN).a(taskVenueExtraTwo).reset(),
-				ansi().fg(YELLOW).a(endTaskTime).reset(),
+				ansi().fg(RED).a(endTaskTime).reset(),
 				ansi().fg(GREEN).a(endTaskDate).reset());
-
+		}
+		
 		if (!taskDescriptionExtra.isEmpty() || !taskVenueExtra.isEmpty()) {
 			double descriptionLines = Math
 					.ceil(taskDescriptionExtra.length() / 25.0);
@@ -194,69 +220,140 @@ public class DisplayHandler extends CommandHandler {
 							0, 25);
 					taskVenueExtra = taskVenueExtra.substring(12);
 					taskDescriptionExtra = taskDescriptionExtra.substring(25);
-
+					if (completed){
+						result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(YELLOW).a(nullSpace).reset(),
+								ansi().fg(YELLOW).a(displayDescription).reset(),
+								ansi().fg(YELLOW).a(displayVenue).reset(), "", "");
+					}
+					else {
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 							ansi().fg(RED).a(nullSpace).reset(),
 							ansi().fg(MAGENTA).a(displayDescription).reset(),
 							ansi().fg(CYAN).a(displayVenue).reset(), "", "");
+					}
 				}
+				
+				if (completed){
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+							.fg(YELLOW).a(nullSpace).reset(),
+							ansi().fg(YELLOW).a(taskDescriptionExtra).reset(),
+							ansi().fg(YELLOW).a(taskVenueExtra).reset(), "", "");
+				}
+				else{
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(RED).a(nullSpace).reset(),
 						ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),
 						ansi().fg(CYAN).a(taskVenueExtra).reset(), "", "");
+				}
 			}
 
 			else if (venueLines > descriptionLines) {
 
 				if (venueLines - descriptionLines - 1 == 0) {
+					if (completed){
+						result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(YELLOW).a(nullSpace).reset(),
+								ansi().fg(YELLOW).a("").reset(), ansi().fg(YELLOW)
+										.a(taskVenueExtra).reset(), "", "");
+					}
+					else{
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 							ansi().fg(RED).a(nullSpace).reset(),
 							ansi().fg(MAGENTA).a("").reset(), ansi().fg(CYAN)
 									.a(taskVenueExtra).reset(), "", "");
+					}
 				} else {
 					for (int j = 0; j < (venueLines - descriptionLines) - 1; j++) {
 						String displayVenue = taskVenueExtra.substring(0, 12);
 						taskVenueExtra = taskVenueExtra.substring(12);
-
+						
+						if (completed){
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace).reset(),
+											ansi().fg(YELLOW).a("").reset(),
+											ansi().fg(YELLOW).a(displayVenue).reset(),
+											"", "");
+						}
+						else{
 						result += String
 								.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 										ansi().fg(RED).a(nullSpace).reset(),
 										ansi().fg(MAGENTA).a("").reset(),
 										ansi().fg(CYAN).a(displayVenue).reset(),
 										"", "");
+						}
 					}
+					
+					if(completed){
+						result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(YELLOW).a(nullSpace).reset(),
+								ansi().fg(YELLOW).a("").reset(), ansi().fg(YELLOW)
+										.a(taskVenueExtra).reset(), "", "");
+					}
+					else{
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 							ansi().fg(RED).a(nullSpace).reset(),
 							ansi().fg(MAGENTA).a("").reset(), ansi().fg(CYAN)
 									.a(taskVenueExtra).reset(), "", "");
+					}
 				}
 			}
 
 			else if (descriptionLines > venueLines) {
 
 				if (descriptionLines - venueLines - 1 == 0) {
+					if(completed){
+						result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(YELLOW).a(nullSpace).reset(),
+								ansi().fg(YELLOW).a(taskDescriptionExtra).reset(),
+								ansi().fg(YELLOW).a("").reset(), "", "");
+
+					}
+					else{
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 							ansi().fg(RED).a(nullSpace).reset(),
 							ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),
 							ansi().fg(CYAN).a("").reset(), "", "");
+					}
 				} else {
 					for (int j = 0; j < (descriptionLines - venueLines) - 1; j++) {
 						String displayDescription = taskDescriptionExtra
 								.substring(0, 25);
 						taskDescriptionExtra = taskDescriptionExtra
 								.substring(25);
+						
+						if(completed){
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(YELLOW)
+											.a(nullSpace).reset(),
+									ansi().fg(YELLOW).a(displayDescription)
+											.reset(),
+									ansi().fg(YELLOW).a("").reset(), "", "");
+						}
+						else{
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
 										.a(nullSpace).reset(),
 								ansi().fg(MAGENTA).a(displayDescription)
 										.reset(),
 								ansi().fg(CYAN).a("").reset(), "", "");
+						}
 					}
-
+					
+					if(completed){
+						result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(YELLOW).a(nullSpace).reset(),
+								ansi().fg(YELLOW).a(taskDescriptionExtra).reset(),
+								ansi().fg(YELLOW).a("").reset(), "", "");
+					}
+					else{
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 							ansi().fg(RED).a(nullSpace).reset(),
 							ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),
 							ansi().fg(CYAN).a("").reset(), "", "");
+					}
 				}
 
 			}
