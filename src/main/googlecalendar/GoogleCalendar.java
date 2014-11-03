@@ -3,7 +3,6 @@ package main.googlecalendar;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Scanner;
@@ -44,9 +43,12 @@ public class GoogleCalendar {
 	private static String CLIENT_SECRET = "0qES2e4j6ob4WlgekNRCESzR";
 	private static String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
 
-//	private static String MESSAGE_ALREADY_LOGGED_IN = "Sorry, you are already logged in to Google Calendar.";
-//	private static String MESSAGE_ASK_TO_LOGIN = "Log in to Google Calendar? [Y/N]";
-//	private static String MESSAGE_NO_LOGIN = "Log in cancelled. Please note that your tasks will not be synchronised to Google Calendar.";
+	// private static String MESSAGE_ALREADY_LOGGED_IN =
+	// "Sorry, you are already logged in to Google Calendar.";
+	// private static String MESSAGE_ASK_TO_LOGIN =
+	// "Log in to Google Calendar? [Y/N]";
+	// private static String MESSAGE_NO_LOGIN =
+	// "Log in cancelled. Please note that your tasks will not be synchronised to Google Calendar.";
 	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google Calendar.";
 	private static String MESSAGE_LOGIN_FAIL = "Sorry, an error has occurred while logging in to Google Calendar. Please try again.";
 	private static String MESSAGE_OFFLINE_FIRST_TIME = "You are currently offline. Please provide your Google account ID to continue: ";
@@ -75,10 +77,9 @@ public class GoogleCalendar {
 	private static BatchRequest updateBatch;
 
 	private static GoogleCalendar theOne = null;
-//	private static boolean isLoggedIn;
+	// private static boolean isLoggedIn;
 	private static String calendarId = null;
 	private static Scanner scanner = new Scanner(System.in);
-	private static Storage storage = Storage.getInstance();
 
 	private JsonBatchCallback<Event> callbackForAdd = new JsonBatchCallback<Event>() {
 
@@ -134,36 +135,36 @@ public class GoogleCalendar {
 		return theOne;
 	}
 
-//	public String initialiseGoogleCalendar() {
-//		String message = "";
-//		if (!isLoggedIn) {
-//			try {
-//				if (isLoggingInToGoogleCalendar()) {
-//					message = logInToGoogleCalendar();
-//				}
-//			} catch (IllegalArgumentException e) {
-//				System.out.println(e.getMessage());
-//				message = initialiseGoogleCalendar();
-//			}
-//		} else {
-//			message = MESSAGE_ALREADY_LOGGED_IN;
-//		}
-//		return message;
-//	}
+	// public String initialiseGoogleCalendar() {
+	// String message = "";
+	// if (!isLoggedIn) {
+	// try {
+	// if (isLoggingInToGoogleCalendar()) {
+	// message = logInToGoogleCalendar();
+	// }
+	// } catch (IllegalArgumentException e) {
+	// System.out.println(e.getMessage());
+	// message = initialiseGoogleCalendar();
+	// }
+	// } else {
+	// message = MESSAGE_ALREADY_LOGGED_IN;
+	// }
+	// return message;
+	// }
 
-//	private boolean isLoggingInToGoogleCalendar() {
-//		System.out.println(MESSAGE_ASK_TO_LOGIN);
-//		String userReplyToLogIn = scanner.nextLine();
-//		if (userReplyToLogIn.equalsIgnoreCase("y")) {
-//			return true;
-//		} else if (userReplyToLogIn.equalsIgnoreCase("n")) {
-//			System.out.println(MESSAGE_NO_LOGIN);
-//			isLoggedIn = false;
-//			return false;
-//		} else {
-//			throw new IllegalArgumentException(MESSAGE_INVALID_ARGUMENT);
-//		}
-//	}
+	// private boolean isLoggingInToGoogleCalendar() {
+	// System.out.println(MESSAGE_ASK_TO_LOGIN);
+	// String userReplyToLogIn = scanner.nextLine();
+	// if (userReplyToLogIn.equalsIgnoreCase("y")) {
+	// return true;
+	// } else if (userReplyToLogIn.equalsIgnoreCase("n")) {
+	// System.out.println(MESSAGE_NO_LOGIN);
+	// isLoggedIn = false;
+	// return false;
+	// } else {
+	// throw new IllegalArgumentException(MESSAGE_INVALID_ARGUMENT);
+	// }
+	// }
 
 	/** Authorizes the installed application to access user's protected data. */
 	private static Credential authorise() throws Exception {
@@ -202,7 +203,7 @@ public class GoogleCalendar {
 			if (deleteBatch == null) {
 				deleteBatch = client.batch();
 			}
-//			isLoggedIn = true;
+			// isLoggedIn = true;
 		} catch (GeneralSecurityException e) {
 			return MESSAGE_LOGIN_FAIL;
 		} catch (Exception e) {
@@ -212,7 +213,7 @@ public class GoogleCalendar {
 		try {
 			calendarId = client.calendars().get("primary").execute().getId();
 		} catch (IOException e) {
-//			isLoggedIn = false;
+			// isLoggedIn = false;
 			if (calendarId == null) {
 				return getCalendarIdFromUser();
 			} else {
@@ -313,86 +314,86 @@ public class GoogleCalendar {
 		}
 	}
 
-	private void syncUpdateTask(String eventId, Event event) {
+	private void syncPatchTask(Event event) {
+		String eventId = event.getId();
 		try {
-			client.events().update(calendarId, eventId, event).execute();
+			client.events().patch(calendarId, eventId, event).execute();
 		} catch (IOException e) {
 			try {
-				client.events().update(calendarId, eventId, event)
+				client.events().patch(calendarId, eventId, event)
 						.queue(updateBatch, callbackForUpdate);
 			} catch (IOException e1) {
-				System.out.println(MESSAGE_SYNC_UPDATE_FAIL);
+				System.out.println(MESSAGE_SYNC_FAIL);
 			}
 		}
 	}
 
-	public void syncUpdateTaskDescription(String eventId, String newDescription) {
-		Event event = findTaskToUpdate(eventId);
+	public void syncUpdateTaskDescription(Task task, String newDescription) {
+		Event event = convertNonFloatingTaskToEvent(task);
 		event.setSummary(newDescription);
-		syncUpdateTask(eventId, event);
+		syncPatchTask(event);
 	}
 
-	public void syncUpdateTaskVenue(String eventId, String newVenue) {
-		Event event = findTaskToUpdate(eventId);
+	public void syncUpdateTaskVenue(Task task, String newVenue) {
+		Event event = convertNonFloatingTaskToEvent(task);
 		event.setLocation(newVenue);
-		syncUpdateTask(eventId, event);
+		syncPatchTask(event);
 	}
 
-	public void syncUpdateTaskStartDate(String eventId, LocalDate newStartDate) {
-		Event event = findTaskToUpdate(eventId);
-		EventDateTime eventDateTime = event.getStart();
-		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
-		LocalTime localTime = localDateTime.toLocalTime();
-		eventDateTime = convertToEventDateTime(newStartDate, localTime);
-		event.setStart(eventDateTime);
-		syncUpdateTask(eventId, event);
-	}
-
-	public void syncUpdateTaskStartTime(String eventId, LocalTime newStartTime) {
-		Event event = findTaskToUpdate(eventId);
-		EventDateTime eventDateTime = event.getStart();
-		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
-		LocalDate localDate = localDateTime.toLocalDate();
-		eventDateTime = convertToEventDateTime(localDate, newStartTime);
-		event.setStart(eventDateTime);
-		syncUpdateTask(eventId, event);
-	}
-
-	public void syncUpdateTaskEndDate(String eventId, LocalDate newEndDate) {
-		Event event = findTaskToUpdate(eventId);
-		EventDateTime eventDateTime = event.getEnd();
-		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
-		LocalTime localTime = localDateTime.toLocalTime();
-		eventDateTime = convertToEventDateTime(newEndDate, localTime);
-		event.setEnd(eventDateTime);
-		syncUpdateTask(eventId, event);
-	}
-
-	public void syncUpdateTaskEndTime(String eventId, LocalTime newEndTime) {
-		Event event = findTaskToUpdate(eventId);
-		EventDateTime eventDateTime = event.getEnd();
-		LocalDateTime localDateTime = convertToLocalDateTime(eventDateTime);
-		LocalDate localDate = localDateTime.toLocalDate();
-		eventDateTime = convertToEventDateTime(localDate, newEndTime);
-		event.setEnd(eventDateTime);
-		syncUpdateTask(eventId, event);
-	}
-
-	private Event findTaskToUpdate(String eventId) {
-		Event event = null;
-		ArrayList<Task> taskList = storage.getTasks();
-		for (Task task : taskList) {
-			String taskEventId = task.getEventId();
-			if (taskEventId.equals(eventId)) {
-				event = convertNonFloatingTaskToEvent(task);
-				break;
-			}
+	public void syncUpdateTaskStartDate(Task task, LocalDate newStartDate) {
+		Event event = convertNonFloatingTaskToEvent(task);
+		EventDateTime eventDateTime = null;
+		if (task.getHasStartTime()) {
+			LocalTime taskTime = task.getStartTime();
+			eventDateTime = convertToEventDateTime(newStartDate, taskTime);
+		} else {
+			eventDateTime = convertToEventDateTime(newStartDate);
 		}
-		return event;
+		event.setStart(eventDateTime);
+		if (task.startDateEqualsEndDate()) {
+			LocalDate newEndDate = newStartDate.plusDays(1);
+			eventDateTime = convertToEventDateTime(newEndDate);
+			event.setEnd(eventDateTime);
+		}
+		syncPatchTask(event);
+	}
+
+	public void syncUpdateTaskStartTime(Task task, LocalTime newStartTime) {
+		Event event = convertNonFloatingTaskToEvent(task);
+		EventDateTime eventDateTime = event.getStart();
+		LocalDateTime taskDateTime = convertToLocalDateTime(eventDateTime);
+		LocalDate taskDate = taskDateTime.toLocalDate();
+		eventDateTime = convertToEventDateTime(taskDate, newStartTime);
+		event.setStart(eventDateTime);
+		syncPatchTask(event);
+	}
+
+	public void syncUpdateTaskEndDate(Task task, LocalDate newEndDate) {
+		Event event = convertNonFloatingTaskToEvent(task);
+		EventDateTime eventDateTime = null;
+		if (task.getHasEndTime()) {
+			LocalTime taskTime = task.getEndTime();
+			eventDateTime = convertToEventDateTime(newEndDate, taskTime);
+		} else {
+			eventDateTime = convertToEventDateTime(newEndDate);
+		}
+		event.setEnd(eventDateTime);
+		syncPatchTask(event);
+	}
+
+	public void syncUpdateTaskEndTime(Task task, LocalTime newEndTime) {
+		Event event = convertNonFloatingTaskToEvent(task);
+		EventDateTime eventDateTime = event.getEnd();
+		LocalDateTime taskDateTime = convertToLocalDateTime(eventDateTime);
+		LocalDate taskDate = taskDateTime.toLocalDate();
+		eventDateTime = convertToEventDateTime(taskDate, newEndTime);
+		event.setEnd(eventDateTime);
+		syncPatchTask(event);
 	}
 
 	private Event convertNonFloatingTaskToEvent(Task task) {
 		Event event = new Event();
+		event.setId(task.getEventId());
 		event.setSummary(task.getDescription());
 		event.setLocation(task.getVenue());
 
@@ -405,7 +406,8 @@ public class GoogleCalendar {
 		if (taskStartTime == null && taskEndTime == null) {
 			EventDateTime eventStartDateTime = convertToEventDateTime(taskStartDate);
 			event.setStart(eventStartDateTime);
-			EventDateTime eventEndDateTime = convertToEventDateTime(taskEndDate);
+			EventDateTime eventEndDateTime = convertToEventDateTime(taskEndDate
+					.plusDays(1));
 			event.setEnd(eventEndDateTime);
 		} else {
 			EventDateTime eventStartDateTime = convertToEventDateTime(
