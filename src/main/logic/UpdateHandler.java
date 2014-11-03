@@ -31,26 +31,24 @@ public class UpdateHandler extends CommandHandler {
 			parser.parse();
 			String field = parser.getField();
 			Task task = getTask(parser.getTaskNumber());
-			String eventId = task.getEventId();
 
 			if (field.equals(UpdateParser.FIELD_DESCRIPTION)) {
 				String newDescription = parser.getDescription();
 				task.setDescription(newDescription);
-				googleCalendar.syncUpdateTaskDescription(eventId,
-						newDescription);
+				googleCalendar.syncUpdateTaskDescription(task, newDescription);
 			} else if (field.equals(UpdateParser.FIELD_VENUE)) {
 				String newVenue = parser.getVenue();
 				task.setVenue(newVenue);
-				googleCalendar.syncUpdateTaskVenue(eventId, newVenue);
+				googleCalendar.syncUpdateTaskVenue(task, newVenue);
 
 			} else if (field.equals(UpdateParser.FIELD_START_DATE)) {
-				updateStartDate(task, parser, eventId);
+				updateStartDate(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_START_TIME)) {
-				updateStartTime(task, parser, eventId);
+				updateStartTime(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_END_DATE)) {
-				updateEndDate(task, parser, eventId);
+				updateEndDate(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_END_TIME)) {
-				updateEndTime(task, parser, eventId);
+				updateEndTime(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_RECURRENCE)) {
 				updateRecurrence(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_REMINDER)) {
@@ -75,8 +73,7 @@ public class UpdateHandler extends CommandHandler {
 		return tasks.get(number - 1);
 	}
 
-	private static void updateStartDate(Task task, UpdateParser parser,
-			String eventId) {
+	private static void updateStartDate(Task task, UpdateParser parser) {
 		Integer startDateYear = Integer.parseInt(parser.getStartDateYear());
 		Integer startDateMonth = Integer.parseInt(parser.getStartDateMonth());
 		Integer startDateDay = Integer.parseInt(parser.getStartDateDay());
@@ -84,16 +81,14 @@ public class UpdateHandler extends CommandHandler {
 		LocalDate newStartDate = new LocalDate(startDateYear, startDateMonth,
 				startDateDay);
 		task.setStartDate(newStartDate);
-		googleCalendar.syncUpdateTaskStartDate(eventId, newStartDate);
-		
-		if(task.startDateEqualsEndDate()) {
+		googleCalendar.syncUpdateTaskStartDate(task, newStartDate);
+
+		if (task.startDateEqualsEndDate()) {
 			task.setEndDate(newStartDate);
-			googleCalendar.syncUpdateTaskEndDate(eventId, newStartDate);
 		}
 	}
 
-	private static void updateEndDate(Task task, UpdateParser parser,
-			String eventId) {
+	private static void updateEndDate(Task task, UpdateParser parser) {
 		Integer endDateYear = Integer.parseInt(parser.getEndDateYear());
 		Integer endDateMonth = Integer.parseInt(parser.getEndDateMonth());
 		Integer endDateDay = Integer.parseInt(parser.getEndDateDay());
@@ -101,35 +96,33 @@ public class UpdateHandler extends CommandHandler {
 		LocalDate newEndDate = new LocalDate(endDateYear, endDateMonth,
 				endDateDay);
 		task.setEndDate(newEndDate);
-		googleCalendar.syncUpdateTaskEndDate(eventId, newEndDate);
+		googleCalendar.syncUpdateTaskEndDate(task, newEndDate);
 	}
 
-	private static void updateStartTime(Task task, UpdateParser parser,
-			String eventId) {
+	private static void updateStartTime(Task task, UpdateParser parser) {
 		Integer startTimeHour = Integer.parseInt(parser.getStartTimeHour());
 		Integer startTimeMinute = Integer.parseInt(parser.getStartTimeMinute());
 
 		LocalTime newStartTime = new LocalTime(startTimeHour, startTimeMinute);
-		
-		task.setStartTime(newStartTime);
-		googleCalendar.syncUpdateTaskStartTime(eventId, newStartTime);
 
-		if(task.startTimeEqualsEndTime()) {
+		task.setStartTime(newStartTime);
+		googleCalendar.syncUpdateTaskStartTime(task, newStartTime);
+
+		if (task.startTimeEqualsEndTime()) {
 			task.setEndTime(newStartTime);
-			googleCalendar.syncUpdateTaskEndTime(eventId, newStartTime);
+			googleCalendar.syncUpdateTaskEndTime(task, newStartTime);
 		}
-		
+
 	}
 
-	private static void updateEndTime(Task task, UpdateParser parser,
-			String eventId) {
+	private static void updateEndTime(Task task, UpdateParser parser) {
 		int endTimeHour = Integer.parseInt(parser.getEndTimeHour());
 		int endTimeMinute = Integer.parseInt(parser.getEndTimeMinute());
 
 		LocalTime newEndTime = new LocalTime(endTimeHour, endTimeMinute);
 
 		task.setEndTime(newEndTime);
-		googleCalendar.syncUpdateTaskEndTime(eventId, newEndTime);
+		googleCalendar.syncUpdateTaskEndTime(task, newEndTime);
 	}
 
 	private static void updateRecurrence(Task task, UpdateParser parser) {
