@@ -60,7 +60,7 @@ public class UpdateHandler extends CommandHandler {
 			} else {
 				task.setCompleted(false);
 			}
-			saveCurrentState();
+			storage.saveCurrentState();
 			String successMessage = getSuccessMessage(parser);
 			return successMessage;
 		} catch (IndexOutOfBoundsException e) {

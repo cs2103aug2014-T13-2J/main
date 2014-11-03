@@ -13,8 +13,4 @@ public abstract class CommandHandler {
 
 	public abstract String execute();
 	
-	protected void saveCurrentState() {
-		Storage.getInstance().updateTaskHistory();
-		Storage.writeToFile();
-	}
 }
