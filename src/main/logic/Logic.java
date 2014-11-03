@@ -9,7 +9,7 @@ public class Logic {
 	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
 
 	private enum CommandType {
-		ADD, DELETE, DISPLAY, UPDATE, SEARCH, UNDO, REPEAT, REMIND, LOGIN, INVALID, EXIT
+		ADD, DELETE, DISPLAY, UPDATE, SEARCH, UNDO, REPEAT, REMIND, SYNC, INVALID, EXIT
 	}
 	
 	public static String uiToLogic(String userCommand) {
@@ -47,9 +47,9 @@ public class Logic {
 		} else if (commandTypeString.equalsIgnoreCase("remind")) {
 			TaskerLog.logSystemInfo("remind command detected");
 			return CommandType.REMIND;
-		} else if (commandTypeString.equalsIgnoreCase("login")) {
+		} else if (commandTypeString.equalsIgnoreCase("sync")) {
 			TaskerLog.logSystemInfo("login command detected");
-			return CommandType.LOGIN;
+			return CommandType.SYNC;
 		} else if (commandTypeString.equalsIgnoreCase("exit")) {
 			TaskerLog.logSystemInfo("exit command detected");
 			return CommandType.EXIT;
@@ -78,8 +78,8 @@ public class Logic {
 			return repeatTask(details);
 		case REMIND:
 			return remindTask(details);
-		case LOGIN:
-			return googleCalendar.initialiseGoogleCalendar(false);
+		case SYNC:
+			return googleCalendar.syncToGoogleCalendar();
 		case EXIT:
 			System.exit(0);
 		default:

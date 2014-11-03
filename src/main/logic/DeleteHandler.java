@@ -53,7 +53,7 @@ public class DeleteHandler extends CommandHandler {
 					returnMessage += DisplayHandler.displayTaskInTable(index,
 							task) + "\n";
 					storage.deleteTask(index);
-					googleCalendar.syncDeleteTask(eventId);
+					googleCalendar.syncDeleteNonFloatingTask(eventId);
 
 				}
 				storage.saveCurrentState();

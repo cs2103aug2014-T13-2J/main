@@ -20,7 +20,7 @@ public class UI {
 	public static void initializeEnvironment() {
 		AnsiConsole.systemInstall();
 		System.out.println(MESSAGE_WELCOME);
-		System.out.println(googleCalendar.initialiseGoogleCalendar(true));
+		System.out.println(googleCalendar.logInToGoogleCalendar());
 		Storage.readFromFile();
 		TaskerLog.logSystemInfo("Tasker initialized.");
 	}
