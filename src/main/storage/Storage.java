@@ -257,5 +257,10 @@ public class Storage {
 
 		return MESSAGE_WRITE_FROM_FILE_SUCCESS;
 	}
+	
+	public void saveCurrentState() {
+		Storage.getInstance().updateTaskHistory();
+		Storage.writeToFile();
+	}
 
 }

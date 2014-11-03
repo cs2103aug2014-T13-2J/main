@@ -56,7 +56,7 @@ public class DeleteHandler extends CommandHandler {
 					googleCalendar.syncDeleteNonFloatingTask(eventId);
 
 				}
-				saveCurrentState();
+				storage.saveCurrentState();
 				resultBottom += DisplayHandler.displayLineSeparator();
 				resultBottom += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 						ansi().fg(RED).a("ID").reset(),

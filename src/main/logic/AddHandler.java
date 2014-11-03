@@ -33,7 +33,7 @@ public class AddHandler extends CommandHandler {
 			String eventId = googleCalendar.syncAddNonFloatingTask(task);
 			task.setEventId(eventId);
 			storage.addTask(task);
-			saveCurrentState();
+			storage.saveCurrentState();
 			return DisplayHandler.displayTaskForAdd(task);
 		} catch (IllegalArgumentException e) {
 			TaskerLog.logSystemExceptionError(e.getMessage());
