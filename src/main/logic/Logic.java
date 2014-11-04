@@ -79,7 +79,7 @@ public class Logic {
 		case REMIND:
 			return remindTask(details);
 		case SYNC:
-			return googleCalendar.syncToGoogleCalendar();
+			return googleCalendar.syncToGoogle();
 		case EXIT:
 			System.exit(0);
 		default:

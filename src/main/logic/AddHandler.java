@@ -30,7 +30,7 @@ public class AddHandler extends CommandHandler {
 			// attributes
 			parser.parse();
 			Task task = convertParsedDetailsToTask();
-			String eventId = googleCalendar.syncAddNonFloatingTask(task);
+			String eventId = googleCalendar.syncAddTask(task);
 			task.setEventId(eventId);
 			storage.addTask(task);
 			storage.saveCurrentState();

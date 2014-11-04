@@ -9,7 +9,6 @@ import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import main.storage.Storage;
 import main.storage.Task;
 
 import org.joda.time.LocalDate;
@@ -36,6 +35,7 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.tasks.Tasks;
 
 public class GoogleCalendar {
 
@@ -43,19 +43,14 @@ public class GoogleCalendar {
 	private static String CLIENT_SECRET = "0qES2e4j6ob4WlgekNRCESzR";
 	private static String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
 
-	// private static String MESSAGE_ALREADY_LOGGED_IN =
-	// "Sorry, you are already logged in to Google Calendar.";
-	// private static String MESSAGE_ASK_TO_LOGIN =
-	// "Log in to Google Calendar? [Y/N]";
-	// private static String MESSAGE_NO_LOGIN =
-	// "Log in cancelled. Please note that your tasks will not be synchronised to Google Calendar.";
-	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google Calendar.";
-	private static String MESSAGE_LOGIN_FAIL = "Sorry, an error has occurred while logging in to Google Calendar. Please try again.";
+	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google.";
+	private static String MESSAGE_LOGIN_FAIL = "Sorry, an error has occurred while logging in to Google. Please try again.";
 	private static String MESSAGE_OFFLINE_FIRST_TIME = "You are currently offline. Please provide your Google account ID to continue: ";
 	private static String MESSAGE_OFFLINE_CONFIRM_ID = "Are you sure %s is the correct ID? [Y/N]\n";
 	private static String MESSAGE_OFFLINE = "You are currently still offline. Please check your Internet connection.";
-	private static String MESSAGE_SYNC_SUCCESS = "You have successfully synchronised all changes to Google Calendar.";
-	private static String MESSAGE_SYNC_FAIL = "Sorry, an error has occurred while synchronising to Google Calendar. Please try again.";
+	private static String MESSAGE_SYNC_SUCCESS = "You have successfully synchronised all changes to Google.";
+	private static String MESSAGE_SYNC_FAIL = "Sorry, an error has occurred while synchronising to Google. Please try again.";
+	private static String MESSAGE_SYNC_EMPTY = "You have no changes to synchronise.";
 	private static String MESSAGE_CALENDAR_ID_SET = "Google ID registered. You may now proceed.";
 	private static String MESSAGE_INVALID_ARGUMENT = "Sorry, the argument must either be 'Y' or 'N'.";
 	private static String MESSAGE_INVALID_EMAIL = "Sorry, the argument must be a valid email address.";
@@ -71,44 +66,18 @@ public class GoogleCalendar {
 	private static HttpTransport httpTransport;
 	private static final JsonFactory JSON_FACTORY = JacksonFactory
 			.getDefaultInstance();
-	private static Calendar client;
-	private static BatchRequest addBatch;
-	private static BatchRequest deleteBatch;
-	private static BatchRequest updateBatch;
+	private static Calendar googleCalendarClient;
+	private static Tasks googleTasksClient;
+	private static BatchRequest addEventBatch;
+	private static BatchRequest deleteEventBatch;
+	private static BatchRequest updateEventBatch;
+	private static BatchRequest addTaskBatch;
+	private static BatchRequest updateTaskBatch;
+	private static BatchRequest deleteTaskBatch;
 
 	private static GoogleCalendar theOne = null;
-	// private static boolean isLoggedIn;
-	private static String calendarId = null;
+	private static String googleId = null;
 	private static Scanner scanner = new Scanner(System.in);
-
-	private JsonBatchCallback<Event> callbackForAdd = new JsonBatchCallback<Event>() {
-
-		@Override
-		public void onSuccess(Event event, HttpHeaders arg1) throws IOException {
-
-		}
-
-		@Override
-		public void onFailure(GoogleJsonError arg0, HttpHeaders arg1)
-				throws IOException {
-			System.out.println(MESSAGE_SYNC_ADD_FAIL);
-		}
-	};
-
-	private JsonBatchCallback<Void> callbackForDelete = new JsonBatchCallback<Void>() {
-
-		@Override
-		public void onSuccess(Void arg0, HttpHeaders arg1) throws IOException {
-
-		}
-
-		@Override
-		public void onFailure(GoogleJsonError arg0, HttpHeaders arg1)
-				throws IOException {
-			System.out.println(MESSAGE_SYNC_DELETE_FAIL);
-		}
-
-	};
 
 	private JsonBatchCallback<Event> callbackForUpdate = new JsonBatchCallback<Event>() {
 
@@ -135,37 +104,6 @@ public class GoogleCalendar {
 		return theOne;
 	}
 
-	// public String initialiseGoogleCalendar() {
-	// String message = "";
-	// if (!isLoggedIn) {
-	// try {
-	// if (isLoggingInToGoogleCalendar()) {
-	// message = logInToGoogleCalendar();
-	// }
-	// } catch (IllegalArgumentException e) {
-	// System.out.println(e.getMessage());
-	// message = initialiseGoogleCalendar();
-	// }
-	// } else {
-	// message = MESSAGE_ALREADY_LOGGED_IN;
-	// }
-	// return message;
-	// }
-
-	// private boolean isLoggingInToGoogleCalendar() {
-	// System.out.println(MESSAGE_ASK_TO_LOGIN);
-	// String userReplyToLogIn = scanner.nextLine();
-	// if (userReplyToLogIn.equalsIgnoreCase("y")) {
-	// return true;
-	// } else if (userReplyToLogIn.equalsIgnoreCase("n")) {
-	// System.out.println(MESSAGE_NO_LOGIN);
-	// isLoggedIn = false;
-	// return false;
-	// } else {
-	// throw new IllegalArgumentException(MESSAGE_INVALID_ARGUMENT);
-	// }
-	// }
-
 	/** Authorizes the installed application to access user's protected data. */
 	private static Credential authorise() throws Exception {
 		// load client secrets
@@ -191,19 +129,13 @@ public class GoogleCalendar {
 			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 			dataStoreFactory = new FileDataStoreFactory(CREDENTIAL_STORE_DIR);
 			Credential credential = authorise();
-			client = new com.google.api.services.calendar.Calendar.Builder(
+			googleCalendarClient = new com.google.api.services.calendar.Calendar.Builder(
 					httpTransport, JSON_FACTORY, credential)
 					.setApplicationName(NAME_APPLICATION).build();
-			if (addBatch == null) {
-				addBatch = client.batch();
-			}
-			if (updateBatch == null) {
-				updateBatch = client.batch();
-			}
-			if (deleteBatch == null) {
-				deleteBatch = client.batch();
-			}
-			// isLoggedIn = true;
+			googleTasksClient = new Tasks.Builder(httpTransport, JSON_FACTORY,
+					credential).setApplicationName(NAME_APPLICATION).build();
+			initialiseGoogleCalendarBatch();
+			initialiseGoogleTasksBatch();
 		} catch (GeneralSecurityException e) {
 			return MESSAGE_LOGIN_FAIL;
 		} catch (Exception e) {
@@ -211,10 +143,10 @@ public class GoogleCalendar {
 		}
 
 		try {
-			calendarId = client.calendars().get("primary").execute().getId();
+			googleId = googleCalendarClient.calendars().get("primary")
+					.execute().getId();
 		} catch (IOException e) {
-			// isLoggedIn = false;
-			if (calendarId == null) {
+			if (googleId == null) {
 				return getCalendarIdFromUser();
 			} else {
 				return MESSAGE_OFFLINE;
@@ -223,29 +155,68 @@ public class GoogleCalendar {
 		return MESSAGE_LOGIN_SUCCESS;
 	}
 
-	public String syncToGoogleCalendar() {
+	private void initialiseGoogleTasksBatch() {
+		if (addTaskBatch == null) {
+			addTaskBatch = googleTasksClient.batch();
+		}
+		if (updateTaskBatch == null) {
+			updateTaskBatch = googleTasksClient.batch();
+		}
+		if (deleteTaskBatch == null) {
+			deleteTaskBatch = googleTasksClient.batch();
+		}
+	}
+
+	private void initialiseGoogleCalendarBatch() {
+		if (addEventBatch == null) {
+			addEventBatch = googleCalendarClient.batch();
+		}
+		if (updateEventBatch == null) {
+			updateEventBatch = googleCalendarClient.batch();
+		}
+		if (deleteEventBatch == null) {
+			deleteEventBatch = googleCalendarClient.batch();
+		}
+	}
+
+	public String syncToGoogle() {
+		String message = MESSAGE_SYNC_EMPTY;
 		try {
-			if (addBatch.size() != 0) {
-				addBatch.execute();
-				Storage.writeToFile();
+			if (addEventBatch.size() != 0) {
+				addEventBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
 			}
-			if (updateBatch.size() != 0) {
-				updateBatch.execute();
+			if (updateEventBatch.size() != 0) {
+				updateEventBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
 			}
-			if (deleteBatch.size() != 0) {
-				deleteBatch.execute();
+			if (deleteEventBatch.size() != 0) {
+				deleteEventBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
+			}
+			if (addTaskBatch.size() != 0) {
+				addTaskBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
+			}
+			if (updateTaskBatch.size() != 0) {
+				updateTaskBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
+			}
+			if (deleteTaskBatch.size() != 0) {
+				deleteTaskBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
 			}
 		} catch (IOException e) {
-			return MESSAGE_SYNC_FAIL;
+			message = MESSAGE_SYNC_FAIL;
 		}
-		return MESSAGE_SYNC_SUCCESS;
+		return message;
 	}
 
 	private String getCalendarIdFromUser() {
 		String message = "";
 		System.out.println(MESSAGE_OFFLINE_FIRST_TIME);
-		calendarId = scanner.nextLine();
-		if (!isValidEmail(calendarId)) {
+		googleId = scanner.nextLine();
+		if (!isValidEmail(googleId)) {
 			System.out.println(MESSAGE_INVALID_EMAIL);
 			return getCalendarIdFromUser();
 		} else {
@@ -259,7 +230,7 @@ public class GoogleCalendar {
 	}
 
 	private boolean confirmCalendarIdFromUser() {
-		System.out.printf(MESSAGE_OFFLINE_CONFIRM_ID, calendarId);
+		System.out.printf(MESSAGE_OFFLINE_CONFIRM_ID, googleId);
 		String userReply = scanner.nextLine();
 		if (userReply.equalsIgnoreCase("y")) {
 			return true;
@@ -276,68 +247,205 @@ public class GoogleCalendar {
 		return isValid;
 	}
 
-	public String syncAddNonFloatingTask(Task task) {
-		Event event = convertNonFloatingTaskToEvent(task);
-		String eventId = generateTimeBasedUUID();
-		event.setId(eventId);
+	public String syncAddTask(Task task) {
+		String id = generateTimeBasedUUID();
+		if (isFloatingTask(task)) {
+			syncAddFloatingTask(task, id);
+		} else {
+			syncAddNonFloatingTask(task, id);
+		}
+		return id;
+	}
+
+	private void syncAddFloatingTask(Task task, String id) {
+		com.google.api.services.tasks.model.Task googleTask = new com.google.api.services.tasks.model.Task();
+		googleTask.setId(id);
+		googleTask.setTitle(task.getDescription());
 		try {
-			client.events().insert(calendarId, event).execute();
+			googleTasksClient.tasks().insert(googleId, googleTask).execute();
 		} catch (IOException e) {
 			try {
-				client.events().insert(calendarId, event)
-						.queue(addBatch, callbackForAdd);
+				googleTasksClient
+						.tasks()
+						.insert(googleId, googleTask)
+						.queue(addTaskBatch,
+								new JsonBatchCallback<com.google.api.services.tasks.model.Task>() {
+
+									@Override
+									public void onSuccess(
+											com.google.api.services.tasks.model.Task arg0,
+											HttpHeaders arg1)
+											throws IOException {
+
+									}
+
+									@Override
+									public void onFailure(GoogleJsonError arg0,
+											HttpHeaders arg1)
+											throws IOException {
+										System.out
+												.println(MESSAGE_SYNC_ADD_FAIL);
+									}
+								});
 			} catch (IOException e1) {
 				System.out.println(MESSAGE_SYNC_ADD_FAIL);
 			}
 		}
-		return eventId;
 	}
 
-	private boolean isNonFloatingTask(Task task) {
-		if (task.getHasStartDate()) {
-			return true;
-		} else {
-			return false;
+	private void syncAddNonFloatingTask(Task task, String eventId) {
+		Event event = convertNonFloatingTaskToEvent(task);
+		event.setId(eventId);
+		try {
+			googleCalendarClient.events().insert(googleId, event).execute();
+		} catch (IOException e) {
+			try {
+				googleCalendarClient.events().insert(googleId, event)
+						.queue(addEventBatch, new JsonBatchCallback<Event>() {
+
+							@Override
+							public void onSuccess(Event event, HttpHeaders arg1)
+									throws IOException {
+
+							}
+
+							@Override
+							public void onFailure(GoogleJsonError arg0,
+									HttpHeaders arg1) throws IOException {
+								System.out.println(MESSAGE_SYNC_ADD_FAIL);
+							}
+						});
+			} catch (IOException e1) {
+				System.out.println(MESSAGE_SYNC_ADD_FAIL);
+			}
 		}
 	}
 
-	public void syncDeleteNonFloatingTask(String eventId) {
+	public void syncDeleteTask(Task task, String id) {
+		if (isFloatingTask(task)) {
+			syncDeleteFloatingTask(id);
+		} else {
+			syncDeleteNonFloatingTask(id);
+		}
+	}
+
+	private void syncDeleteFloatingTask(String taskId) {
 		try {
-			client.events().delete(calendarId, eventId).execute();
+			googleTasksClient.tasks().delete(googleId, taskId).execute();
 		} catch (IOException e) {
 			try {
-				client.events().delete(calendarId, eventId)
-						.queue(deleteBatch, callbackForDelete);
+				googleTasksClient.tasks().delete(googleId, taskId)
+						.queue(deleteTaskBatch, new JsonBatchCallback<Void>() {
+
+							@Override
+							public void onSuccess(Void arg0, HttpHeaders arg1)
+									throws IOException {
+
+							}
+
+							@Override
+							public void onFailure(GoogleJsonError arg0,
+									HttpHeaders arg1) throws IOException {
+								System.out.println(MESSAGE_SYNC_DELETE_FAIL);
+							}
+						});
 			} catch (IOException e1) {
 				System.out.println(MESSAGE_SYNC_DELETE_FAIL);
 			}
 		}
 	}
 
-	private void syncPatchTask(Event event) {
-		String eventId = event.getId();
+	private void syncDeleteNonFloatingTask(String eventId) {
 		try {
-			client.events().patch(calendarId, eventId, event).execute();
+			googleCalendarClient.events().delete(googleId, eventId).execute();
 		} catch (IOException e) {
 			try {
-				client.events().patch(calendarId, eventId, event)
-						.queue(updateBatch, callbackForUpdate);
+				googleCalendarClient.events().delete(googleId, eventId)
+						.queue(deleteEventBatch, new JsonBatchCallback<Void>() {
+
+							@Override
+							public void onSuccess(Void arg0, HttpHeaders arg1)
+									throws IOException {
+
+							}
+
+							@Override
+							public void onFailure(GoogleJsonError arg0,
+									HttpHeaders arg1) throws IOException {
+								System.out.println(MESSAGE_SYNC_DELETE_FAIL);
+							}
+
+						});
 			} catch (IOException e1) {
-				System.out.println(MESSAGE_SYNC_FAIL);
+				System.out.println(MESSAGE_SYNC_DELETE_FAIL);
+			}
+		}
+	}
+
+	private void syncPatchTaskToGoogleCalendar(Event event) {
+		String eventId = event.getId();
+		try {
+			googleCalendarClient.events().patch(googleId, eventId, event)
+					.execute();
+		} catch (IOException e) {
+			try {
+				googleCalendarClient.events().patch(googleId, eventId, event)
+						.queue(updateEventBatch, callbackForUpdate);
+			} catch (IOException e1) {
+				System.out.println(MESSAGE_SYNC_UPDATE_FAIL);
 			}
 		}
 	}
 
 	public void syncUpdateTaskDescription(Task task, String newDescription) {
-		Event event = convertNonFloatingTaskToEvent(task);
-		event.setSummary(newDescription);
-		syncPatchTask(event);
+		if (isFloatingTask(task)) {
+			com.google.api.services.tasks.model.Task googleTask = new com.google.api.services.tasks.model.Task();
+			String id = task.getEventId();
+			googleTask.setId(id);
+			googleTask.setTitle(newDescription);
+			try {
+				googleTasksClient.tasks().update(googleId, id, googleTask)
+						.execute();
+			} catch (IOException e) {
+				try {
+					googleTasksClient
+							.tasks()
+							.update(googleId, id, googleTask)
+							.queue(updateTaskBatch,
+									new JsonBatchCallback<com.google.api.services.tasks.model.Task>() {
+
+										@Override
+										public void onSuccess(
+												com.google.api.services.tasks.model.Task arg0,
+												HttpHeaders arg1)
+												throws IOException {
+
+										}
+
+										@Override
+										public void onFailure(
+												GoogleJsonError arg0,
+												HttpHeaders arg1)
+												throws IOException {
+											System.out
+													.println(MESSAGE_SYNC_UPDATE_FAIL);
+										}
+									});
+				} catch (IOException e1) {
+					System.out.println(MESSAGE_SYNC_UPDATE_FAIL);
+				}
+			}
+		} else {
+			Event event = convertNonFloatingTaskToEvent(task);
+			event.setSummary(newDescription);
+			syncPatchTaskToGoogleCalendar(event);
+		}
 	}
 
 	public void syncUpdateTaskVenue(Task task, String newVenue) {
 		Event event = convertNonFloatingTaskToEvent(task);
 		event.setLocation(newVenue);
-		syncPatchTask(event);
+		syncPatchTaskToGoogleCalendar(event);
 	}
 
 	public void syncUpdateTaskStartDate(Task task, LocalDate newStartDate) {
@@ -355,7 +463,7 @@ public class GoogleCalendar {
 			eventDateTime = convertToEventDateTime(newEndDate);
 			event.setEnd(eventDateTime);
 		}
-		syncPatchTask(event);
+		syncPatchTaskToGoogleCalendar(event);
 	}
 
 	public void syncUpdateTaskStartTime(Task task, LocalTime newStartTime) {
@@ -365,7 +473,7 @@ public class GoogleCalendar {
 		LocalDate taskDate = taskDateTime.toLocalDate();
 		eventDateTime = convertToEventDateTime(taskDate, newStartTime);
 		event.setStart(eventDateTime);
-		syncPatchTask(event);
+		syncPatchTaskToGoogleCalendar(event);
 	}
 
 	public void syncUpdateTaskEndDate(Task task, LocalDate newEndDate) {
@@ -375,10 +483,10 @@ public class GoogleCalendar {
 			LocalTime taskTime = task.getEndTime();
 			eventDateTime = convertToEventDateTime(newEndDate, taskTime);
 		} else {
-			eventDateTime = convertToEventDateTime(newEndDate);
+			eventDateTime = convertToEventDateTime(newEndDate.plusDays(1));
 		}
 		event.setEnd(eventDateTime);
-		syncPatchTask(event);
+		syncPatchTaskToGoogleCalendar(event);
 	}
 
 	public void syncUpdateTaskEndTime(Task task, LocalTime newEndTime) {
@@ -388,7 +496,7 @@ public class GoogleCalendar {
 		LocalDate taskDate = taskDateTime.toLocalDate();
 		eventDateTime = convertToEventDateTime(taskDate, newEndTime);
 		event.setEnd(eventDateTime);
-		syncPatchTask(event);
+		syncPatchTaskToGoogleCalendar(event);
 	}
 
 	private Event convertNonFloatingTaskToEvent(Task task) {
@@ -420,7 +528,6 @@ public class GoogleCalendar {
 		}
 
 		return event;
-
 	}
 
 	private EventDateTime convertToEventDateTime(LocalDate localDate) {
@@ -445,6 +552,14 @@ public class GoogleCalendar {
 		DateTime dateTime = eventDateTime.getDateTime();
 		LocalDateTime localDateTime = new LocalDateTime(dateTime.getValue());
 		return localDateTime;
+	}
+
+	private boolean isFloatingTask(Task task) {
+		if (task.getHasStartDate()) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	private String generateTimeBasedUUID() {
