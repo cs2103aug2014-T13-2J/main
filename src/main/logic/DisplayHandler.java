@@ -287,7 +287,6 @@ public class DisplayHandler extends CommandHandler {
 					for (int j = 0; j < (venueLines - descriptionLines) - 1; j++) {
 						String displayVenue = taskVenueExtra.substring(0, 12);
 						taskVenueExtra = taskVenueExtra.substring(12);
-
 						if (completed) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
