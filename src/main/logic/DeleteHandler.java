@@ -16,7 +16,6 @@ import main.storage.Task;
 public class DeleteHandler extends CommandHandler {
 	private static String MESSAGE_DELETE = "List of deleted tasks: \n";
 	private static String MESSAGE_INDEX_OUT_OF_BOUNDS = "Sorry, the arguments are out of bounds of the task list. Please try again.";
-	private static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-10s %-35s %-30s %-20s %-20s\n";
 
 	private DeleteParser parser;
 	private static Storage storage = Storage.getInstance();
@@ -37,12 +36,13 @@ public class DeleteHandler extends CommandHandler {
 				String resultBottom = "";
 				returnMessage += "\n";
 				returnMessage += MESSAGE_DELETE;
-				resultTop += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a("ID").reset(),
-						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi()
-								.fg(CYAN).a(" VENUE").reset(), ansi()
-								.fg(YELLOW).a(" TIME").reset(), ansi()
-								.fg(GREEN).a(" DATE").reset());
+				resultTop += DisplayHandler.displayLineSeparator();
+				resultTop += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+						ansi().fg(RED).a("ID").reset()," |",
+						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),"|",
+						ansi().fg(CYAN).a(" VENUE").reset(),"|",
+						ansi().fg(YELLOW).a(" TIME").reset(),"|",
+						ansi().fg(GREEN).a(" DATE").reset());
 				resultTop += DisplayHandler.displayLineSeparator();
 				returnMessage += resultTop;
 
@@ -51,19 +51,19 @@ public class DeleteHandler extends CommandHandler {
 					Task task = list.get(index);
 					String taskId = task.getId();
 					returnMessage += DisplayHandler.displayTaskInTable(index,
-							task) + "\n";
+							task) ;
 					storage.deleteTask(index);
 					googleCalendar.syncDeleteTask(task, taskId);
 
 				}
 				storage.saveCurrentState();
+				resultBottom += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+						ansi().fg(RED).a("ID").reset()," |",
+						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),"|",
+						ansi().fg(CYAN).a(" VENUE").reset(),"|",
+						ansi().fg(YELLOW).a(" TIME").reset(),"|",
+						ansi().fg(GREEN).a(" DATE").reset());
 				resultBottom += DisplayHandler.displayLineSeparator();
-				resultBottom += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a("ID").reset(),
-						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi()
-								.fg(CYAN).a(" VENUE").reset(), ansi()
-								.fg(YELLOW).a(" TIME").reset(), ansi()
-								.fg(GREEN).a(" DATE").reset());
 				returnMessage += resultBottom;
 			} catch (IndexOutOfBoundsException e) {
 				returnMessage = MESSAGE_INDEX_OUT_OF_BOUNDS;

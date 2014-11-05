@@ -17,7 +17,6 @@ public class SearchParser extends CommandParser {
 	public static final String MESSAGE_NULL = "Task list is empty. There is nothing to search from.";
 	public static final String MESSAGE_UNAVAILABLE = "Search term cannot be found in task list.";
 	public static final String MESSAGE_SEARCH = "List of tasks containing";
-	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-10s %-35s %-30s %-25s %-20s\n";
 
 	public static String returnMessage = "";
 	public static String lowerCaseKey = "";
@@ -55,11 +54,10 @@ public class SearchParser extends CommandParser {
 			System.out.println(MESSAGE_SEARCH + " " + "'"
 					+ ansi().fg(RED).a(userInput).reset() + "'" + ": ");
 			resultTop += DisplayHandler.displayLineSeparator();
-			resultTop += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-					.fg(RED).a("ID").reset(),
-					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
-					ansi().fg(CYAN).a(" VENUE").reset(),
-					ansi().fg(YELLOW).a(" TIME").reset(),
+			resultTop += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a("ID").reset()," |",
+					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),"|",
+					ansi().fg(CYAN).a(" VENUE").reset(),"|",
+					ansi().fg(YELLOW).a(" TIME").reset(),"|",
 					ansi().fg(GREEN).a(" DATE").reset());
 			resultTop += DisplayHandler.displayLineSeparator();
 			System.out.print(resultTop);
@@ -71,11 +69,11 @@ public class SearchParser extends CommandParser {
 				}
 			}
 
-			resultBottom += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-					ansi().fg(RED).a("ID").reset(),
-					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),
-					ansi().fg(CYAN).a(" VENUE").reset(),
-					ansi().fg(YELLOW).a(" TIME").reset(),
+			resultBottom += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+					ansi().fg(RED).a("ID").reset()," |",
+					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),"|",
+					ansi().fg(CYAN).a(" VENUE").reset(),"|",
+					ansi().fg(YELLOW).a(" TIME").reset(),"|",
 					ansi().fg(GREEN).a(" DATE").reset());
 			resultBottom += DisplayHandler.displayLineSeparator();
 			System.out.print(resultBottom);
