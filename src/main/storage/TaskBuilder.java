@@ -7,7 +7,7 @@ import org.joda.time.LocalTime;
 public class TaskBuilder {
 
 	/***************************** Data Members ************************/
-	private String eventId = null;
+	private String id = null;
 	private String description;
 	private String venue = null;
 	private LocalDate startDate = null;
@@ -68,7 +68,7 @@ public class TaskBuilder {
 	}
 
 	public Task buildTask() {
-		return new Task(eventId, description, venue, startDate, startTime, endDate,
+		return new Task(id, description, venue, startDate, startTime, endDate,
 				endTime, reminder, recurrence, completed);
 	}
 }

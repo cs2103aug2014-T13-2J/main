@@ -61,7 +61,7 @@ public class TaskBuilderTest {
 		assertEquals("endTime - Hour: ", 00, task.getEndTime().getHourOfDay());
 		assertEquals("endTime - Minute: ", 00, task.getEndTime().getMinuteOfHour());
 		
-		assertEquals(task.getHasReminder(), true);
+		assertEquals(task.hasReminder(), true);
 		
 		assertEquals("Reminder - Year: ", 2014, task.getReminder().getYear());
 		assertEquals("Reminder - Month: ", 9, task.getReminder().getMonthOfYear());
@@ -69,9 +69,9 @@ public class TaskBuilderTest {
 		assertEquals("Reminder - Hour: ", 21, task.getReminder().getHourOfDay());
 		assertEquals("Reminder - Minute: ", 30, task.getReminder().getMinuteOfHour());
 		
-		assertEquals(true, task.getHasRecurrence());
+		assertEquals(true, task.hasRecurrence());
 		assertEquals("weekly", task.getRecurrence());
-		assertEquals(false, task.getCompleted());
+		assertEquals(false, task.hasCompleted());
 		
 	}
 

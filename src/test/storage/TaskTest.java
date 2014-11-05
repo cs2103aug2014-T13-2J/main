@@ -61,7 +61,7 @@ public class TaskTest {
 		
 		task.setStartDate(new LocalDate(2014, 10, 19));
 		assertEquals("Start date: ", "2014-10-19", task.getStartDate().toString());
-		assertEquals("has start date: ", true, task.getHasStartDate());
+		assertEquals("has start date: ", true, task.hasStartDate());
 	}
 	
 	//This is the case for the start later than end equivalence partition
@@ -160,10 +160,10 @@ public class TaskTest {
 		Task task = builder.buildTask();
 		
 		task.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
-		assertEquals("has reminder: ", true, task.getHasReminder());
+		assertEquals("has reminder: ", true, task.hasReminder());
 		assertEquals("reminder: ", "2014-09-20T21:30:00.000+08:00", task.getReminder().toString());
 		task.setReminder(null);
-		assertEquals("has reminder: ", false, task.getHasReminder());
+		assertEquals("has reminder: ", false, task.hasReminder());
 		assertEquals("reminder: ", null, task.getReminder());
 	}
 
@@ -176,10 +176,10 @@ public class TaskTest {
 		Task task = builder.buildTask();
 		
 		task.setRecurrence("weekly");
-		assertEquals("has recurrence: ", true, task.getHasRecurrence());
+		assertEquals("has recurrence: ", true, task.hasRecurrence());
 		assertEquals("recurrence: ", "weekly", task.getRecurrence());
 		task.setRecurrence(null);
-		assertEquals("has recurrence: ", false, task.getHasRecurrence());
+		assertEquals("has recurrence: ", false, task.hasRecurrence());
 		assertEquals("recurrence: ", null, task.getRecurrence());
 	}
 
@@ -192,7 +192,7 @@ public class TaskTest {
 		
 		task.setCompleted(true);
 		
-		assertEquals("completed: ", true, task.getCompleted());
+		assertEquals("completed: ", true, task.hasCompleted());
 	}
 
 	@Test
