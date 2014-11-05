@@ -127,7 +127,11 @@ public class AddParser extends CommandParser {
 	}
 
 	private static void removeCurrentWord(LinkedList<String> wordsList) {
-		wordsList.poll();
+		if(wordsList.isEmpty()) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_FORMAT);
+		} else {
+			wordsList.poll();
+		}
 	}
 
 	private static String viewNextWord(LinkedList<String> wordsList) {

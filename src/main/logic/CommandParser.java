@@ -17,6 +17,7 @@ public abstract class CommandParser {
 	protected final static String MESSAGE_REQUIRE_START_TIME_OR_DATE = "Sorry you need to specify either the time or date";
 	protected final static String MESSAGE_INVALID_RECURRENCE_FORMAT = "Sorry, we did not manage to capture the recurrence. Please try again.";
 	protected final static String MESSAGE_INVALID_COMPLETED_FORMAT = "Sorry, we did not manage to capture the completion of the task. Please try again.";
+	protected final static String MESSAGE_INVALID_FORMAT = "Sorry we were unable to parse the information";
 	public static final String STRING_SPACE = " ";
 	protected final static Integer INDEX_HOUR = 0;
 	protected final static Integer INDEX_MINUTE = 1;
@@ -380,14 +381,25 @@ public abstract class CommandParser {
 
 	public static String getVenueAndTrimUserInput(LinkedList<String> wordsList)
 			throws IllegalArgumentException {
+		LinkedList<String> stack = new LinkedList<String>();
 		String currentWord, venue = "";
 		while (!wordsList.isEmpty()) {
-			currentWord = wordsList.peek();
+			currentWord = wordsList.poll();
 			if (isReservedWord(currentWord)) {
-				break;
+				stack.push(currentWord);
+				currentWord = wordsList.poll();
+				stack.push(currentWord);
+				if(representsTime(currentWord) || representsDate(wordsList)) {
+					while(!stack.isEmpty()) {
+						wordsList.offerFirst(stack.pop());
+					}
+				} else {
+					while(!stack.isEmpty()) {
+						venue += stack.removeLast() + STRING_SPACE;
+					}
+				}
 			} else {
-				wordsList.poll();
-				venue += currentWord + " ";
+				venue += currentWord + STRING_SPACE;
 			}
 		}
 		venue = venue.trim();
@@ -678,7 +690,13 @@ public abstract class CommandParser {
 	
 	protected static boolean representsDate(LinkedList<String> wordsList) {
 		LinkedList<String> stack = new LinkedList<String>();
-		String currentWord = wordsList.peek().toLowerCase();
+		String currentWord;
+		if(wordsList.isEmpty()) {
+			return false;
+		} else {
+			currentWord = wordsList.peek().toLowerCase();
+		}
+		
 		if(currentWord.equals("next")) {
 			stack.push(currentWord);
 			wordsList.poll();
@@ -688,6 +706,18 @@ public abstract class CommandParser {
 				return true;
 			} else {
 				wordsList.offerFirst(stack.pop());
+				return false;
+			}
+		} else if(isDayOfWeek(currentWord)){
+			return true;
+		} else if(isInteger(currentWord)) {
+			stack.push(currentWord);
+			currentWord = wordsList.peek().toLowerCase();
+			//put the word back
+			wordsList.offerFirst(stack.pop());
+			if(isMonth(currentWord)) {
+				return true;
+			} else {
 				return false;
 			}
 		} else {
