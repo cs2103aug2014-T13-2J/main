@@ -142,8 +142,8 @@ public class Task {
 		this.hasId = hasId;
 	}
 
-	public void setId(String eventId) {
-		this.id = eventId;
+	public void setId(String id) {
+		this.id = id;
 
 		if (id != null) {
 			this.setHasId(true);
