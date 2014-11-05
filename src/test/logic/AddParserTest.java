@@ -58,10 +58,10 @@ public class AddParserTest {
 		assertEquals("startTimeMinute: ", "0", p2.getStartTimeMinute());
 		assertEquals("endTimeHour: ", "23", p2.getEndTimeHour());
 		assertEquals("endTimeMinute: ", "0", p2.getEndTimeMinute());
-		assertEquals("startDateYear: ", "2014", p2.getStartDateYear());
+		assertEquals("startDateYear: ", "2015", p2.getStartDateYear());
 		assertEquals("startDateMonth: ", "10", p2.getStartDateMonth());
 		assertEquals("startDateDay: ", "3", p2.getStartDateDay());
-		assertEquals("endDateYear: ", "2014", p2.getEndDateYear());
+		assertEquals("endDateYear: ", "2015", p2.getEndDateYear());
 		assertEquals("endDateMonth: ", "10", p2.getEndDateMonth());
 		assertEquals("endDateDay: ", "3", p2.getEndDateDay());
 		
@@ -106,10 +106,10 @@ public class AddParserTest {
 		assertEquals("startTimeMinute: ", null, p5.getStartTimeMinute());
 		assertEquals("endTimeHour: ", null, p5.getEndTimeHour());
 		assertEquals("endTimeMinute: ", null, p5.getEndTimeMinute());
-		assertEquals("startDateYear: ", "2014", p5.getStartDateYear());
+		assertEquals("startDateYear: ", "2015", p5.getStartDateYear());
 		assertEquals("startDateMonth: ", "10", p5.getStartDateMonth());
 		assertEquals("startDateDay: ", "3", p5.getStartDateDay());
-		assertEquals("endDateYear: ", "2014", p5.getEndDateYear());
+		assertEquals("endDateYear: ", "2015", p5.getEndDateYear());
 		assertEquals("endDateMonth: ", "10", p5.getEndDateMonth());
 		assertEquals("endDateDay: ", "3", p5.getEndDateDay());
 		
@@ -123,10 +123,10 @@ public class AddParserTest {
 		assertEquals("startTimeMinute: ", null, p6.getStartTimeMinute());
 		assertEquals("endTimeHour: ", null, p6.getEndTimeHour());
 		assertEquals("endTimeMinute: ", null, p6.getEndTimeMinute());
-		assertEquals("startDateYear: ", "2014", p6.getStartDateYear());
+		assertEquals("startDateYear: ", "2015", p6.getStartDateYear());
 		assertEquals("startDateMonth: ", "10", p6.getStartDateMonth());
 		assertEquals("startDateDay: ", "3", p6.getStartDateDay());
-		assertEquals("endDateYear: ", "2014", p6.getEndDateYear());
+		assertEquals("endDateYear: ", "2015", p6.getEndDateYear());
 		assertEquals("endDateMonth: ", "10", p6.getEndDateMonth());
 		assertEquals("endDateDay: ", "3", p6.getEndDateDay());
 		
@@ -171,10 +171,10 @@ public class AddParserTest {
 		assertEquals("startTimeMinute: ", null, p9.getStartTimeMinute());
 		assertEquals("endTimeHour: ", null, p9.getEndTimeHour());
 		assertEquals("endTimeMinute: ", null, p9.getEndTimeMinute());
-		assertEquals("startDateYear: ", "2014", p9.getStartDateYear());
+		assertEquals("startDateYear: ", "2015", p9.getStartDateYear());
 		assertEquals("startDateMonth: ", "10", p9.getStartDateMonth());
 		assertEquals("startDateDay: ", "3", p9.getStartDateDay());
-		assertEquals("endDateYear: ", "2014", p9.getEndDateYear());
+		assertEquals("endDateYear: ", "2015", p9.getEndDateYear());
 		assertEquals("endDateMonth: ", "10", p9.getEndDateMonth());
 		assertEquals("endDateDay: ", "4", p9.getEndDateDay());
 		
@@ -187,10 +187,10 @@ public class AddParserTest {
 		assertEquals("startTimeMinute: ", "0", p10.getStartTimeMinute());
 		assertEquals("endTimeHour: ", "1", p10.getEndTimeHour());
 		assertEquals("endTimeMinute: ", "0", p10.getEndTimeMinute());
-		assertEquals("startDateYear: ", "2014", p10.getStartDateYear());
+		assertEquals("startDateYear: ", "2015", p10.getStartDateYear());
 		assertEquals("startDateMonth: ", "10", p10.getStartDateMonth());
 		assertEquals("startDateDay: ", "3", p10.getStartDateDay());
-		assertEquals("endDateYear: ", "2014", p10.getEndDateYear());
+		assertEquals("endDateYear: ", "2015", p10.getEndDateYear());
 		assertEquals("endDateMonth: ", "10", p10.getEndDateMonth());
 		assertEquals("endDateDay: ", "4", p10.getEndDateDay());
 
@@ -203,10 +203,10 @@ public class AddParserTest {
 		assertEquals("startTimeMinute: ", null, p11.getStartTimeMinute());
 		assertEquals("endTimeHour: ", null, p11.getEndTimeHour());
 		assertEquals("endTimeMinute: ", null, p11.getEndTimeMinute());
-		assertEquals("startDateYear: ", "2014", p11.getStartDateYear());
+		assertEquals("startDateYear: ", "2015", p11.getStartDateYear());
 		assertEquals("startDateMonth: ", "10", p11.getStartDateMonth());
 		assertEquals("startDateDay: ", "3", p11.getStartDateDay());
-		assertEquals("endDateYear: ", "2014", p11.getEndDateYear());
+		assertEquals("endDateYear: ", "2015", p11.getEndDateYear());
 		assertEquals("endDateMonth: ", "10", p11.getEndDateMonth());
 		assertEquals("endDateDay: ", "18", p11.getEndDateDay());
 		
@@ -251,10 +251,10 @@ public class AddParserTest {
 		assertEquals("startTimeMinute: ", "0", p14.getStartTimeMinute());
 		assertEquals("endTimeHour: ", "12", p14.getEndTimeHour());
 		assertEquals("endTimeMinute: ", "0", p14.getEndTimeMinute());
-		assertEquals("startDateYear: ", "2014", p14.getStartDateYear());
+		assertEquals("startDateYear: ", "2015", p14.getStartDateYear());
 		assertEquals("startDateMonth: ", "10", p14.getStartDateMonth());
 		assertEquals("startDateDay: ", "22", p14.getStartDateDay());
-		assertEquals("endDateYear: ", "2014", p14.getEndDateYear());
+		assertEquals("endDateYear: ", "2015", p14.getEndDateYear());
 		assertEquals("endDateMonth: ", "10", p14.getEndDateMonth());
 		assertEquals("endDateDay: ", "22", p14.getEndDateDay());
 		
@@ -269,10 +269,10 @@ public class AddParserTest {
 		assertEquals("endTimeMinute: ", null, p15.getEndTimeMinute());
 		assertEquals("startDateYear: ", "2014", p15.getStartDateYear());
 		assertEquals("startDateMonth: ", "11", p15.getStartDateMonth());
-		assertEquals("startDateDay: ", "2", p15.getStartDateDay());
+		assertEquals("startDateDay: ", "9", p15.getStartDateDay());
 		assertEquals("endDateYear: ", "2014", p15.getEndDateYear());
 		assertEquals("endDateMonth: ", "11", p15.getEndDateMonth());
-		assertEquals("endDateDay: ", "2", p15.getEndDateDay());
+		assertEquals("endDateDay: ", "9", p15.getEndDateDay());
 		
 		String s16 = "meeting with Prof next Friday from 11am to 2pm";
 		AddParser p16 = new AddParser(s16);
@@ -285,10 +285,10 @@ public class AddParserTest {
 		assertEquals("endTimeMinute: ", "0", p16.getEndTimeMinute());
 		assertEquals("startDateYear: ", "2014", p16.getStartDateYear());
 		assertEquals("startDateMonth: ", "11", p16.getStartDateMonth());
-		assertEquals("startDateDay: ", "7", p16.getStartDateDay());
+		assertEquals("startDateDay: ", "14", p16.getStartDateDay());
 		assertEquals("endDateYear: ", "2014", p16.getEndDateYear());
 		assertEquals("endDateMonth: ", "11", p16.getEndDateMonth());
-		assertEquals("endDateDay: ", "7", p16.getEndDateDay());
+		assertEquals("endDateDay: ", "14", p16.getEndDateDay());
 	}
 	
 	@Test
@@ -439,14 +439,14 @@ public class AddParserTest {
 		
 		assertEquals("Date: ", "2/10/2015", AddParser.getDateAndTrimUserInput(l1));
 		assertEquals("Date: ", "2/10/2014", AddParser.getDateAndTrimUserInput(l2));
-		assertEquals("Date: ", "3/9/2014", AddParser.getDateAndTrimUserInput(l3));
-		assertEquals("Date: ", "3/9/2014", AddParser.getDateAndTrimUserInput(l4));
+		assertEquals("Date: ", "3/9/2015", AddParser.getDateAndTrimUserInput(l3));
+		assertEquals("Date: ", "3/9/2015", AddParser.getDateAndTrimUserInput(l4));
 		assertEquals("Date: ", "99/12/2014", AddParser.getDateAndTrimUserInput(l5));
 		assertEquals("Date: ", "99/12/2014", AddParser.getDateAndTrimUserInput(l6));
-		assertEquals("Date: ", "35/1/2014", AddParser.getDateAndTrimUserInput(l7));
-		assertEquals("Date: ", "35/1/2014", AddParser.getDateAndTrimUserInput(l8));
+		assertEquals("Date: ", "35/1/2015", AddParser.getDateAndTrimUserInput(l7));
+		assertEquals("Date: ", "35/1/2015", AddParser.getDateAndTrimUserInput(l8));
 		assertEquals("Date: ", "42/10/2050", AddParser.getDateAndTrimUserInput(l9)); 
-		assertEquals("Date: ", "42/10/2014", AddParser.getDateAndTrimUserInput(l10));
+		assertEquals("Date: ", "42/10/2015", AddParser.getDateAndTrimUserInput(l10));
 		assertEquals("Date: ", "27/2/1002", AddParser.getDateAndTrimUserInput(l11)); 
 		assertEquals("Date: ", "27/2/1002", AddParser.getDateAndTrimUserInput(l12));
 		
