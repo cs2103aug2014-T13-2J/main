@@ -15,7 +15,8 @@ public class Task {
 	private static final String MESSAGE_HAS_TIME_WITHOUT_DATE = "Sorry, can't have time without date.";
 
 	/***************************** Data Members ************************/
-	private String eventId = null;
+	private String id = null;
+	private boolean hasId = false; 
 	private String description;
 	private boolean hasVenue = false;
 	private String venue = null;
@@ -34,11 +35,11 @@ public class Task {
 	private boolean completed = false;
 
 	/***************************** Constructors ************************/
-	public Task(String eventId, String description, String venue,
+	public Task(String id, String description, String venue,
 			LocalDate startDate, LocalTime startTime, LocalDate endDate,
 			LocalTime endTime, DateTime reminder, String recurrence,
 			boolean completed) throws IllegalArgumentException {
-		this.setEventId(eventId);
+		this.setId(id);
 		this.setDescription(description);
 		this.setVenue(venue);
 		this.setStartDate(startDate);
@@ -64,15 +65,19 @@ public class Task {
 	}
 
 	/***************************** Accessors ************************/
-	public String getEventId() {
-		return eventId;
+	public boolean hasId() {
+		return hasId;
+	}
+	
+	public String getId() {
+		return id;
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public boolean getHasVenue() {
+	public boolean hasVenue() {
 		return hasVenue;
 	}
 
@@ -80,7 +85,7 @@ public class Task {
 		return venue;
 	}
 
-	public boolean getHasStartDate() {
+	public boolean hasStartDate() {
 		return hasStartDate;
 	}
 
@@ -88,7 +93,7 @@ public class Task {
 		return startDate;
 	}
 
-	public boolean getHasStartTime() {
+	public boolean hasStartTime() {
 		return hasStartTime;
 	}
 
@@ -96,7 +101,7 @@ public class Task {
 		return startTime;
 	}
 
-	public boolean getHasEndDate() {
+	public boolean hasEndDate() {
 		return hasEndDate;
 	}
 
@@ -104,7 +109,7 @@ public class Task {
 		return endDate;
 	}
 
-	public boolean getHasEndTime() {
+	public boolean hasEndTime() {
 		return hasEndTime;
 	}
 
@@ -112,7 +117,7 @@ public class Task {
 		return endTime;
 	}
 
-	public boolean getHasReminder() {
+	public boolean hasReminder() {
 		return hasReminder;
 	}
 
@@ -120,7 +125,7 @@ public class Task {
 		return reminder;
 	}
 
-	public boolean getHasRecurrence() {
+	public boolean hasRecurrence() {
 		return hasRecurrence;
 	}
 
@@ -128,13 +133,23 @@ public class Task {
 		return recurrence;
 	}
 
-	public boolean getCompleted() {
+	public boolean hasCompleted() {
 		return completed;
 	}
 
 	/***************************** Mutators ************************/
-	public void setEventId(String eventId) {
-		this.eventId = eventId;
+	private void setHasId(boolean hasId) {
+		this.hasId = hasId;
+	}
+	
+	public void setId(String eventId) {
+		this.id = eventId;
+		
+		if (id != null) {
+			this.setHasId(true);
+		} else {
+			this.setHasId(false);
+		}
 	}
 
 	public void setDescription(String description) {
@@ -277,7 +292,7 @@ public class Task {
 
 	public String convertToCSVFormat() {
 		String result = "";
-		result = result + this.getEventId() + DELIMITER;
+		result = result + this.getId() + DELIMITER;
 		result = result + this.getDescription() + DELIMITER;
 		result = result + this.getVenue() + DELIMITER;
 		result = result + this.getStartDate() + DELIMITER;
@@ -286,7 +301,7 @@ public class Task {
 		result = result + this.getEndTime() + DELIMITER;
 		result = result + this.getReminder() + DELIMITER;
 		result = result + this.getRecurrence() + DELIMITER;
-		result = result + this.getCompleted();
+		result = result + this.hasCompleted();
 
 		return result;
 	}
@@ -296,26 +311,26 @@ public class Task {
 		result = result + "Description: " + this.getDescription();
 		result = result + ", " + "Venue: " + this.getVenue();
 
-		if (this.getHasStartDate()) {
+		if (this.hasStartDate()) {
 			result = result + ", " + "Start date: " + this.getStartDate();
 		}
 
-		if (this.getHasStartTime()) {
+		if (this.hasStartTime()) {
 			result = result + ", " + "Start time: " + this.getStartTime();
 		}
 
-		if (this.getHasEndDate()) {
+		if (this.hasEndDate()) {
 			result = result + ", " + "End date: " + this.getEndDate();
 		}
 
-		if (this.getHasEndTime()) {
+		if (this.hasEndTime()) {
 			result = result + ", " + "End time: " + this.getEndTime();
 		}
 
-		if (this.getHasReminder()) {
+		if (this.hasReminder()) {
 			result = result + ", " + "Reminder on: " + this.getReminder();
 		}
-		if (this.getHasRecurrence()) {
+		if (this.hasRecurrence()) {
 			result = result + ", " + "Recurrence: " + this.getRecurrence();
 		}
 		return result;

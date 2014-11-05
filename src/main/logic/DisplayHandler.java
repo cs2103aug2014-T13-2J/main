@@ -80,7 +80,7 @@ public class DisplayHandler extends CommandHandler {
 
 	public static String displayTaskInTable(int number, Task task) {
 		result = "";
-		boolean completed = task.getCompleted();
+		boolean completed = task.hasCompleted();
 		String taskNumber = getTaskNumber(number);
 		String taskDescription = task.getDescription();
 		String taskDescriptionExtra = "";
@@ -110,7 +110,7 @@ public class DisplayHandler extends CommandHandler {
 		String taskVenueExtra = "";
 		String taskVenueExtraOne = "";
 		String taskVenueExtraTwo = "";
-		if (task.getHasVenue()) {
+		if (task.hasVenue()) {
 			taskVenue = task.getVenue();
 
 			if (taskVenue.length() >= 12 && taskVenue.length() < 24) {
@@ -130,7 +130,7 @@ public class DisplayHandler extends CommandHandler {
 
 		String startTaskTime = "-";
 		String endTaskTime = "-";
-		if (task.getHasStartTime()) {
+		if (task.hasStartTime()) {
 			startTaskTime = addStartTime(task);
 			if (!task.getEndTime().equals(task.getStartTime())) {
 				// taskTime += "to " + addEndTime(task);
@@ -140,7 +140,7 @@ public class DisplayHandler extends CommandHandler {
 
 		String startTaskDate = "-";
 		String endTaskDate = "-";
-		if (task.getHasStartDate()) {
+		if (task.hasStartDate()) {
 			startTaskDate = addStartDate(task);
 			if (!task.getEndDate().equals(task.getStartDate())) {
 				// taskDate += "to " + addEndDate(task);
@@ -413,43 +413,43 @@ public class DisplayHandler extends CommandHandler {
 		result += getVenue(task);
 		// if a task has a start date, it will definitely have an end date, it
 		// just depends whether they are equal
-		if (task.getHasStartDate() && !task.startDateEqualsEndDate()) { // append
+		if (task.hasStartDate() && !task.startDateEqualsEndDate()) { // append
 																		// "from.. ..to"
 			result += addFrom();
 			result += addStartDate(task);
-			if (task.getHasStartTime()) {
+			if (task.hasStartTime()) {
 				result += addStartTime(task);
 			}
 			result += addTo();
 			result += addEndDate(task);
-			if (task.getHasEndTime()) {
+			if (task.hasEndTime()) {
 				result += addEndTime(task);
 			}
-		} else if (task.getHasStartDate()) {
+		} else if (task.hasStartDate()) {
 			result += addOn();
 			result += addStartDate(task);
 
-			if (task.getHasStartTime() && task.getHasEndTime()
+			if (task.hasStartTime() && task.hasEndTime()
 					&& !task.startTimeEqualsEndTime()) {
 				result += addFrom();
 				result += addStartTime(task);
 				result += addTo();
 				result += addEndTime(task);
-			} else if (task.getHasStartTime()) {
+			} else if (task.hasStartTime()) {
 				result += addAt();
 				result += addStartTime(task);
 			}
 
-		} else if (task.getHasStartTime()) {
+		} else if (task.hasStartTime()) {
 			result += addAt();
 			result += addStartTime(task);
 		}
 
-		if (task.getHasRecurrence()) {
+		if (task.hasRecurrence()) {
 			result += addRecurrence(task);
 		}
 
-		if (task.getCompleted()) {
+		if (task.hasCompleted()) {
 			result += addCompleted(task);
 		}
 		result = result.trim();
@@ -514,7 +514,7 @@ public class DisplayHandler extends CommandHandler {
 	}
 
 	private static String addCompleted(Task task) {
-		return "(" + task.getCompleted() + ")" + STRING_SPACE;
+		return "(" + task.hasCompleted() + ")" + STRING_SPACE;
 	}
 
 }

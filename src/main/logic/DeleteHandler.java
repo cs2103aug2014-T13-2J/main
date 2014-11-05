@@ -49,11 +49,11 @@ public class DeleteHandler extends CommandHandler {
 				for (int index : listOfIndexes) {
 					ArrayList<Task> list = storage.getTasks();
 					Task task = list.get(index);
-					String eventId = task.getEventId();
+					String taskId = task.getId();
 					returnMessage += DisplayHandler.displayTaskInTable(index,
 							task) + "\n";
 					storage.deleteTask(index);
-					googleCalendar.syncDeleteTask(task, eventId);
+					googleCalendar.syncDeleteTask(task, taskId);
 
 				}
 				storage.saveCurrentState();

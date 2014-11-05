@@ -93,12 +93,12 @@ public class UpdateHandlerTest {
 		String ss8 = "8 complete";
 		UpdateHandler u8 = new UpdateHandler(ss8);
 		u8.execute();
-		assertEquals("New completed:", true, UpdateHandler.getTask(8).getCompleted());
+		assertEquals("New completed:", true, UpdateHandler.getTask(8).hasCompleted());
 		
 		String ss9 = "8 incomplete";
 		UpdateHandler u9 = new UpdateHandler(ss9);
 		u9.execute();		
-		assertEquals("New completed:", false, UpdateHandler.getTask(8).getCompleted());
+		assertEquals("New completed:", false, UpdateHandler.getTask(8).hasCompleted());
 	}
 
 }

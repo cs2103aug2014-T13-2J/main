@@ -9,6 +9,7 @@ import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.UUID;
 
+import main.storage.Storage;
 import main.storage.Task;
 
 import org.joda.time.LocalDate;
@@ -79,20 +80,7 @@ public class GoogleCalendar {
 	private static GoogleCalendar theOne = null;
 	private static String googleId = null;
 	private static Scanner scanner = new Scanner(System.in);
-
-	private JsonBatchCallback<Event> callbackForUpdate = new JsonBatchCallback<Event>() {
-
-		@Override
-		public void onSuccess(Event event, HttpHeaders arg1) throws IOException {
-
-		}
-
-		@Override
-		public void onFailure(GoogleJsonError arg0, HttpHeaders arg1)
-				throws IOException {
-			System.out.println(MESSAGE_SYNC_UPDATE_FAIL);
-		}
-	};
+	private static Storage storage = Storage.getInstance();
 
 	private GoogleCalendar() {
 
@@ -119,9 +107,7 @@ public class GoogleCalendar {
 		scopes.add(CalendarScopes.CALENDAR);
 		scopes.add(TasksScopes.TASKS);
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-				httpTransport, JSON_FACTORY, clientSecrets,
-//				Collections.singleton(CalendarScopes.CALENDAR))
-				scopes)
+				httpTransport, JSON_FACTORY, clientSecrets, scopes)
 				.setDataStoreFactory(dataStoreFactory).build();
 
 		// authorise
@@ -184,39 +170,6 @@ public class GoogleCalendar {
 		}
 	}
 
-	public String syncToGoogle() {
-		String message = MESSAGE_SYNC_EMPTY;
-		try {
-			if (addEventBatch.size() != 0) {
-				addEventBatch.execute();
-				message = MESSAGE_SYNC_SUCCESS;
-			}
-			if (updateEventBatch.size() != 0) {
-				updateEventBatch.execute();
-				message = MESSAGE_SYNC_SUCCESS;
-			}
-			if (deleteEventBatch.size() != 0) {
-				deleteEventBatch.execute();
-				message = MESSAGE_SYNC_SUCCESS;
-			}
-			if (addTaskBatch.size() != 0) {
-				addTaskBatch.execute();
-				message = MESSAGE_SYNC_SUCCESS;
-			}
-			if (updateTaskBatch.size() != 0) {
-				updateTaskBatch.execute();
-				message = MESSAGE_SYNC_SUCCESS;
-			}
-			if (deleteTaskBatch.size() != 0) {
-				deleteTaskBatch.execute();
-				message = MESSAGE_SYNC_SUCCESS;
-			}
-		} catch (IOException e) {
-			message = MESSAGE_SYNC_FAIL;
-		}
-		return message;
-	}
-
 	private String getCalendarIdFromUser() {
 		String message = "";
 		System.out.println(MESSAGE_OFFLINE_FIRST_TIME);
@@ -253,10 +206,11 @@ public class GoogleCalendar {
 	}
 
 	public String syncAddTask(Task task) {
-		String id = generateTimeBasedUUID();
+		String id = null;
 		if (isFloatingTask(task)) {
 			id = syncAddFloatingTask(task);
 		} else {
+			id = generateTimeBasedUUID();
 			syncAddNonFloatingTask(task, id);
 		}
 		return id;
@@ -267,35 +221,11 @@ public class GoogleCalendar {
 		com.google.api.services.tasks.model.Task googleTask = new com.google.api.services.tasks.model.Task();
 		googleTask.setTitle(task.getDescription());
 		try {
-			googleTask = googleTasksClient.tasks().insert("@default", googleTask).execute();
+			googleTask = googleTasksClient.tasks()
+					.insert("@default", googleTask).execute();
 			id = googleTask.getId();
 		} catch (IOException e) {
-			try {
-				googleTasksClient
-						.tasks()
-						.insert("@default", googleTask)
-						.queue(addTaskBatch,
-								new JsonBatchCallback<com.google.api.services.tasks.model.Task>() {
-
-									@Override
-									public void onSuccess(
-											com.google.api.services.tasks.model.Task googleTask,
-											HttpHeaders arg1)
-											throws IOException {
-										
-									}
-
-									@Override
-									public void onFailure(GoogleJsonError arg0,
-											HttpHeaders arg1)
-											throws IOException {
-										System.out
-												.println(MESSAGE_SYNC_ADD_FAIL);
-									}
-								});
-			} catch (IOException e1) {
-				System.out.println(MESSAGE_SYNC_ADD_FAIL);
-			}
+			// perform sync only when online
 		}
 		return id;
 	}
@@ -332,7 +262,9 @@ public class GoogleCalendar {
 		if (isFloatingTask(task)) {
 			syncDeleteFloatingTask(id);
 		} else {
-			syncDeleteNonFloatingTask(id);
+			if (id != null) {
+				syncDeleteNonFloatingTask(id);
+			}
 		}
 	}
 
@@ -396,8 +328,27 @@ public class GoogleCalendar {
 					.execute();
 		} catch (IOException e) {
 			try {
-				googleCalendarClient.events().patch(googleId, eventId, event)
-						.queue(updateEventBatch, callbackForUpdate);
+				googleCalendarClient
+						.events()
+						.patch(googleId, eventId, event)
+						.queue(updateEventBatch,
+								new JsonBatchCallback<Event>() {
+
+									@Override
+									public void onSuccess(Event event,
+											HttpHeaders arg1)
+											throws IOException {
+
+									}
+
+									@Override
+									public void onFailure(GoogleJsonError arg0,
+											HttpHeaders arg1)
+											throws IOException {
+										System.out
+												.println(MESSAGE_SYNC_UPDATE_FAIL);
+									}
+								});
 			} catch (IOException e1) {
 				System.out.println(MESSAGE_SYNC_UPDATE_FAIL);
 			}
@@ -405,9 +356,9 @@ public class GoogleCalendar {
 	}
 
 	public void syncUpdateTaskDescription(Task task, String newDescription) {
-		if (isFloatingTask(task)) {
+		if (task.hasId() && isFloatingTask(task)) {
 			com.google.api.services.tasks.model.Task googleTask = new com.google.api.services.tasks.model.Task();
-			String id = task.getEventId();
+			String id = task.getId();
 			googleTask.setId(id);
 			googleTask.setTitle(newDescription);
 			try {
@@ -458,7 +409,7 @@ public class GoogleCalendar {
 	public void syncUpdateTaskStartDate(Task task, LocalDate newStartDate) {
 		Event event = convertNonFloatingTaskToEvent(task);
 		EventDateTime eventDateTime = null;
-		if (task.getHasStartTime()) {
+		if (task.hasStartTime()) {
 			LocalTime taskTime = task.getStartTime();
 			eventDateTime = convertToEventDateTime(newStartDate, taskTime);
 		} else {
@@ -486,7 +437,7 @@ public class GoogleCalendar {
 	public void syncUpdateTaskEndDate(Task task, LocalDate newEndDate) {
 		Event event = convertNonFloatingTaskToEvent(task);
 		EventDateTime eventDateTime = null;
-		if (task.getHasEndTime()) {
+		if (task.hasEndTime()) {
 			LocalTime taskTime = task.getEndTime();
 			eventDateTime = convertToEventDateTime(newEndDate, taskTime);
 		} else {
@@ -505,10 +456,57 @@ public class GoogleCalendar {
 		event.setEnd(eventDateTime);
 		syncPatchTaskToGoogleCalendar(event);
 	}
+	
+	public String syncToGoogle() {
+		String message = MESSAGE_SYNC_EMPTY;
+		try {
+			if (addEventBatch.size() != 0) {
+				addEventBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
+			}
+			if (updateEventBatch.size() != 0) {
+				updateEventBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
+			}
+			if (deleteEventBatch.size() != 0) {
+				deleteEventBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
+			}
+			if (addTaskBatch.size() != 0) {
+				addTaskBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
+			}
+			if (updateTaskBatch.size() != 0) {
+				updateTaskBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
+			}
+			if (deleteTaskBatch.size() != 0) {
+				deleteTaskBatch.execute();
+				message = MESSAGE_SYNC_SUCCESS;
+			}
+			message = setIdForFloatingTasksWhenOnline(message);
+		} catch (IOException e) {
+			message = MESSAGE_SYNC_FAIL;
+		}
+		return message;
+	}
+
+	private String setIdForFloatingTasksWhenOnline(String message) {
+		ArrayList<Task> taskList = storage.getTasks();
+		for (Task task : taskList) {
+			if (!task.hasId()) {
+				String taskId = syncAddFloatingTask(task);
+				task.setId(taskId);
+				storage.saveCurrentState();
+				message = MESSAGE_SYNC_SUCCESS;
+			}
+		}
+		return message;
+	}
 
 	private Event convertNonFloatingTaskToEvent(Task task) {
 		Event event = new Event();
-		event.setId(task.getEventId());
+		event.setId(task.getId());
 		event.setSummary(task.getDescription());
 		event.setLocation(task.getVenue());
 
@@ -562,7 +560,7 @@ public class GoogleCalendar {
 	}
 
 	private boolean isFloatingTask(Task task) {
-		if (task.getHasStartDate()) {
+		if (task.hasStartDate()) {
 			return false;
 		} else {
 			return true;
