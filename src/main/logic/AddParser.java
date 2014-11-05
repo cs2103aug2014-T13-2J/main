@@ -27,7 +27,7 @@ public class AddParser extends CommandParser {
 			// insert an assert that currentReservedWord is indeed a reserved
 			// word
 			if (currentReservedWord.equals("at")) {
-				//remove reserved word
+				// remove reserved word
 				removeCurrentWord(wordsList);
 				String nextWord = wordsList.peek();
 				// determine if next word is time or venue
@@ -42,12 +42,12 @@ public class AddParser extends CommandParser {
 					venue = getVenueAndTrimUserInput(wordsList);
 				}
 			} else if (currentReservedWord.equals("on")) { // get date
-				//remove reserved word
+				// remove reserved word
 				removeCurrentWord(wordsList);
 				startDate = getDateAndTrimUserInput(wordsList);
 				endDate = startDate;
 			} else if (currentReservedWord.equals("from")) {
-				//remove reserved word
+				// remove reserved word
 				removeCurrentWord(wordsList);
 				String nextWord = viewNextWord(wordsList);
 				if (representsTime(nextWord)) {
@@ -72,16 +72,13 @@ public class AddParser extends CommandParser {
 				}
 
 			} else if (currentReservedWord.equals("next")) {
-				startDate = getDateAndTrimUserInput(wordsList);				
+				startDate = getDateAndTrimUserInput(wordsList);
 				endDate = startDate;
 			}
 		}
-		
-		//if no time and date, reject
-		if(startDate == null && startTime == null) {
-			throw new IllegalArgumentException(MESSAGE_REQUIRE_START_TIME_OR_DATE);
-		} else if (startDate == null && startTime != null) {
-			//if time but no date, set today
+
+		if (startDate == null && startTime != null) {
+			// if time but no date, set today
 			startDateYear = generateYear();
 			startDateMonth = generateMonth();
 			startDateDay = generateDay();
@@ -96,12 +93,12 @@ public class AddParser extends CommandParser {
 			endDateMonth = getMonth(endDate);
 			endDateDay = getDay(endDate);
 		}
-		
+
 		startTimeHour = getHour(startTime);
 		startTimeMinute = getMinute(startTime);
 		endTimeHour = getHour(endTime);
 		endTimeMinute = getMinute(endTime);
-		
+
 		this.setDescription(description);
 		this.setVenue(venue);
 		this.setStartDateYear(startDateYear);
@@ -119,11 +116,11 @@ public class AddParser extends CommandParser {
 
 		return MESSAGE_PARSE_SUCCESS;
 	}
-	
+
 	private static void removeCurrentWord(LinkedList<String> wordsList) {
 		wordsList.poll();
 	}
-	
+
 	private static String viewNextWord(LinkedList<String> wordsList) {
 		return wordsList.peek();
 	}
