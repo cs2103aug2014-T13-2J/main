@@ -9,7 +9,11 @@ import main.logic.CommandHandler;
 import main.logic.DisplayHandler;
 import main.storage.Storage;
 import main.storage.Task;
+import main.storage.TaskBuilder;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -98,6 +102,54 @@ public class DisplayHandlerTest {
 		CommandHandler e13 = new AddHandler(s13);
 		assertEquals("1", e13.execute());
 		
+	}
+	
+	@Test
+	public void testDeterminePastPresentFuture() {
+		Integer past = -1;
+		Integer present = 0;
+		Integer future = 1;
+		
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setStartTime(new LocalTime(23, 59));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setEndTime(new LocalTime(00, 00));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task t1 = builder.buildTask();
+		
+		assertEquals(past, DisplayHandler.determinePastPresentFuture(t1));
+		
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 11, 6));
+		builder.setStartTime(new LocalTime(23, 59));
+		builder.setEndDate(new LocalDate(2014, 11, 6));
+		builder.setEndTime(new LocalTime(23, 59));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task t2 = builder.buildTask();
+		
+		assertEquals(present, DisplayHandler.determinePastPresentFuture(t2));
+		
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 11, 7));
+		builder.setStartTime(new LocalTime(23, 59));
+		builder.setEndDate(new LocalDate(2014, 11, 7));
+		builder.setEndTime(new LocalTime(23, 59));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task t3 = builder.buildTask();
+		
+		assertEquals(future, DisplayHandler.determinePastPresentFuture(t3));
+
 	}
 
 }
