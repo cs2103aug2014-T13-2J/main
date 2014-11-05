@@ -7,6 +7,7 @@ import main.googlecalendar.GoogleCalendar;
 public class Logic {
 	
 	private final static String MESSAGE_UNRECOGNIZED_COMMAND = "Unrecognized command.";
+	private final static String MESSAGE_UNSYNCED_TASKS = "You still have unsynchronised tasks left. Please sync before exit.";
 	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
 
 	private enum CommandType {
@@ -82,7 +83,11 @@ public class Logic {
 		case SYNC:
 			return googleCalendar.syncToGoogle();
 		case EXIT:
-			System.exit(0);
+			if (googleCalendar.hasUnsyncedTasks()) {
+				return MESSAGE_UNSYNCED_TASKS;
+			} else {
+				System.exit(0);
+			}
 		default:
 			TaskerLog.logSystemInfo("Unable to execute invalid command type.");
 			return MESSAGE_UNRECOGNIZED_COMMAND;

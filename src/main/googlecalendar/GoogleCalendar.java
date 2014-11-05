@@ -456,7 +456,7 @@ public class GoogleCalendar {
 		event.setEnd(eventDateTime);
 		syncPatchTaskToGoogleCalendar(event);
 	}
-	
+
 	public String syncToGoogle() {
 		String message = MESSAGE_SYNC_EMPTY;
 		try {
@@ -575,6 +575,21 @@ public class GoogleCalendar {
 		UUID uuid = Generators.timeBasedGenerator().generate();
 		String uuidString = uuid.toString().replace("-", "");
 		return uuidString;
+	}
+
+	public boolean hasUnsyncedTasks() {
+		if (addEventBatch.size() != 0 || updateEventBatch.size() != 0
+				|| deleteEventBatch.size() != 0 || addTaskBatch.size() != 0
+				|| updateTaskBatch.size() != 0 || deleteTaskBatch.size() != 0) {
+			return true;
+		}
+		ArrayList<Task> taskList = storage.getTasks();
+		for (Task task : taskList) {
+			if (!task.hasId()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
