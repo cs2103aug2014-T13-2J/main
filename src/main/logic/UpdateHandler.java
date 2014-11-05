@@ -12,6 +12,15 @@ import org.joda.time.LocalTime;
 public class UpdateHandler extends CommandHandler {
 
 	private final static String MESSAGE_TASK_NOT_FOUND = "Sorry we couldn't find that task. Please try again.";
+	private final static String MESSAGE_CANNOT_UPDATE_VENUE_FOR_FLOATING_TASK = "Sorry you can't update the venue field for a floating task.";
+	private final static String MESSAGE_CANNOT_UPDATE_DATE_FOR_FLOATING_TASK = "Sorry you can't update the date field for a floating task.";
+	private final static String MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK = "Sorry you can't update the time field for a floating task.";
+	private final static String MESSAGE_CANNOT_UPDATE_RECURRENCE_FOR_FLOATING_TASK = "Sorry you can't update the recurrence field for a floating task.";
+	private final static String MESSAGE_CANNOT_UPDATE_REMINDER_FOR_FLOATING_TASK = "Sorry you can't update the reminder field for a floating task.";
+	private final static String MESSAGE_CANNOT_UPDATE_COMPLETED_FOR_FLOATING_TASK = "Sorry you can't update the completed field for a floating task.";
+
+
+
 
 	private UpdateParser parser;
 	private static Storage storage = Storage.getInstance();
@@ -37,23 +46,44 @@ public class UpdateHandler extends CommandHandler {
 				task.setDescription(newDescription);
 				googleCalendar.syncUpdateTaskDescription(task, newDescription);
 			} else if (field.equals(UpdateParser.FIELD_VENUE)) {
+				if(isFloatingTask(task)) {
+					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_VENUE_FOR_FLOATING_TASK);
+				}
 				String newVenue = parser.getVenue();
 				task.setVenue(newVenue);
 				googleCalendar.syncUpdateTaskVenue(task, newVenue);
 
 			} else if (field.equals(UpdateParser.FIELD_START_DATE)) {
+				if(isFloatingTask(task)) {
+					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_DATE_FOR_FLOATING_TASK);
+				}
 				updateStartDate(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_START_TIME)) {
+				if(isFloatingTask(task)) {
+					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK);
+				}
 				updateStartTime(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_END_DATE)) {
+				if(isFloatingTask(task)) {
+					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_DATE_FOR_FLOATING_TASK);
+				}
 				updateEndDate(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_END_TIME)) {
+				if(isFloatingTask(task)) {
+					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK);
+				}
 				updateEndTime(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_RECURRENCE)) {
+				if(isFloatingTask(task)) {
+					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_RECURRENCE_FOR_FLOATING_TASK);
+				}
 				updateRecurrence(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_REMINDER)) {
+				if(isFloatingTask(task)) {
+					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_REMINDER_FOR_FLOATING_TASK);
+				}
 				updateReminder(task, parser);
-			} else if (field.equals(UpdateParser.FIELD_COMPLETE)) {
+			}  else if (field.equals(UpdateParser.FIELD_COMPLETE)) {
 				task.setCompleted(true);
 			} else {
 				task.setCompleted(false);
@@ -147,5 +177,13 @@ public class UpdateHandler extends CommandHandler {
 					+ parser.getField() + " updated!";
 		}
 		return result;
+	}
+	
+	private static boolean isFloatingTask(Task task) {
+		if( (task.hasStartDate() && task.hasEndDate()) || (task.hasStartTime() && task.hasEndTime()) ) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 }
