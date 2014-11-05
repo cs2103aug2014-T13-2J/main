@@ -14,8 +14,9 @@ public abstract class CommandParser {
 	protected final static String MESSAGE_INVALID_DATE_FORMAT = "Sorry, we did not manage to capture the date. Please ensure you entered it in the correct format.";
 	protected final static String MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS = "If the task falls on next week, you need to have the word \"next\" before the day.";
 	protected final static String MESSAGE_PARSE_SUCCESS = "Parse successful.";
-	protected final static String INVALID_RECURRENCE_FORMAT = "Sorry, we did not manage to capture the recurrence. Please try again.";
-	protected final static String INVALID_COMPLETED_FORMAT = "Sorry, we did not manage to capture the completion of the task. Please try again.";
+	protected final static String MESSAGE_REQUIRE_START_TIME_OR_DATE = "Sorry you need to specify either the time or date";
+	protected final static String MESSAGE_INVALID_RECURRENCE_FORMAT = "Sorry, we did not manage to capture the recurrence. Please try again.";
+	protected final static String MESSAGE_INVALID_COMPLETED_FORMAT = "Sorry, we did not manage to capture the completion of the task. Please try again.";
 	protected final static Integer INDEX_HOUR = 0;
 	protected final static Integer INDEX_MINUTE = 1;
 	protected final static Integer INDEX_DAY = 0;
@@ -216,7 +217,7 @@ public abstract class CommandParser {
 				|| recurrence.equals("yearly")) {
 			this.recurrence = recurrence;
 		} else {
-			throw new IllegalArgumentException(INVALID_RECURRENCE_FORMAT);
+			throw new IllegalArgumentException(MESSAGE_INVALID_RECURRENCE_FORMAT);
 		}
 	}
 
@@ -225,7 +226,7 @@ public abstract class CommandParser {
 		if (completed.equals("true") || completed.equals("false")) {
 			this.completed = completed;
 		} else {
-			throw new IllegalArgumentException(INVALID_COMPLETED_FORMAT);
+			throw new IllegalArgumentException(MESSAGE_INVALID_COMPLETED_FORMAT);
 		}
 	}
 
@@ -567,9 +568,7 @@ public abstract class CommandParser {
 	// can be any integer not starting with 0
 	public static String getYear(String dateFormat) {
 		if (dateFormat == null) {
-			DateTime current = new DateTime();
-			Integer year = current.getYear(); 
-			return year.toString();
+			return null;
 		}
 		String[] temp = dateFormat.split("/");
 		return temp[INDEX_YEAR];
@@ -579,9 +578,7 @@ public abstract class CommandParser {
 	// can be any integer not starting with 0
 	public static String getMonth(String dateFormat) {
 		if (dateFormat == null) {
-			DateTime current = new DateTime();
-			Integer month = current.getMonthOfYear(); 
-			return month.toString();
+			return null;
 		}
 		String[] temp = dateFormat.split("/");
 		return temp[INDEX_MONTH];
@@ -591,12 +588,28 @@ public abstract class CommandParser {
 	// can be any integer not starting with 0
 	public static String getDay(String dateFormat) {
 		if (dateFormat == null) {
-			DateTime current = new DateTime();
-			Integer day = current.getDayOfMonth(); 
-			return day.toString();
+			return null;
 		}
 		String[] temp = dateFormat.split("/");
 		return temp[INDEX_DAY];
+	}
+	
+	protected static String generateYear() {
+		DateTime current = new DateTime();
+		Integer year = current.getYear(); 
+		return year.toString();
+	}
+	
+	protected static String generateMonth() {
+		DateTime current = new DateTime();
+		Integer month = current.getMonthOfYear(); 
+		return month.toString();
+	}
+	
+	protected static String generateDay() {
+		DateTime current = new DateTime();
+		Integer day = current.getDayOfMonth(); 
+		return day.toString();
 	}
 
 	protected static boolean isMonth(String word) {

@@ -77,12 +77,26 @@ public class AddParser extends CommandParser {
 			}
 		}
 		
-		startDateYear = getYear(startDate);
-		startDateMonth = getMonth(startDate);
-		startDateDay = getDay(startDate);
-		endDateYear = getYear(endDate);
-		endDateMonth = getMonth(endDate);
-		endDateDay = getDay(endDate);
+		//if no time and date, reject
+		if(startDate == null && startTime == null) {
+			throw new IllegalArgumentException(MESSAGE_REQUIRE_START_TIME_OR_DATE);
+		} else if (startDate == null && startTime != null) {
+			//if time but no date, set today
+			startDateYear = generateYear();
+			startDateMonth = generateMonth();
+			startDateDay = generateDay();
+			endDateYear = startDateYear;
+			endDateMonth = startDateMonth;
+			endDateDay = startDateDay;
+		} else {
+			startDateYear = getYear(startDate);
+			startDateMonth = getMonth(startDate);
+			startDateDay = getDay(startDate);
+			endDateYear = getYear(endDate);
+			endDateMonth = getMonth(endDate);
+			endDateDay = getDay(endDate);
+		}
+		
 		startTimeHour = getHour(startTime);
 		startTimeMinute = getMinute(startTime);
 		endTimeHour = getHour(endTime);
