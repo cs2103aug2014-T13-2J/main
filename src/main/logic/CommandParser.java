@@ -17,6 +17,7 @@ public abstract class CommandParser {
 	protected final static String MESSAGE_REQUIRE_START_TIME_OR_DATE = "Sorry you need to specify either the time or date";
 	protected final static String MESSAGE_INVALID_RECURRENCE_FORMAT = "Sorry, we did not manage to capture the recurrence. Please try again.";
 	protected final static String MESSAGE_INVALID_COMPLETED_FORMAT = "Sorry, we did not manage to capture the completion of the task. Please try again.";
+	public static final String STRING_SPACE = " ";
 	protected final static Integer INDEX_HOUR = 0;
 	protected final static Integer INDEX_MINUTE = 1;
 	protected final static Integer INDEX_DAY = 0;
@@ -296,8 +297,8 @@ public abstract class CommandParser {
 		if (word.length() < 2) {
 			return false;
 		}
-		String numPortion = word.substring(0, word.length() - 2);
-		String amPortion = word.substring(word.length() - 2, word.length());
+		String numPortion = word.substring(0, word.length() - 2).toLowerCase();
+		String amPortion = word.substring(word.length() - 2, word.length()).toLowerCase();
 		// checks that H does not start with 0
 		if (numPortion.startsWith("0")) {
 			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
@@ -333,8 +334,8 @@ public abstract class CommandParser {
 		String result = "";
 		String word = wordList.poll();
 
-		String pmPortion = word.substring(word.length() - 2, word.length());
-		String numPortion = word.substring(0, word.length() - 2);
+		String pmPortion = word.substring(word.length() - 2, word.length()).toLowerCase();
+		String numPortion = word.substring(0, word.length() - 2).toLowerCase();
 
 		boolean isPm;
 		if (pmPortion.equals("pm")) {
@@ -673,6 +674,43 @@ public abstract class CommandParser {
 			return false;
 		}
 		return true;
+	}
+	
+	protected static boolean representsDate(LinkedList<String> wordsList) {
+		LinkedList<String> stack = new LinkedList<String>();
+		String currentWord = wordsList.peek().toLowerCase();
+		if(currentWord.equals("next")) {
+			stack.push(currentWord);
+			wordsList.poll();
+			currentWord = wordsList.peek().toLowerCase();
+			if(isDayOfWeek(currentWord)) {
+				wordsList.offerFirst(stack.pop());
+				return true;
+			} else {
+				wordsList.offerFirst(stack.pop());
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
+	//this function is called when the next word is a reserved word
+	protected static String appendToDescription(LinkedList<String> wordsList, String description) {
+		//the first word will be a reserved word so we add it to description first
+		String currentWord = wordsList.poll();
+		description = description + STRING_SPACE + currentWord;
+		while(!wordsList.isEmpty()) {
+			currentWord = wordsList.poll();
+			if(!isReservedWord(currentWord)) {
+				description = description + STRING_SPACE + currentWord;
+			} else {
+				wordsList.offerFirst(currentWord);
+				break;
+			}
+		}
+		
+		return description;
 	}
 	
 }

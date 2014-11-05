@@ -16,20 +16,21 @@ public class AddParser extends CommandParser {
 		String startTime = null, startTimeHour = null, startTimeMinute = null;
 		String endDate = null, endDateYear = null, endDateMonth = null, endDateDay = null;
 		String endTime = null, endTimeHour = null, endTimeMinute = null;
-
+		boolean inDescription = true;
+		
 		String[] userInput = this.getUserInput().split(" ");
 		LinkedList<String> wordsList = new LinkedList<String>(
 				Arrays.asList(userInput));
 
 		description = getDescriptionAndTrimUserInput(wordsList);
 		while (!wordsList.isEmpty()) {
-			String currentReservedWord = wordsList.peek();
+			String currentReservedWord = wordsList.peek().toLowerCase();
 			// insert an assert that currentReservedWord is indeed a reserved
 			// word
 			if (currentReservedWord.equals("at")) {
 				// remove reserved word
 				removeCurrentWord(wordsList);
-				String nextWord = wordsList.peek();
+				String nextWord = wordsList.peek().toLowerCase();
 				// determine if next word is time or venue
 				if (representsTime(nextWord)) {
 					startTime = getTimeAndTrimUserInput(wordsList);
@@ -37,15 +38,18 @@ public class AddParser extends CommandParser {
 					// user only
 					// specifies startTime without endTime
 					endTime = startTime;
+					inDescription = false;
 				} else {
 					// if it's not time, then the next word must represent venue
 					venue = getVenueAndTrimUserInput(wordsList);
+					inDescription = false;
 				}
 			} else if (currentReservedWord.equals("on")) { // get date
 				// remove reserved word
 				removeCurrentWord(wordsList);
 				startDate = getDateAndTrimUserInput(wordsList);
 				endDate = startDate;
+				inDescription = false;
 			} else if (currentReservedWord.equals("from")) {
 				// remove reserved word
 				removeCurrentWord(wordsList);
@@ -70,10 +74,15 @@ public class AddParser extends CommandParser {
 						endDate = getDateAndTrimUserInput(wordsList);
 					}
 				}
-
+				inDescription = false;
 			} else if (currentReservedWord.equals("next")) {
-				startDate = getDateAndTrimUserInput(wordsList);
-				endDate = startDate;
+				if (representsDate(wordsList)) {
+					startDate = getDateAndTrimUserInput(wordsList);
+					endDate = startDate;
+					inDescription = false;
+				} else if (inDescription == true) {
+					description = appendToDescription(wordsList, description);
+				}
 			}
 		}
 
