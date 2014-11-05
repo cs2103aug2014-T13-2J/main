@@ -30,9 +30,8 @@ public class AddParser extends CommandParser {
 			if (currentReservedWord.equals("at")) {
 				// remove reserved word
 				removeCurrentWord(wordsList);
-				String nextWord = wordsList.peek().toLowerCase();
 				// determine if next word is time or venue
-				if (representsTime(nextWord)) {
+				if (representsTime(wordsList)) {
 					startTime = getTimeAndTrimUserInput(wordsList);
 					// set endTime to startTime by default, in the case that
 					// user only
@@ -53,16 +52,14 @@ public class AddParser extends CommandParser {
 			} else if (currentReservedWord.equals("from")) {
 				// remove reserved word
 				removeCurrentWord(wordsList);
-				String nextWord = viewNextWord(wordsList);
-				if (representsTime(nextWord)) {
+				if (representsTime(wordsList)) {
 					startTime = getTimeAndTrimUserInput(wordsList);
 					// remove the word "to"
 					removeCurrentWord(wordsList);
 					endTime = getTimeAndTrimUserInput(wordsList);
 				} else {
 					startDate = getDateAndTrimUserInput(wordsList);
-					nextWord = viewNextWord(wordsList);
-					if (representsTime(nextWord)) {
+					if (representsTime(wordsList)) {
 						startTime = getTimeAndTrimUserInput(wordsList);
 						// remove the word "to"
 						removeCurrentWord(wordsList);

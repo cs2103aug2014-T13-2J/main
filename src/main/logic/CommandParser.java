@@ -219,7 +219,8 @@ public abstract class CommandParser {
 				|| recurrence.equals("yearly")) {
 			this.recurrence = recurrence;
 		} else {
-			throw new IllegalArgumentException(MESSAGE_INVALID_RECURRENCE_FORMAT);
+			throw new IllegalArgumentException(
+					MESSAGE_INVALID_RECURRENCE_FORMAT);
 		}
 	}
 
@@ -292,39 +293,41 @@ public abstract class CommandParser {
 
 	// This function ensures that word is of the format H.M or H, appended by am
 	// or pm. H and M can be any integer.
-	// H or M cannot start with the number 0
-	public static boolean representsTime(String word)
+	public static boolean representsTime(LinkedList<String> wordsList)
 			throws IllegalArgumentException {
+		String word;
+		if(!wordsList.isEmpty()) {
+			word = wordsList.peek().toLowerCase();
+		} else {
+			return false;
+		}
 		if (word.length() < 2) {
 			return false;
 		}
 		String numPortion = word.substring(0, word.length() - 2).toLowerCase();
-		String amPortion = word.substring(word.length() - 2, word.length()).toLowerCase();
-		// checks that H does not start with 0
-		if (numPortion.startsWith("0")) {
-			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
+		String amPortion = word.substring(word.length() - 2, word.length())
+				.toLowerCase();
+
+		if (!amPortion.equals("am") && !amPortion.equals("pm")) {
+			return false;
 		}
+
 		if (numPortion.contains(".")) {
 			// Need the double backslash if we want to use . as the delimiter
 			String[] numPortionParts = numPortion.split("\\.");
 			if (numPortionParts.length != 2) {
-				throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
+				return false;
 			}
 			String numHour = numPortionParts[INDEX_HOUR];
 			String numMinute = numPortionParts[INDEX_MINUTE];
-			// checks that M does not start with 0
-			if (numMinute.startsWith("0")) {
-				throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
-			}
-			if (isInteger(numHour) && isInteger(numMinute)
-					&& (amPortion.equals("am") || amPortion.equals("pm"))) {
+
+			if (isInteger(numHour) && isInteger(numMinute)) {
 				return true;
 			} else {
 				return false;
 			}
 
-		} else if (isInteger(numPortion)
-				&& (amPortion.equals("am") || amPortion.equals("pm"))) {
+		} else if (isInteger(numPortion)) {
 			return true;
 		} else {
 			return false;
@@ -335,9 +338,14 @@ public abstract class CommandParser {
 		String result = "";
 		String word = wordList.poll();
 
-		String pmPortion = word.substring(word.length() - 2, word.length()).toLowerCase();
+		String pmPortion = word.substring(word.length() - 2, word.length())
+				.toLowerCase();
 		String numPortion = word.substring(0, word.length() - 2).toLowerCase();
-
+		
+		if(!pmPortion.equals("am") && !pmPortion.equals("pm")) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
+		}
+		
 		boolean isPm;
 		if (pmPortion.equals("pm")) {
 			isPm = true;
@@ -350,9 +358,16 @@ public abstract class CommandParser {
 		if (numPortion.contains(".")) {
 			// Need the double backslash if we want to use . as the delimiter
 			String[] numPortionParts = numPortion.split("\\.");
-			Integer numHour = Integer.parseInt(numPortionParts[INDEX_HOUR]);
-			Integer numMinute = Integer.parseInt(numPortionParts[INDEX_MINUTE]);
-
+			String hour = numPortionParts[INDEX_HOUR];
+			String minute = numPortionParts[INDEX_MINUTE];
+			if(!isInteger(hour) && !isInteger(minute)) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
+			}
+			
+			Integer numHour = Integer.parseInt(hour);
+			Integer numMinute = Integer.parseInt(minute);
+			
+			
 			if (isPm == true && numHour != 12) {
 				numHour += 12;
 			} else if (isPm == false && numHour == 12) { // to cater to the 12am
@@ -387,14 +402,13 @@ public abstract class CommandParser {
 			currentWord = wordsList.poll();
 			if (isReservedWord(currentWord)) {
 				stack.push(currentWord);
-				currentWord = wordsList.poll();
-				stack.push(currentWord);
-				if(representsTime(currentWord) || representsDate(wordsList)) {
-					while(!stack.isEmpty()) {
+				if (representsTime(wordsList) || representsDate(wordsList)) {
+					while (!stack.isEmpty()) {
 						wordsList.offerFirst(stack.pop());
 					}
+					break;
 				} else {
-					while(!stack.isEmpty()) {
+					while (!stack.isEmpty()) {
 						venue += stack.removeLast() + STRING_SPACE;
 					}
 				}
@@ -444,13 +458,15 @@ public abstract class CommandParser {
 
 			int differenceInDays = inputDayInt - todayInt;
 			if (differenceInDays < 0) {
-				throw new IllegalArgumentException(MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS);
+				throw new IllegalArgumentException(
+						MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS);
 			}
 			todayLocalDate = todayLocalDate.plusDays(differenceInDays);
 			Integer yearInt = todayLocalDate.getYear();
 			Integer monthInt = todayLocalDate.getMonthOfYear();
 			Integer dayInt = todayLocalDate.getDayOfMonth();
-			date = dayInt.toString() + "/" + monthInt.toString() + "/" + yearInt.toString();
+			date = dayInt.toString() + "/" + monthInt.toString() + "/"
+					+ yearInt.toString();
 			return date;
 		} else if (currentWord.equals("next")) {
 			String inputDayString = wordsList.poll();
@@ -461,13 +477,15 @@ public abstract class CommandParser {
 
 			int differenceInDays = inputDayInt - todayInt + DAYS_IN_WEEK;
 			if (differenceInDays < 0) {
-				throw new IllegalArgumentException(MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS);
+				throw new IllegalArgumentException(
+						MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS);
 			}
 			todayLocalDate = todayLocalDate.plusDays(differenceInDays);
 			Integer yearInt = todayLocalDate.getYear();
 			Integer monthInt = todayLocalDate.getMonthOfYear();
 			Integer dayInt = todayLocalDate.getDayOfMonth();
-			date = dayInt.toString() + "/" + monthInt.toString() + "/" + yearInt.toString();
+			date = dayInt.toString() + "/" + monthInt.toString() + "/"
+					+ yearInt.toString();
 			return date;
 		} else { // if the format is D M Y
 			// get day
@@ -499,7 +517,7 @@ public abstract class CommandParser {
 					wordsList.poll();
 				} else {
 					String year = getYearForAppend(month);
-					date = currentWord + "/" + year;
+					date = date + "/" + year;
 				}
 			} else {
 				String year = getYearForAppend(month);
@@ -509,18 +527,18 @@ public abstract class CommandParser {
 			return date;
 		}
 	}
-	
+
 	private static String getYearForAppend(String month) {
 		// get current year and append to D/M
 		DateTime current = new DateTime();
 		Integer year = current.getYear();
 		Integer currentMonth = current.getMonthOfYear();
 		Integer monthOfDate = Integer.valueOf(month);
-		
-		if(monthOfDate < currentMonth) {
+
+		if (monthOfDate < currentMonth) {
 			year += 1;
 		}
-		
+
 		return year.toString();
 	}
 
@@ -606,22 +624,22 @@ public abstract class CommandParser {
 		String[] temp = dateFormat.split("/");
 		return temp[INDEX_DAY];
 	}
-	
+
 	protected static String generateYear() {
 		DateTime current = new DateTime();
-		Integer year = current.getYear(); 
+		Integer year = current.getYear();
 		return year.toString();
 	}
-	
+
 	protected static String generateMonth() {
 		DateTime current = new DateTime();
-		Integer month = current.getMonthOfYear(); 
+		Integer month = current.getMonthOfYear();
 		return month.toString();
 	}
-	
+
 	protected static String generateDay() {
 		DateTime current = new DateTime();
-		Integer day = current.getDayOfMonth(); 
+		Integer day = current.getDayOfMonth();
 		return day.toString();
 	}
 
@@ -639,7 +657,7 @@ public abstract class CommandParser {
 		}
 	}
 
-	protected static String convertMonthToNumberStringFormat(String word) {
+	public static String convertMonthToNumberStringFormat(String word) {
 		word = word.toLowerCase();
 		if (word.equals("january")) {
 			return "1";
@@ -687,36 +705,58 @@ public abstract class CommandParser {
 		}
 		return true;
 	}
-	
-	protected static boolean representsDate(LinkedList<String> wordsList) {
+
+	public static boolean representsDate(LinkedList<String> wordsList) {
 		LinkedList<String> stack = new LinkedList<String>();
 		String currentWord;
-		if(wordsList.isEmpty()) {
+		if (wordsList.isEmpty()) {
 			return false;
 		} else {
 			currentWord = wordsList.peek().toLowerCase();
 		}
-		
-		if(currentWord.equals("next")) {
+
+		if (currentWord.equals("next")) {
 			stack.push(currentWord);
 			wordsList.poll();
 			currentWord = wordsList.peek().toLowerCase();
-			if(isDayOfWeek(currentWord)) {
+			if (isDayOfWeek(currentWord)) {
 				wordsList.offerFirst(stack.pop());
 				return true;
 			} else {
 				wordsList.offerFirst(stack.pop());
 				return false;
 			}
-		} else if(isDayOfWeek(currentWord)){
+		} else if (isDayOfWeek(currentWord)) {
 			return true;
-		} else if(isInteger(currentWord)) {
-			stack.push(currentWord);
+		} else if (isInteger(currentWord)) {
+			stack.push(wordsList.poll());
 			currentWord = wordsList.peek().toLowerCase();
-			//put the word back
+			// put the word back
 			wordsList.offerFirst(stack.pop());
-			if(isMonth(currentWord)) {
+			if (isMonth(currentWord)) {
 				return true;
+			} else {
+				return false;
+			}
+		} else if (currentWord.contains("/")) {
+			String[] dateFormat = currentWord.split("/");
+			if (dateFormat.length == 2) {
+				String day = dateFormat[INDEX_DAY];
+				String month = dateFormat[INDEX_MONTH];
+				if (isInteger(day) && isInteger(month)) {
+					return true;
+				} else {
+					return false;
+				}
+			} else if (dateFormat.length == 3) {
+				String day = dateFormat[INDEX_DAY];
+				String month = dateFormat[INDEX_MONTH];
+				String year = dateFormat[INDEX_YEAR];
+				if (isInteger(day) && isInteger(month) && isInteger(year)) {
+					return true;
+				} else {
+					return false;
+				}
 			} else {
 				return false;
 			}
@@ -724,23 +764,25 @@ public abstract class CommandParser {
 			return false;
 		}
 	}
-	
-	//this function is called when the next word is a reserved word
-	protected static String appendToDescription(LinkedList<String> wordsList, String description) {
-		//the first word will be a reserved word so we add it to description first
+
+	// this function is called when the next word is a reserved word
+	protected static String appendToDescription(LinkedList<String> wordsList,
+			String description) {
+		// the first word will be a reserved word so we add it to description
+		// first
 		String currentWord = wordsList.poll();
 		description = description + STRING_SPACE + currentWord;
-		while(!wordsList.isEmpty()) {
+		while (!wordsList.isEmpty()) {
 			currentWord = wordsList.poll();
-			if(!isReservedWord(currentWord)) {
+			if (!isReservedWord(currentWord)) {
 				description = description + STRING_SPACE + currentWord;
 			} else {
 				wordsList.offerFirst(currentWord);
 				break;
 			}
 		}
-		
+
 		return description;
 	}
-	
+
 }
