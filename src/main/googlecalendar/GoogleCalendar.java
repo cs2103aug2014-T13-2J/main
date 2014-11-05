@@ -496,9 +496,13 @@ public class GoogleCalendar {
 		for (Task task : taskList) {
 			if (!task.hasId()) {
 				String taskId = syncAddFloatingTask(task);
-				task.setId(taskId);
-				storage.saveCurrentState();
-				message = MESSAGE_SYNC_SUCCESS;
+				if (taskId != null) {
+					task.setId(taskId);
+					storage.saveCurrentState();
+					message = MESSAGE_SYNC_SUCCESS;
+				} else {
+					message = MESSAGE_SYNC_FAIL;
+				}
 			}
 		}
 		return message;
