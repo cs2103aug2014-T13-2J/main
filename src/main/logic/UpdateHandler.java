@@ -180,7 +180,7 @@ public class UpdateHandler extends CommandHandler {
 	}
 	
 	private static boolean isFloatingTask(Task task) {
-		if(task.hasStartDate() && task.hasEndDate() && task.hasStartTime() && task.hasEndTime()) {
+		if( (task.hasStartDate() && task.hasEndDate()) || (task.hasStartTime() && task.hasEndTime()) ) {
 			return false;
 		} else {
 			return true;
