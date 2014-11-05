@@ -3,7 +3,7 @@ package main.googlecalendar;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.TimeZone;
@@ -36,6 +36,7 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.tasks.Tasks;
+import com.google.api.services.tasks.TasksScopes;
 
 public class GoogleCalendar {
 
@@ -114,9 +115,13 @@ public class GoogleCalendar {
 		clientSecrets.setInstalled(installedDetails);
 
 		// set up authorization code flow
+		ArrayList<String> scopes = new ArrayList<>();
+		scopes.add(CalendarScopes.CALENDAR);
+		scopes.add(TasksScopes.TASKS);
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
 				httpTransport, JSON_FACTORY, clientSecrets,
-				Collections.singleton(CalendarScopes.CALENDAR))
+//				Collections.singleton(CalendarScopes.CALENDAR))
+				scopes)
 				.setDataStoreFactory(dataStoreFactory).build();
 
 		// authorise
@@ -250,33 +255,34 @@ public class GoogleCalendar {
 	public String syncAddTask(Task task) {
 		String id = generateTimeBasedUUID();
 		if (isFloatingTask(task)) {
-			syncAddFloatingTask(task, id);
+			id = syncAddFloatingTask(task);
 		} else {
 			syncAddNonFloatingTask(task, id);
 		}
 		return id;
 	}
 
-	private void syncAddFloatingTask(Task task, String id) {
+	private String syncAddFloatingTask(Task task) {
+		String id = null;
 		com.google.api.services.tasks.model.Task googleTask = new com.google.api.services.tasks.model.Task();
-		googleTask.setId(id);
 		googleTask.setTitle(task.getDescription());
 		try {
-			googleTasksClient.tasks().insert(googleId, googleTask).execute();
+			googleTask = googleTasksClient.tasks().insert("@default", googleTask).execute();
+			id = googleTask.getId();
 		} catch (IOException e) {
 			try {
 				googleTasksClient
 						.tasks()
-						.insert(googleId, googleTask)
+						.insert("@default", googleTask)
 						.queue(addTaskBatch,
 								new JsonBatchCallback<com.google.api.services.tasks.model.Task>() {
 
 									@Override
 									public void onSuccess(
-											com.google.api.services.tasks.model.Task arg0,
+											com.google.api.services.tasks.model.Task googleTask,
 											HttpHeaders arg1)
 											throws IOException {
-
+										
 									}
 
 									@Override
@@ -291,6 +297,7 @@ public class GoogleCalendar {
 				System.out.println(MESSAGE_SYNC_ADD_FAIL);
 			}
 		}
+		return id;
 	}
 
 	private void syncAddNonFloatingTask(Task task, String eventId) {
@@ -331,10 +338,10 @@ public class GoogleCalendar {
 
 	private void syncDeleteFloatingTask(String taskId) {
 		try {
-			googleTasksClient.tasks().delete(googleId, taskId).execute();
+			googleTasksClient.tasks().delete("@default", taskId).execute();
 		} catch (IOException e) {
 			try {
-				googleTasksClient.tasks().delete(googleId, taskId)
+				googleTasksClient.tasks().delete("@default", taskId)
 						.queue(deleteTaskBatch, new JsonBatchCallback<Void>() {
 
 							@Override
@@ -404,13 +411,13 @@ public class GoogleCalendar {
 			googleTask.setId(id);
 			googleTask.setTitle(newDescription);
 			try {
-				googleTasksClient.tasks().update(googleId, id, googleTask)
+				googleTasksClient.tasks().patch("@default", id, googleTask)
 						.execute();
 			} catch (IOException e) {
 				try {
 					googleTasksClient
 							.tasks()
-							.update(googleId, id, googleTask)
+							.patch("@default", id, googleTask)
 							.queue(updateTaskBatch,
 									new JsonBatchCallback<com.google.api.services.tasks.model.Task>() {
 
