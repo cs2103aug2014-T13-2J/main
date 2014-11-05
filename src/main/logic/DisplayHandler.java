@@ -17,7 +17,6 @@ import org.fusesource.jansi.AnsiConsole;
 public class DisplayHandler extends CommandHandler {
 
 	public static final String DISPLAY_NUM_OF_TASKS = "Total number of tasks: %d\n";
-	public static final String DISPLAY_TABLE_ROW_STRING_FORMAt = "%-10s %-35s %-30s %-20s %-20s\n";
 	public static final String DISPLAY_TABLE_ROW_STRING_FORMAT = "%-8s %-1s %-33s %-1s %-26s %-1s %-18s %-1s %-18s\n";
 	public static final String MESSAGE_EMPTY = "There is nothing to display";
 	public static final String MESSAGE_DISPLAY_SUCCESS = "Display successful.";
