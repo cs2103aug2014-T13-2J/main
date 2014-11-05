@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import main.logic.AddParser;
+import main.logic.CommandParser;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -324,48 +325,76 @@ public class AddParserTest {
 	@Test
 	public void testRepresentsTime() {
 		String s1 = "11am";
+		LinkedList<String> l1 = convertStringToLinkedList(s1);
+		assertEquals(true, AddParser.representsTime(l1));
+
 		String s2 = "12pm";
-		String s3 = "9am";
-		String s4 = "1pm";
-		String s5 = "0pm";
-		String s6 = "20am";
-		String s7 = "20 pm";
-		String s8 = "0800";
-		String s9 = "09am";
-		String s10 = "02pm";
-		String s11 = "1a2m";
-		String s12 = "1a2am";
-		String s13 = "12depm";
-		String s14 = "12.30am";
-		String s15 = "12.30pm";
-		String s16 = "12323.12321am";
-		String s17 = "0900am";
-		String s18 = "0900.12321pm";
-		String s19 = "900.02321pm";
-
-
+		LinkedList<String> l2 = convertStringToLinkedList(s2);
+		assertEquals(true, AddParser.representsTime(l2));
 		
-		assertEquals("Represents time: ", true, AddParser.representsTime(s1));
-		assertEquals("Represents time: ", true, AddParser.representsTime(s2));
-		assertEquals("Represents time: ", true, AddParser.representsTime(s3));
-		assertEquals("Represents time: ", true, AddParser.representsTime(s4));
-		//assertEquals("Represents time: ", false, AddParser.representsTime(s5));
-		assertEquals("Represents time: ", true, AddParser.representsTime(s6));
-		assertEquals("Represents time: ", false, AddParser.representsTime(s7));
-		//assertEquals("Represents time: ", false, AddParser.representsTime(s8));
-		//assertEquals("Represents time: ", true, AddParser.representsTime(s9));
-		//assertEquals("Represents time: ", true, AddParser.representsTime(s10));
-		assertEquals("Represents time: ", false, AddParser.representsTime(s11));
-		assertEquals("Represents time: ", false, AddParser.representsTime(s12));
-		assertEquals("Represents time: ", false, AddParser.representsTime(s13));
-		assertEquals("Represents time: ", true, AddParser.representsTime(s14));
-		assertEquals("Represents time: ", true, AddParser.representsTime(s15));
-		assertEquals("Represents time: ", true, AddParser.representsTime(s16));
-		//assertEquals("Represents time: ", false, AddParser.representsTime(s17));
-		//assertEquals("Represents time: ", false, AddParser.representsTime(s18));
-		//assertEquals("Represents time: ", false, AddParser.representsTime(s19));
-
+		String s3 = "0pm";
+		LinkedList<String> l3 = convertStringToLinkedList(s3);
+		assertEquals(false, AddParser.representsTime(l3));
+		
+		String s4 = "123.431am";
+		LinkedList<String> l4 = convertStringToLinkedList(s4);
+		assertEquals(true, AddParser.representsTime(l4));
+		
+		String s5 = "123.am";
+		LinkedList<String> l5 = convertStringToLinkedList(s5);
+		assertEquals(false, AddParser.representsTime(l5));
+		
+		String s6 = ".3134am";
+		LinkedList<String> l6 = convertStringToLinkedList(s6);
+		assertEquals(false, AddParser.representsTime(l6));
+		
+		String s7 = "11.30am";
+		LinkedList<String> l7 = convertStringToLinkedList(s7);
+		assertEquals(true, AddParser.representsTime(l7));
+		
+		String s8 = "12.30pm";
+		LinkedList<String> l8 = convertStringToLinkedList(s8);
+		assertEquals(true, AddParser.representsTime(l8));
 	} 
+	
+	@Test
+	public void testRepresentsDate() {
+		String s1 = "25 NOvEMber 2014";
+		LinkedList<String> l1 = convertStringToLinkedList(s1);
+		assertEquals(true, CommandParser.representsDate(l1));
+		
+		String s2 = "25 NoVemBEr";
+		LinkedList<String> l2 = convertStringToLinkedList(s2);
+		assertEquals(true, CommandParser.representsDate(l2));
+		
+		String s3 = "5/11";
+		LinkedList<String> l3 = convertStringToLinkedList(s3);
+		assertEquals(true, CommandParser.representsDate(l3));
+		
+		String s4 = "5/11/2014";
+		LinkedList<String> l4 = convertStringToLinkedList(s4);
+		assertEquals(true, CommandParser.representsDate(l4));
+		
+		String s5 = "nEXt ThuRsDay";
+		LinkedList<String> l5 = convertStringToLinkedList(s5);
+		assertEquals(true, CommandParser.representsDate(l5));
+		
+		String s6 = "friDaY";
+		LinkedList<String> l6 = convertStringToLinkedList(s6);
+		assertEquals(true, CommandParser.representsDate(l6));
+		
+		String s7 = "next week's agenda";
+		LinkedList<String> l7 = convertStringToLinkedList(s7);
+		assertEquals(false, CommandParser.representsDate(l7));
+		
+		String s8 = "5 cows on the moon";
+		LinkedList<String> l8 = convertStringToLinkedList(s8);
+		assertEquals(false, CommandParser.representsDate(l8));
+		
+		String s9 = "213/431a/5334";
+		LinkedList<String> l9 = convertStringToLinkedList(s9);
+		assertEquals(false, CommandParser.representsDate(l9));
+	}
 
 	@Test
 	public void testGetTime() {
@@ -396,17 +425,12 @@ public class AddParserTest {
 		LinkedList<String> l4 = new LinkedList<String>(Arrays.asList(s4.split(" ")));
 		String s5 = "Jalan Kayu Street 31 on 5 October";
 		LinkedList<String> l5 = new LinkedList<String>(Arrays.asList(s5.split(" ")));
-		String s6 = " on 25 December";
-		LinkedList<String> l6 = new LinkedList<String>(Arrays.asList(s6.split(" ")));
 
-
-		
 		assertEquals("Venue: ", "Zouk", AddParser.getVenueAndTrimUserInput(l1));
 		assertEquals("Venue: ", "MPSH1", AddParser.getVenueAndTrimUserInput(l2));
 		assertEquals("Venue: ", "CLB", AddParser.getVenueAndTrimUserInput(l3));
 		assertEquals("Venue: ", "SRC", AddParser.getVenueAndTrimUserInput(l4));
 		assertEquals("Venue: ", "Jalan Kayu Street 31", AddParser.getVenueAndTrimUserInput(l5));
-		//assertEquals("Venue: ", "", AddParser.getVenueAndTrimUserInput(l6));
 		
 	}
 
@@ -452,7 +476,7 @@ public class AddParserTest {
 		
 	}
 	
-/**	@Test
+	@Test
 	public void testConvertMonthToNumberStringFormat() {
 		String s1 = "January";
 		String s2 = "feBruary";
@@ -481,6 +505,12 @@ public class AddParserTest {
 		assertEquals("Month: ", "12", AddParser.convertMonthToNumberStringFormat(s12));
 		
 		
-	} **/
+	}
 
+	public static LinkedList<String> convertStringToLinkedList(String s) {
+		String[] userInput = s.split(" ");
+		LinkedList<String> wordsList = new LinkedList<String>(
+				Arrays.asList(userInput));
+		return wordsList;
+	}
 }
