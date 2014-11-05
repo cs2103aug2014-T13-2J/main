@@ -6,6 +6,7 @@ import main.googlecalendar.GoogleCalendar;
 
 public class Logic {
 	
+	private final static String MESSAGE_UNRECOGNIZED_COMMAND = "Unrecognized command.";
 	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
 
 	private enum CommandType {
@@ -84,7 +85,7 @@ public class Logic {
 			System.exit(0);
 		default:
 			TaskerLog.logSystemInfo("Unable to execute invalid command type.");
-			return null;
+			return MESSAGE_UNRECOGNIZED_COMMAND;
 		}
 	}
 
