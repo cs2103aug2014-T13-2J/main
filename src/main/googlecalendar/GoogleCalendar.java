@@ -259,10 +259,10 @@ public class GoogleCalendar {
 	}
 
 	public void syncDeleteTask(Task task, String id) {
-		if (isFloatingTask(task)) {
-			syncDeleteFloatingTask(id);
-		} else {
-			if (id != null) {
+		if (id != null) {
+			if (isFloatingTask(task)) {
+				syncDeleteFloatingTask(id);
+			} else {
 				syncDeleteNonFloatingTask(id);
 			}
 		}
@@ -324,8 +324,10 @@ public class GoogleCalendar {
 	private void syncPatchTaskToGoogleCalendar(Event event) {
 		String eventId = event.getId();
 		try {
-			googleCalendarClient.events().patch(googleId, eventId, event)
-					.execute();
+			if (eventId != null) {
+				googleCalendarClient.events().patch(googleId, eventId, event)
+						.execute();
+			}
 		} catch (IOException e) {
 			try {
 				googleCalendarClient
