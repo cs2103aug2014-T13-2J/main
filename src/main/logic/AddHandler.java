@@ -6,12 +6,13 @@ import main.storage.Storage;
 import main.storage.Task;
 import main.storage.TaskBuilder;
 
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
 public class AddHandler extends CommandHandler {
 
-	final static String TASK_ADDED_MESSAGE = "Task added!";
+	private final static String TASK_ADDED_MESSAGE = "Task added!";
 
 	private AddParser parser;
 	private static Storage storage = Storage.getInstance();
@@ -53,45 +54,66 @@ public class AddHandler extends CommandHandler {
 		}
 
 		if (parser.hasStartDate()) {
-			Integer startDateYear = Integer.parseInt(parser.getStartDateYear());
-			Integer startDateMonth = Integer.parseInt(parser
-					.getStartDateMonth());
-			Integer startDateDay = Integer.parseInt(parser.getStartDateDay());
+			try {
+				Integer startDateYear = Integer.parseInt(parser
+						.getStartDateYear());
+				Integer startDateMonth = Integer.parseInt(parser
+						.getStartDateMonth());
+				Integer startDateDay = Integer.parseInt(parser
+						.getStartDateDay());
 
-			LocalDate date = new LocalDate(startDateYear, startDateMonth,
-					startDateDay);
+				LocalDate date = new LocalDate(startDateYear, startDateMonth,
+						startDateDay);
 
-			builder.setStartDate(date);
+				builder.setStartDate(date);
+			} catch (IllegalFieldValueException e) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_DATE_VALUE);
+			}
 		}
 
 		if (parser.hasStartTime()) {
-			Integer startTimeHour = Integer.parseInt(parser.getStartTimeHour());
-			Integer startTimeMinute = Integer.parseInt(parser
-					.getStartTimeMinute());
+			try {
+				Integer startTimeHour = Integer.parseInt(parser
+						.getStartTimeHour());
+				Integer startTimeMinute = Integer.parseInt(parser
+						.getStartTimeMinute());
 
-			LocalTime time = new LocalTime(startTimeHour, startTimeMinute);
+				LocalTime time = new LocalTime(startTimeHour, startTimeMinute);
 
-			builder.setStartTime(time);
+				builder.setStartTime(time);
+			} catch (IllegalFieldValueException e) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
+			}
 		}
 
 		if (parser.hasEndDate()) {
-			Integer endDateYear = Integer.parseInt(parser.getEndDateYear());
-			Integer endDateMonth = Integer.parseInt(parser.getEndDateMonth());
-			Integer endDateDay = Integer.parseInt(parser.getEndDateDay());
+			try {
+				Integer endDateYear = Integer.parseInt(parser.getEndDateYear());
+				Integer endDateMonth = Integer.parseInt(parser
+						.getEndDateMonth());
+				Integer endDateDay = Integer.parseInt(parser.getEndDateDay());
 
-			LocalDate date = new LocalDate(endDateYear, endDateMonth,
-					endDateDay);
+				LocalDate date = new LocalDate(endDateYear, endDateMonth,
+						endDateDay);
 
-			builder.setEndDate(date);
+				builder.setEndDate(date);
+			} catch (IllegalFieldValueException e) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_DATE_VALUE);
+			}
 		}
 
 		if (parser.hasEndTime()) {
-			Integer endTimeHour = Integer.parseInt(parser.getEndTimeHour());
-			Integer endTimeMinute = Integer.parseInt(parser.getEndTimeMinute());
+			try {
+				Integer endTimeHour = Integer.parseInt(parser.getEndTimeHour());
+				Integer endTimeMinute = Integer.parseInt(parser
+						.getEndTimeMinute());
 
-			LocalTime time = new LocalTime(endTimeHour, endTimeMinute);
+				LocalTime time = new LocalTime(endTimeHour, endTimeMinute);
 
-			builder.setEndTime(time);
+				builder.setEndTime(time);
+			} catch (IllegalFieldValueException e) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
+			}
 		}
 		return builder.buildTask();
 

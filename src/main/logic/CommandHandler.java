@@ -1,12 +1,11 @@
 package main.logic;
 
-import main.storage.Storage;
-
-
 public abstract class CommandHandler {
 	
-	final static Integer DEFAULT_SECOND = 0;
-	final static Integer DEFAULT_MILLISECOND = 0;
+	protected final static String MESSAGE_INVALID_DATE_VALUE = "That's not a valid date.";
+	protected final static String MESSAGE_INVALID_TIME_VALUE = "That's not a valid time.";
+	protected final static Integer DEFAULT_SECOND = 0;
+	protected final static Integer DEFAULT_MILLISECOND = 0;
 	
 	public CommandHandler(String details) {
 	}

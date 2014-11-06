@@ -6,6 +6,7 @@ import main.googlecalendar.GoogleCalendar;
 import main.storage.Storage;
 import main.storage.Task;
 
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
@@ -18,9 +19,6 @@ public class UpdateHandler extends CommandHandler {
 	private final static String MESSAGE_CANNOT_UPDATE_RECURRENCE_FOR_FLOATING_TASK = "Sorry you can't update the recurrence field for a floating task.";
 	private final static String MESSAGE_CANNOT_UPDATE_REMINDER_FOR_FLOATING_TASK = "Sorry you can't update the reminder field for a floating task.";
 	private final static String MESSAGE_CANNOT_UPDATE_COMPLETED_FOR_FLOATING_TASK = "Sorry you can't update the completed field for a floating task.";
-
-
-
 
 	private UpdateParser parser;
 	private static Storage storage = Storage.getInstance();
@@ -46,44 +44,51 @@ public class UpdateHandler extends CommandHandler {
 				task.setDescription(newDescription);
 				googleCalendar.syncUpdateTaskDescription(task, newDescription);
 			} else if (field.equals(UpdateParser.FIELD_VENUE)) {
-				if(isFloatingTask(task)) {
-					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_VENUE_FOR_FLOATING_TASK);
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_VENUE_FOR_FLOATING_TASK);
 				}
 				String newVenue = parser.getVenue();
 				task.setVenue(newVenue);
 				googleCalendar.syncUpdateTaskVenue(task, newVenue);
 
 			} else if (field.equals(UpdateParser.FIELD_START_DATE)) {
-				if(isFloatingTask(task)) {
-					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_DATE_FOR_FLOATING_TASK);
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_DATE_FOR_FLOATING_TASK);
 				}
 				updateStartDate(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_START_TIME)) {
-				if(isFloatingTask(task)) {
-					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK);
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK);
 				}
 				updateStartTime(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_END_DATE)) {
-				if(isFloatingTask(task)) {
-					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_DATE_FOR_FLOATING_TASK);
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_DATE_FOR_FLOATING_TASK);
 				}
 				updateEndDate(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_END_TIME)) {
-				if(isFloatingTask(task)) {
-					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK);
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK);
 				}
 				updateEndTime(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_RECURRENCE)) {
-				if(isFloatingTask(task)) {
-					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_RECURRENCE_FOR_FLOATING_TASK);
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_RECURRENCE_FOR_FLOATING_TASK);
 				}
 				updateRecurrence(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_REMINDER)) {
-				if(isFloatingTask(task)) {
-					throw new IllegalArgumentException(MESSAGE_CANNOT_UPDATE_REMINDER_FOR_FLOATING_TASK);
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_REMINDER_FOR_FLOATING_TASK);
 				}
 				updateReminder(task, parser);
-			}  else if (field.equals(UpdateParser.FIELD_COMPLETE)) {
+			} else if (field.equals(UpdateParser.FIELD_COMPLETE)) {
 				task.setCompleted(true);
 			} else {
 				task.setCompleted(false);
@@ -104,55 +109,75 @@ public class UpdateHandler extends CommandHandler {
 	}
 
 	private static void updateStartDate(Task task, UpdateParser parser) {
-		Integer startDateYear = Integer.parseInt(parser.getStartDateYear());
-		Integer startDateMonth = Integer.parseInt(parser.getStartDateMonth());
-		Integer startDateDay = Integer.parseInt(parser.getStartDateDay());
+		try {
+			Integer startDateYear = Integer.parseInt(parser.getStartDateYear());
+			Integer startDateMonth = Integer.parseInt(parser
+					.getStartDateMonth());
+			Integer startDateDay = Integer.parseInt(parser.getStartDateDay());
 
-		LocalDate newStartDate = new LocalDate(startDateYear, startDateMonth,
-				startDateDay);
-		task.setStartDate(newStartDate);
-		googleCalendar.syncUpdateTaskStartDate(task, newStartDate);
+			LocalDate newStartDate = new LocalDate(startDateYear,
+					startDateMonth, startDateDay);
+			task.setStartDate(newStartDate);
+			googleCalendar.syncUpdateTaskStartDate(task, newStartDate);
 
-		if (task.startDateEqualsEndDate()) {
-			task.setEndDate(newStartDate);
+			if (task.startDateEqualsEndDate()) {
+				task.setEndDate(newStartDate);
+			}
+
+		} catch (IllegalFieldValueException e) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_DATE_VALUE);
 		}
 	}
 
 	private static void updateEndDate(Task task, UpdateParser parser) {
-		Integer endDateYear = Integer.parseInt(parser.getEndDateYear());
-		Integer endDateMonth = Integer.parseInt(parser.getEndDateMonth());
-		Integer endDateDay = Integer.parseInt(parser.getEndDateDay());
+		try {
+			Integer endDateYear = Integer.parseInt(parser.getEndDateYear());
+			Integer endDateMonth = Integer.parseInt(parser.getEndDateMonth());
+			Integer endDateDay = Integer.parseInt(parser.getEndDateDay());
 
-		LocalDate newEndDate = new LocalDate(endDateYear, endDateMonth,
-				endDateDay);
-		task.setEndDate(newEndDate);
-		googleCalendar.syncUpdateTaskEndDate(task, newEndDate);
+			LocalDate newEndDate = new LocalDate(endDateYear, endDateMonth,
+					endDateDay);
+			task.setEndDate(newEndDate);
+			googleCalendar.syncUpdateTaskEndDate(task, newEndDate);
+
+		} catch (IllegalFieldValueException e) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_DATE_VALUE);
+		}
 	}
 
 	private static void updateStartTime(Task task, UpdateParser parser) {
-		Integer startTimeHour = Integer.parseInt(parser.getStartTimeHour());
-		Integer startTimeMinute = Integer.parseInt(parser.getStartTimeMinute());
+		try {
+			Integer startTimeHour = Integer.parseInt(parser.getStartTimeHour());
+			Integer startTimeMinute = Integer.parseInt(parser
+					.getStartTimeMinute());
 
-		LocalTime newStartTime = new LocalTime(startTimeHour, startTimeMinute);
+			LocalTime newStartTime = new LocalTime(startTimeHour,
+					startTimeMinute);
 
-		task.setStartTime(newStartTime);
-		googleCalendar.syncUpdateTaskStartTime(task, newStartTime);
+			task.setStartTime(newStartTime);
+			googleCalendar.syncUpdateTaskStartTime(task, newStartTime);
 
-		if (task.startTimeEqualsEndTime()) {
-			task.setEndTime(newStartTime);
-			googleCalendar.syncUpdateTaskEndTime(task, newStartTime);
+			if (task.startTimeEqualsEndTime()) {
+				task.setEndTime(newStartTime);
+				googleCalendar.syncUpdateTaskEndTime(task, newStartTime);
+			}
+		} catch (IllegalFieldValueException e) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
 		}
-
 	}
 
 	private static void updateEndTime(Task task, UpdateParser parser) {
-		int endTimeHour = Integer.parseInt(parser.getEndTimeHour());
-		int endTimeMinute = Integer.parseInt(parser.getEndTimeMinute());
+		try {
+			int endTimeHour = Integer.parseInt(parser.getEndTimeHour());
+			int endTimeMinute = Integer.parseInt(parser.getEndTimeMinute());
 
-		LocalTime newEndTime = new LocalTime(endTimeHour, endTimeMinute);
+			LocalTime newEndTime = new LocalTime(endTimeHour, endTimeMinute);
 
-		task.setEndTime(newEndTime);
-		googleCalendar.syncUpdateTaskEndTime(task, newEndTime);
+			task.setEndTime(newEndTime);
+			googleCalendar.syncUpdateTaskEndTime(task, newEndTime);
+		} catch (IllegalFieldValueException e) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
+		}
 	}
 
 	private static void updateRecurrence(Task task, UpdateParser parser) {
@@ -178,9 +203,10 @@ public class UpdateHandler extends CommandHandler {
 		}
 		return result;
 	}
-	
+
 	private static boolean isFloatingTask(Task task) {
-		if( (task.hasStartDate() && task.hasEndDate()) || (task.hasStartTime() && task.hasEndTime()) ) {
+		if ((task.hasStartDate() && task.hasEndDate())
+				|| (task.hasStartTime() && task.hasEndTime())) {
 			return false;
 		} else {
 			return true;
