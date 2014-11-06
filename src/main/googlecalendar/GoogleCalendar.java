@@ -323,36 +323,37 @@ public class GoogleCalendar {
 
 	private void syncPatchTaskToGoogleCalendar(Event event) {
 		String eventId = event.getId();
-		try {
-			if (eventId != null) {
+		if (eventId != null) {
+			try {
 				googleCalendarClient.events().patch(googleId, eventId, event)
 						.execute();
-			}
-		} catch (IOException e) {
-			try {
-				googleCalendarClient
-						.events()
-						.patch(googleId, eventId, event)
-						.queue(updateEventBatch,
-								new JsonBatchCallback<Event>() {
+			} catch (IOException e) {
+				try {
+					googleCalendarClient
+							.events()
+							.patch(googleId, eventId, event)
+							.queue(updateEventBatch,
+									new JsonBatchCallback<Event>() {
 
-									@Override
-									public void onSuccess(Event event,
-											HttpHeaders arg1)
-											throws IOException {
+										@Override
+										public void onSuccess(Event event,
+												HttpHeaders arg1)
+												throws IOException {
 
-									}
+										}
 
-									@Override
-									public void onFailure(GoogleJsonError arg0,
-											HttpHeaders arg1)
-											throws IOException {
-										System.out
-												.println(MESSAGE_SYNC_UPDATE_FAIL);
-									}
-								});
-			} catch (IOException e1) {
-				System.out.println(MESSAGE_SYNC_UPDATE_FAIL);
+										@Override
+										public void onFailure(
+												GoogleJsonError arg0,
+												HttpHeaders arg1)
+												throws IOException {
+											System.out
+													.println(MESSAGE_SYNC_UPDATE_FAIL);
+										}
+									});
+				} catch (IOException e1) {
+					System.out.println(MESSAGE_SYNC_UPDATE_FAIL);
+				}
 			}
 		}
 	}
