@@ -77,9 +77,11 @@ public class AddParser extends CommandParser {
 					startDate = getDateAndTrimUserInput(wordsList);
 					endDate = startDate;
 					inDescription = false;
-				} else if (inDescription == true) {
+				} else {
 					description = appendToDescription(wordsList, description);
 				}
+			} else {
+				description = appendToDescription(wordsList, description);
 			}
 		}
 
