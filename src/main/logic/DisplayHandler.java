@@ -49,22 +49,22 @@ public class DisplayHandler extends CommandHandler {
 			result = String.format(DISPLAY_NUM_OF_TASKS, numberOfTasks);
 			result += displayLineSeparator();
 			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-					ansi().fg(RED).a("ID").reset(), " |",
-					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
-							.fg(CYAN).a(" VENUE").reset(), "|",
-					ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
-							.a(" DATE").reset());
+					ansi().fg(RED).a("ID").reset(), "  |", ansi().fg(MAGENTA)
+							.a(" DESCRIPTION").reset(), "|",
+					ansi().fg(CYAN).a(" VENUE").reset(), "|", ansi().fg(YELLOW)
+							.a(" TIME").reset(), "|",
+					ansi().fg(GREEN).a(" DATE").reset());
 			result += displayLineSeparator();
 			for (int j = 0; j < tasks.size(); j++) {
 				result += displayTaskInTable(j, tasks.get(j));
 			}
 			// result += displayLineSeparator();
 			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-					ansi().fg(RED).a("ID").reset(), " |",
-					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
-							.fg(CYAN).a(" VENUE").reset(), "|",
-					ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
-							.a(" DATE").reset());
+					ansi().fg(RED).a("ID").reset(), "  |", ansi().fg(MAGENTA)
+							.a(" DESCRIPTION").reset(), "|",
+					ansi().fg(CYAN).a(" VENUE").reset(), "|", ansi().fg(YELLOW)
+							.a(" TIME").reset(), "|",
+					ansi().fg(GREEN).a(" DATE").reset());
 			result += displayLineSeparator();
 
 		}
@@ -219,7 +219,7 @@ public class DisplayHandler extends CommandHandler {
 			double venueLines = Math.ceil(taskVenueExtra.length() / 12.0);
 
 			if (venueLines == descriptionLines) {
-				for (int i = 0; i < venueLines - 1; i++) {
+				for (int i = 0; i < venueLines - 2; i++) {
 					String displayVenue = taskVenueExtra.substring(0, 12);
 					String displayDescription = taskDescriptionExtra.substring(
 							0, 25);
@@ -267,222 +267,143 @@ public class DisplayHandler extends CommandHandler {
 
 			else if (venueLines > descriptionLines) {
 
-				for (int i = 0; i < descriptionLines - 2; i++) {
+				for (int i = 0; i < descriptionLines - 1; i++) {
 					String displayVenue = taskVenueExtra.substring(0, 12);
 					String displayDescription = taskDescriptionExtra.substring(
 							0, 25);
-					taskVenueExtra = taskVenueExtra.substring(12);
-					taskDescriptionExtra = taskDescriptionExtra.substring(25);
 
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-							ansi().fg(RED).a(nullSpace).reset(),"|",
-							ansi().fg(MAGENTA).a(displayDescription).reset(),"|",
-							ansi().fg(CYAN).a(displayVenue).reset(),"|", "","|", "");
+							ansi().fg(RED).a(nullSpace).reset(), "|", ansi()
+									.fg(MAGENTA).a(displayDescription).reset(),
+							"|", ansi().fg(CYAN).a(displayVenue).reset(), "|",
+							"           |", "", "");
+					taskVenueExtra = taskVenueExtra.substring(12);
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
 				}
-				
-				if(taskVenueExtra.length()>12){
-				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-						.fg(RED).a(nullSpace).reset(),"|",
-						ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),"|",
-						ansi().fg(CYAN).a(taskVenueExtra.substring(0, 12))
-								.reset(),"|", "           |","", "");
-				taskVenueExtra = taskVenueExtra.substring(12);
-
-				
-				}
-				else{
-					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-							.fg(RED).a(nullSpace).reset(),"|",
-							ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),"|",
-							ansi().fg(CYAN).a(taskVenueExtra)
-									.reset(),"|", "           |","", "");
-				}
-
-				
-				
 				if (venueLines - descriptionLines - 1 == 0) {
-					if (completed) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(YELLOW).a(nullSpace).reset(), "|",
-								ansi().fg(YELLOW).a("").reset(), "|", ansi()
-										.fg(YELLOW).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-						result += displayLineSeparator();
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+							ansi().fg(RED).a(nullSpace).reset(), "|", ansi()
+									.fg(MAGENTA).a(taskDescriptionExtra)
+									.reset(), "|",
+							ansi().fg(CYAN).a(taskVenueExtra).reset(), "|",
+							"           |", "", "");
+					result += displayLineSeparator();
 
-					} else {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-										.a(nullSpace).reset(), "|",
-								ansi().fg(MAGENTA).a("").reset(), "|", ansi()
-										.fg(CYAN).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-						result += displayLineSeparator();
-
-					}
 				} else {
-					for (int j = 0; j < (venueLines - descriptionLines) - 2; j++) {
-						String displayVenue = taskVenueExtra.substring(0, 12);
-						taskVenueExtra = taskVenueExtra.substring(12);
-						if (completed) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(YELLOW).a(nullSpace).reset(),
-									"|", ansi().fg(YELLOW).a("").reset(), "|",
-									ansi().fg(YELLOW).a(displayVenue).reset(),
-									"|", "           |", "", "");
-						} else {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(RED).a(nullSpace).reset(), "|",
-									ansi().fg(MAGENTA).a("").reset(), "|",
-									ansi().fg(CYAN).a(displayVenue).reset(),
-									"|", "           |", "", "");
-						}
-					}
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+							ansi().fg(RED).a(nullSpace).reset(), "|", ansi()
+									.fg(MAGENTA).a(taskDescriptionExtra)
+									.reset(), "|",
+							ansi().fg(CYAN).a(taskVenueExtra.substring(0, 12))
+									.reset(), "|", "           |", "", "");
 
-					if (completed) {
+					taskVenueExtra = taskVenueExtra.substring(12);
+
+					for (int i = 0; i < venueLines - descriptionLines - 1; i++) {
+						if(taskVenueExtra.length()>12){
+						
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(YELLOW).a(nullSpace).reset(), "|",
-								ansi().fg(YELLOW).a("").reset(), "|", ansi()
-										.fg(YELLOW).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-						result += displayLineSeparator();
-
-					} else {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-										.a(nullSpace).reset(), "|",
-								ansi().fg(MAGENTA).a("").reset(), "|", ansi()
-										.fg(CYAN).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-						result += displayLineSeparator();
-
+								ansi().fg(RED).a(nullSpace).reset(),
+								"|",
+								ansi().fg(MAGENTA).a("").reset(),
+								"|",
+								ansi().fg(CYAN)
+										.a(taskVenueExtra.substring(0, 12))
+										.reset(), "|", "           |", "", "");
+						taskVenueExtra = taskVenueExtra.substring(12);
+						}
+						
 					}
+
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+							ansi().fg(RED).a(nullSpace).reset(), "|", ansi()
+									.fg(MAGENTA).a("").reset(), "|",
+							ansi().fg(CYAN).a(taskVenueExtra).reset(), "|",
+							"           |", "", "");
+					result += displayLineSeparator();
 				}
+
 			}
 
 			else if (descriptionLines > venueLines) {
-				
 				for (int i = 0; i < venueLines - 1; i++) {
 					String displayVenue = taskVenueExtra.substring(0, 12);
 					String displayDescription = taskDescriptionExtra.substring(
 							0, 25);
-					taskVenueExtra = taskVenueExtra.substring(12);
-					taskDescriptionExtra = taskDescriptionExtra.substring(25);
 
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-							ansi().fg(RED).a(nullSpace).reset(), "|",
-							ansi().fg(MAGENTA).a(displayDescription).reset(),"|",
-							ansi().fg(CYAN).a(displayVenue).reset(),"|", "           |","", "");
+							ansi().fg(RED).a(nullSpace).reset(), "|", ansi()
+									.fg(MAGENTA).a(displayDescription).reset(),
+							"|", ansi().fg(CYAN).a(displayVenue).reset(), "|",
+							"           |", "", "");
+					taskVenueExtra = taskVenueExtra.substring(12);
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
 				}
-				result += String.format(
-						DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a(nullSpace).reset(),"|",
-						ansi().fg(MAGENTA)
-								.a(taskDescriptionExtra.substring(0, 25))
-								.reset(), "|",ansi().fg(CYAN).a(taskVenueExtra)
-								.reset(), "|","           |","", "");
-
-				taskDescriptionExtra = taskDescriptionExtra.substring(25);
 
 				if (descriptionLines - venueLines - 1 == 0) {
-					if (completed) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(YELLOW).a(nullSpace).reset(), "|",
-								ansi().fg(YELLOW).a(taskDescriptionExtra)
-										.reset(), "|", ansi().fg(YELLOW).a("")
-										.reset(), "|", "           |", "", "");
-						result += displayLineSeparator();
-
-					} else {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-										.a(nullSpace).reset(), "|",
-								ansi().fg(MAGENTA).a(taskDescriptionExtra)
-										.reset(), "|", ansi().fg(CYAN).a("")
-										.reset(), "|", "           |", "", "");
-						result += displayLineSeparator();
-
-					}
-				} else {
-					for (int j = 0; j < (descriptionLines - venueLines) - 2; j++) {
-						String displayDescription = taskDescriptionExtra
-								.substring(0, 25);
-						taskDescriptionExtra = taskDescriptionExtra
-								.substring(25);
-
-						if (completed) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(YELLOW).a(nullSpace).reset(),
-									"|", ansi().fg(YELLOW)
-											.a(displayDescription).reset(),
-									"|", ansi().fg(YELLOW).a("").reset(), "|",
-									"           |", "", "");
-						} else {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(RED).a(nullSpace).reset(), "|",
-									ansi().fg(MAGENTA).a(displayDescription)
-											.reset(), "|", ansi().fg(CYAN)
-											.a("").reset(), "|",
-									"           |", "", "");
-						}
-					}
-
 					if(taskDescriptionExtra.length()>25){
-						if (completed) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(YELLOW).a(nullSpace).reset(), "|",
-									ansi().fg(YELLOW).a(taskDescriptionExtra.substring(0,25))
-											.reset(), "|", ansi().fg(YELLOW).a("")
-											.reset(), "|", "           |", "", "");
-							result += displayLineSeparator();
-
-						} else {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-											.a(nullSpace).reset(), "|",
-									ansi().fg(MAGENTA).a(taskDescriptionExtra.substring(0,25))
-											.reset(), "|", ansi().fg(CYAN).a("")
-											.reset(), "|", "           |", "", "");
-							
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-											.a(nullSpace).reset(), "|",
-									ansi().fg(MAGENTA).a(taskDescriptionExtra.substring(25))
-											.reset(), "|", ansi().fg(CYAN).a("")
-											.reset(), "|", "           |", "", "");
-							
-							result += displayLineSeparator();
-
-						}
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+							ansi().fg(RED).a(nullSpace).reset(), "|", ansi()
+									.fg(MAGENTA).a(taskDescriptionExtra.substring(0,25))
+									.reset(), "|",
+							ansi().fg(CYAN).a(taskVenueExtra).reset(), "|",
+							"           |", "", "");
+					
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+							ansi().fg(RED).a(nullSpace).reset(), "|", ansi()
+									.fg(MAGENTA).a(taskDescriptionExtra.substring(25))
+									.reset(), "|",
+							ansi().fg(CYAN).a("").reset(), "|",
+							"           |", "", "");
+					result += displayLineSeparator();
 					}
 					else{
-					if (completed) {
+						result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(RED).a(nullSpace).reset(), "|", ansi()
+										.fg(MAGENTA).a(taskDescriptionExtra)
+										.reset(), "|",
+								ansi().fg(CYAN).a(taskVenueExtra).reset(), "|",
+								"           |", "", "");
+						result += displayLineSeparator();
+					}
+
+				}
+				
+					
+				else {
+					result += String.format(
+							DISPLAY_TABLE_ROW_STRING_FORMAT,
+							ansi().fg(RED).a(nullSpace).reset(),
+							"|",
+							ansi().fg(MAGENTA)
+									.a(taskDescriptionExtra.substring(0, 25))
+									.reset(), "|",
+							ansi().fg(CYAN).a(taskVenueExtra).reset(), "|",
+							"           |", "", "");
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+
+					for (int i = 0; i < descriptionLines - venueLines - 1; i++) {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(YELLOW).a(nullSpace).reset(), "|",
-								ansi().fg(YELLOW).a(taskDescriptionExtra)
-										.reset(), "|", ansi().fg(YELLOW).a("")
-										.reset(), "|", "           |", "", "");
-						result += displayLineSeparator();
-
-					} else {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-										.a(nullSpace).reset(), "|",
-								ansi().fg(MAGENTA).a(taskDescriptionExtra)
-										.reset(), "|", ansi().fg(CYAN).a("")
-										.reset(), "|", "           |", "", "");
-						result += displayLineSeparator();
-
+								ansi().fg(RED).a(nullSpace).reset(),
+								"|",
+								ansi().fg(MAGENTA)
+										.a(taskDescriptionExtra
+												.substring(0, 25)).reset(),
+								"|", ansi().fg(CYAN).a("").reset(), "|",
+								"           |", "", "");
+						taskDescriptionExtra = taskDescriptionExtra
+								.substring(25);
 					}
-					}
+
+					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+							ansi().fg(RED).a(nullSpace).reset(), "|", ansi()
+									.fg(MAGENTA).a(taskDescriptionExtra)
+									.reset(), "|", ansi().fg(CYAN).a("")
+									.reset(), "|", "           |", "", "");
+					result += displayLineSeparator();
+
 				}
 
 			}
@@ -607,18 +528,20 @@ public class DisplayHandler extends CommandHandler {
 	private static String addCompleted(Task task) {
 		return "(" + task.hasCompleted() + ")" + STRING_SPACE;
 	}
-	
-	//this function returns -1 if the start date time of the task is before
-	//the current date time, 0 if the the start date time of the task is after
-	//the current date time but on the same day, 1 if the start date time of the task
-	//is after the current date time and not on the same day
+
+	// this function returns -1 if the start date time of the task is before
+	// the current date time, 0 if the the start date time of the task is after
+	// the current date time but on the same day, 1 if the start date time of
+	// the task
+	// is after the current date time and not on the same day
 	public static Integer determinePastPresentFuture(Task task) {
 		DateTime currentDateTime = new DateTime();
 		LocalDate taskDate = task.getStartDate();
 		LocalTime taskTime = task.getStartTime();
 		DateTime taskDateTime = taskDate.toDateTime(taskTime);
 
-		int compareDate = DateTimeComparator.getInstance().compare(taskDateTime, currentDateTime);
+		int compareDate = DateTimeComparator.getInstance().compare(
+				taskDateTime, currentDateTime);
 
 		switch (compareDate) {
 		case -1:
@@ -627,7 +550,7 @@ public class DisplayHandler extends CommandHandler {
 		case 1: {
 			int taskDay = taskDateTime.getDayOfYear();
 			int currentDay = currentDateTime.getDayOfYear();
-			if(taskDay == currentDay) {
+			if (taskDay == currentDay) {
 				return 0;
 			} else {
 				return 1;
