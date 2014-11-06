@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import main.TaskerLog;
+
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -145,7 +147,7 @@ public class Storage {
 
 			reader.close();
 		} catch (FileNotFoundException e) {
-			return MESSAGE_FILE_NOT_FOUND;
+			TaskerLog.logSystemInfo(MESSAGE_FILE_NOT_FOUND);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ArrayIndexOutOfBoundsException e) {
