@@ -384,6 +384,7 @@ public class DisplayHandler extends CommandHandler {
 					taskDescriptionExtra = taskDescriptionExtra.substring(25);
 
 					for (int i = 0; i < descriptionLines - venueLines - 1; i++) {
+						if(taskDescriptionExtra.length()>25){
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT,
 								ansi().fg(RED).a(nullSpace).reset(),
@@ -395,6 +396,7 @@ public class DisplayHandler extends CommandHandler {
 								"           |", "", "");
 						taskDescriptionExtra = taskDescriptionExtra
 								.substring(25);
+						}
 					}
 
 					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
