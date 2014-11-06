@@ -730,7 +730,12 @@ public abstract class CommandParser {
 			return true;
 		} else if (isInteger(currentWord)) {
 			stack.push(wordsList.poll());
-			currentWord = wordsList.peek().toLowerCase();
+			if(!wordsList.isEmpty()) {
+				currentWord = wordsList.peek().toLowerCase();
+			} else {
+				wordsList.offerFirst(stack.pop());
+				return false;
+			}
 			// put the word back
 			wordsList.offerFirst(stack.pop());
 			if (isMonth(currentWord)) {
