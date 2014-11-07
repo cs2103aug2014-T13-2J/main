@@ -17,6 +17,8 @@ public class SearchParser extends CommandParser {
 	public static final String MESSAGE_NULL = "Task list is empty. There is nothing to search from.";
 	public static final String MESSAGE_UNAVAILABLE = "Search term cannot be found in task list.";
 	public static final String MESSAGE_SEARCH = "List of tasks containing";
+	public static final String MESSAGE_NOT_TODAY = "There are no tasks due today.";
+	public static final String MESSAGE_TODAY = "These are the tasks due today.";
 
 	public static String returnMessage = "";
 	public static String lowerCaseKey = "";
@@ -42,6 +44,47 @@ public class SearchParser extends CommandParser {
 			return MESSAGE_ERROR;
 		}
 
+		else if (userInput.toLowerCase().equals("today")) {
+			if (isToday()) {
+				String resultTop = "";
+				String resultBottom = "";
+				System.out.println();
+				System.out.println(MESSAGE_TODAY);
+				resultTop += DisplayHandler.displayLineSeparator();
+				resultTop += String.format(
+						DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+						ansi().fg(RED).a("ID").reset(), " |",
+						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
+								.fg(CYAN).a(" VENUE").reset(), "|",
+						ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
+								.a(" DATE").reset());
+				resultTop += DisplayHandler.displayLineSeparator();
+				System.out.print(resultTop);
+				
+				for (int i = 0; i < list.size(); i++) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 0) {
+						System.out.print(DisplayHandler.displayTaskInTable(i,
+								list.get(i)));
+					}
+				}
+				
+				resultBottom += String.format(
+						DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+						ansi().fg(RED).a("ID").reset(), " |",
+						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
+								.fg(CYAN).a(" VENUE").reset(), "|",
+						ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
+								.a(" DATE").reset());
+				resultBottom += DisplayHandler.displayLineSeparator();
+				System.out.print(resultBottom);
+				
+			} else {
+				System.out.println(MESSAGE_NOT_TODAY);
+			}
+
+			return returnMessage;
+		}
+
 		else if (!isWithin(userInput)) {
 			return MESSAGE_UNAVAILABLE;
 		}
@@ -54,11 +97,13 @@ public class SearchParser extends CommandParser {
 			System.out.println(MESSAGE_SEARCH + " " + "'"
 					+ ansi().fg(RED).a(userInput).reset() + "'" + ": ");
 			resultTop += DisplayHandler.displayLineSeparator();
-			resultTop += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED).a("ID").reset()," |",
-					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),"|",
-					ansi().fg(CYAN).a(" VENUE").reset(),"|",
-					ansi().fg(YELLOW).a(" TIME").reset(),"|",
-					ansi().fg(GREEN).a(" DATE").reset());
+			resultTop += String.format(
+					DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+					ansi().fg(RED).a("ID").reset(), " |",
+					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
+							.fg(CYAN).a(" VENUE").reset(), "|",
+					ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
+							.a(" DATE").reset());
 			resultTop += DisplayHandler.displayLineSeparator();
 			System.out.print(resultTop);
 
@@ -69,12 +114,13 @@ public class SearchParser extends CommandParser {
 				}
 			}
 
-			resultBottom += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-					ansi().fg(RED).a("ID").reset()," |",
-					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),"|",
-					ansi().fg(CYAN).a(" VENUE").reset(),"|",
-					ansi().fg(YELLOW).a(" TIME").reset(),"|",
-					ansi().fg(GREEN).a(" DATE").reset());
+			resultBottom += String.format(
+					DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+					ansi().fg(RED).a("ID").reset(), " |",
+					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
+							.fg(CYAN).a(" VENUE").reset(), "|",
+					ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
+							.a(" DATE").reset());
 			resultBottom += DisplayHandler.displayLineSeparator();
 			System.out.print(resultBottom);
 
@@ -83,7 +129,7 @@ public class SearchParser extends CommandParser {
 
 	}
 
-	public boolean isWithin(String input) {
+	private boolean isWithin(String input) {
 
 		lowerCaseKey = userInput.toLowerCase();
 
@@ -93,6 +139,15 @@ public class SearchParser extends CommandParser {
 			}
 		}
 
+		return false;
+	}
+
+	private boolean isToday() {
+		for (int i = 0; i < list.size(); i++) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 0) {
+				return true;
+			}
+		}
 		return false;
 	}
 

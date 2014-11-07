@@ -540,8 +540,12 @@ public class DisplayHandler extends CommandHandler {
 		DateTime currentDateTime = new DateTime();
 		LocalDate taskDate = task.getStartDate();
 		LocalTime taskTime = task.getStartTime();
+		if(taskDate == null && taskTime == null){
+			return -2;
+		}
+		else{
 		DateTime taskDateTime = taskDate.toDateTime(taskTime);
-
+		
 		int compareDate = DateTimeComparator.getInstance().compare(
 				taskDateTime, currentDateTime);
 
@@ -561,6 +565,7 @@ public class DisplayHandler extends CommandHandler {
 		default:
 			// we should never reach this case
 			throw new IllegalArgumentException();
+		}
 		}
 	}
 }
