@@ -35,6 +35,8 @@ public class Storage {
 	private static final String MESSAGE_WRITE_FROM_FILE_SUCCESS = "Tasks added.";
 	private static final String MESSAGE_NO_MORE_COMMANDS_TO_UNDO = "There are no more commands to undo.";
 	private static final String MESSAGE_FILE_NOT_FOUND = "File does not exist";
+	private static final String MESSAGE_IO_EXCEPTION = "IO exception in readFromFile function.";
+	private static final String MESSAGE_ARRAY_INDEX_OUT_OF_BOUNDS_EXCEPTION = "ArrayIndexOutOfBounds exception in readFromFile function.";
 	private static final String FILENAME = "database.csv";
 	private static final int DATE_INDEX = 0;
 	private static final int TIME_INDEX = 1;
@@ -152,9 +154,9 @@ public class Storage {
 		} catch (FileNotFoundException e) {
 			TaskerLog.logSystemInfo(MESSAGE_FILE_NOT_FOUND);
 		} catch (IOException e) {
-			e.printStackTrace();
+			TaskerLog.logSystemInfo(MESSAGE_IO_EXCEPTION);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			e.printStackTrace();
+			TaskerLog.logSystemInfo(MESSAGE_ARRAY_INDEX_OUT_OF_BOUNDS_EXCEPTION);
 		}
 
 		return MESSAGE_READ_FROM_FILE_SUCCESS;
