@@ -16,7 +16,8 @@ public class UI {
 	public static final String MESSAGE_WELCOME = "Welcome to Tasker!";
 	public static final String MESSAGE_PROMPT = "Enter command:";
 	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
-
+	private static TabCompletion tab = new TabCompletion();
+	
 	public static void initializeEnvironment() {
 		AnsiConsole.systemInstall();
 		System.out.println(MESSAGE_WELCOME);
@@ -26,14 +27,17 @@ public class UI {
 	}
 
 	public static void readAndExecuteCommands() throws IOException {
-		@SuppressWarnings("resource")
+		//Comment the line below to disable tab completion.
+		tab.run();
+		
+		/*@SuppressWarnings("resource")
 		Scanner scanner = new Scanner(System.in);
 		while (true) {
 			System.out.println(MESSAGE_PROMPT);
 			String userCommand = scanner.nextLine();
 			TaskerLog.logSystemInfo("User entered:" + userCommand);
 			System.out.println(Logic.uiToLogic(userCommand));
-		}
+		}*/
 	}
 
 }

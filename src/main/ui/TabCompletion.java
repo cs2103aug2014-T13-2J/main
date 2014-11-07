@@ -26,21 +26,21 @@ public class TabCompletion {
 	public void run() throws IOException {
 		ConsoleReader reader = new ConsoleReader();
 		reader.addCompletor(new SimpleCompletor(new String[] {
-				"\nThese are the commands available:",
-				" add  delete  display  search  update help exit" }));
+				"These are the commands available:\nadd  delete  display  search  update help exit\n" }));
 
 		completors.add(new SimpleCompletor(new String[] { "add",
-				"search", "update", "exit", "display", "delete"}));
-		reader.addCompletor(new ArgumentCompletor(completors));
+				"search", "update", "exit", "display", "help", "delete"}));
 
+		reader.addCompletor(new ArgumentCompletor(completors));
+		
 		while ((line = readLine(reader, "")) != null) {
 
 			if ("exit".equals(line)) {
 				System.out.println(MESSAGE_EXITED);
 				return;
 				
-			} else if ("help".equals(line)) {
-				printHelp();
+			//} else if ("help".equals(line)) {
+				//printHelp();
 
 			} else {
 				System.out.println(Logic.uiToLogic(line));
@@ -58,10 +58,10 @@ public class TabCompletion {
 
 	}
 
-	private String readLine(ConsoleReader reader, String promtMessage)
+	private String readLine(ConsoleReader reader, String promptMessage)
 			throws IOException {
 
-		String line = reader.readLine(promtMessage + MESSAGE_PROMPT);
+		String line = reader.readLine(promptMessage + MESSAGE_PROMPT);
 
 		return line;
 	}
