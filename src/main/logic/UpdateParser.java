@@ -75,8 +75,13 @@ public class UpdateParser extends CommandParser {
 
 		String taskNumber = wordsList.poll();
 		setTaskNumber(taskNumber);
-
-		String field = wordsList.poll().toLowerCase();
+		String field;
+		if(!wordsList.isEmpty()) {
+			field = wordsList.poll().toLowerCase();
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_FIELD);
+		}
+		
 		if (isValidField(field)) {
 			String details = getDetails(wordsList);
 			setFieldAndDetails(field, details, wordsList);

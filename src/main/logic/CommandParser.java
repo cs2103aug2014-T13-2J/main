@@ -488,7 +488,13 @@ public abstract class CommandParser {
 	public static String getDateAndTrimUserInput(LinkedList<String> wordsList)
 			throws IllegalArgumentException {
 		String date = "";
-		String currentWord = wordsList.poll();
+		String currentWord;
+		if(!wordsList.isEmpty()) {
+			currentWord = wordsList.poll();
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_DATE_FORMAT);
+		}
+		
 		String[] arr = currentWord.split("/");
 		// if the format is D/M/Y, where D, M, Y can be any integer, but cannot
 		// start with 0
