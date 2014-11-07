@@ -295,7 +295,7 @@ public class AddParserTest {
 		AddParser p17 = new AddParser(s17);
 		p17.parse();
 		assertEquals("Description: ", "meeting on level 3", p17.getDescription());
-		assertEquals("Venue: ", null, p16.getVenue());
+		assertEquals("Venue: ", null, p17.getVenue());
 		assertEquals("startTimeHour: ", "14", p17.getStartTimeHour());
 		assertEquals("startTimeMinute: ", "0", p17.getStartTimeMinute());
 		assertEquals("endTimeHour: ", "14", p17.getEndTimeHour());
@@ -306,6 +306,22 @@ public class AddParserTest {
 		assertEquals("endDateYear: ", "2014", p17.getEndDateYear());
 		assertEquals("endDateMonth: ", "11", p17.getEndDateMonth());
 		assertEquals("endDateDay: ", "7", p17.getEndDateDay());
+		
+		String s18 = "\"meeting at somerset at 313 on level 3\" at \"2pm 2\"pm on next from\"     on 7 November";
+		AddParser p18 = new AddParser(s18);
+		p18.parse();
+		assertEquals("Description: ", "meeting at somerset at 313 on level 3", p18.getDescription());
+		assertEquals("Venue: ", "2pm 2\"pm on next from", p18.getVenue());
+		assertEquals("startTimeHour: ", null, p18.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p18.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p18.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p18.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p18.getStartDateYear());
+		assertEquals("startDateMonth: ", "11", p18.getStartDateMonth());
+		assertEquals("startDateDay: ", "7", p18.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p18.getEndDateYear());
+		assertEquals("endDateMonth: ", "11", p18.getEndDateMonth());
+		assertEquals("endDateDay: ", "7", p18.getEndDateDay());
 	}
 	
 	@Test

@@ -263,6 +263,7 @@ public abstract class CommandParser {
 			LinkedList<String> wordsList) throws IllegalArgumentException {
 		String currentWord, description = "";
 		boolean hasEndQuotations = false;
+
 		currentWord = wordsList.peek();
 		if (currentWord.startsWith("\"")) {
 			wordsList.poll();
@@ -279,11 +280,10 @@ public abstract class CommandParser {
 					description = description + currentWord + STRING_SPACE;
 				}
 			}
-			
-			if(hasEndQuotations == false) {
+
+			if (hasEndQuotations == false) {
 				throw new IllegalArgumentException(MESSAGE_INVALID_QUOTATIONS);
 			}
-
 		} else {
 			while (!wordsList.isEmpty()) {
 				currentWord = wordsList.peek();
@@ -329,7 +329,7 @@ public abstract class CommandParser {
 	public static boolean representsTime(LinkedList<String> wordsList)
 			throws IllegalArgumentException {
 		String word;
-		
+
 		if (!wordsList.isEmpty()) {
 			word = wordsList.peek().toLowerCase();
 		} else {
@@ -431,22 +431,46 @@ public abstract class CommandParser {
 			throws IllegalArgumentException {
 		LinkedList<String> stack = new LinkedList<String>();
 		String currentWord, venue = "";
-		while (!wordsList.isEmpty()) {
-			currentWord = wordsList.poll();
-			if (isReservedWord(currentWord)) {
-				stack.push(currentWord);
-				if (representsTime(wordsList) || representsDate(wordsList)) {
-					while (!stack.isEmpty()) {
-						wordsList.offerFirst(stack.pop());
-					}
+		boolean hasEndQuotations = false;
+
+		currentWord = wordsList.peek();
+		if (currentWord.startsWith("\"")) {
+			wordsList.poll();
+			currentWord = removeStartQuotations(currentWord);
+			venue = venue + currentWord + STRING_SPACE;
+			while (!wordsList.isEmpty()) {
+				currentWord = wordsList.poll();
+				if (currentWord.endsWith("\"")) {
+					hasEndQuotations = true;
+					currentWord = removeEndQuotations(currentWord);
+					venue = venue + currentWord + STRING_SPACE;
 					break;
 				} else {
-					while (!stack.isEmpty()) {
-						venue += stack.removeLast() + STRING_SPACE;
-					}
+					venue = venue + currentWord + STRING_SPACE;
 				}
-			} else {
-				venue += currentWord + STRING_SPACE;
+			}
+
+			if (hasEndQuotations == false) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_QUOTATIONS);
+			}
+		} else {
+			while (!wordsList.isEmpty()) {
+				currentWord = wordsList.poll();
+				if (isReservedWord(currentWord)) {
+					stack.push(currentWord);
+					if (representsTime(wordsList) || representsDate(wordsList)) {
+						while (!stack.isEmpty()) {
+							wordsList.offerFirst(stack.pop());
+						}
+						break;
+					} else {
+						while (!stack.isEmpty()) {
+							venue += stack.removeLast() + STRING_SPACE;
+						}
+					}
+				} else {
+					venue += currentWord + STRING_SPACE;
+				}
 			}
 		}
 		venue = venue.trim();
@@ -810,6 +834,7 @@ public abstract class CommandParser {
 		// first
 		String currentWord = wordsList.poll();
 		description = description + STRING_SPACE + currentWord;
+		
 		while (!wordsList.isEmpty()) {
 			currentWord = wordsList.poll();
 			if (!isReservedWord(currentWord)) {
