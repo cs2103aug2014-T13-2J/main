@@ -219,7 +219,7 @@ public class DisplayHandler extends CommandHandler {
 			double venueLines = Math.ceil(taskVenueExtra.length() / 12.0);
 
 			if (venueLines == descriptionLines) {
-				for (int i = 0; i < venueLines - 2; i++) {
+				for (int i = 0; i < venueLines - 1; i++) {
 					String displayVenue = taskVenueExtra.substring(0, 12);
 					String displayDescription = taskDescriptionExtra.substring(
 							0, 25);
