@@ -43,8 +43,14 @@ public class AddParser extends CommandParser {
 			} else if (currentReservedWord.equals("on")) { // get date
 				// remove reserved word
 				removeCurrentWord(wordsList);
-				startDate = getDateAndTrimUserInput(wordsList);
-				endDate = startDate;
+				if(representsDate(wordsList)) {
+					startDate = getDateAndTrimUserInput(wordsList);
+					endDate = startDate;
+				} else {
+					replaceWordOn(wordsList);
+					description = appendToDescription(wordsList, description);
+				}
+				
 			} else if (currentReservedWord.equals("from")) {
 				// remove reserved word
 				removeCurrentWord(wordsList);
