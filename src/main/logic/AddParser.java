@@ -16,7 +16,7 @@ public class AddParser extends CommandParser {
 		String startTime = null, startTimeHour = null, startTimeMinute = null;
 		String endDate = null, endDateYear = null, endDateMonth = null, endDateDay = null;
 		String endTime = null, endTimeHour = null, endTimeMinute = null;
-		
+
 		String[] userInput = this.getUserInput().split(" ");
 		LinkedList<String> wordsList = new LinkedList<String>(
 				Arrays.asList(userInput));
@@ -24,9 +24,10 @@ public class AddParser extends CommandParser {
 		description = getDescriptionAndTrimUserInput(wordsList);
 		while (!wordsList.isEmpty()) {
 			String currentReservedWord = wordsList.peek().toLowerCase();
-			// insert an assert that currentReservedWord is indeed a reserved
-			// word
-			if (currentReservedWord.equals("at")) {
+			if (currentReservedWord.equals("")) {
+				wordsList.pop();
+				continue;
+			} else if (currentReservedWord.equals("at")) {
 				// remove reserved word
 				removeCurrentWord(wordsList);
 				// determine if next word is time or venue
@@ -43,14 +44,14 @@ public class AddParser extends CommandParser {
 			} else if (currentReservedWord.equals("on")) { // get date
 				// remove reserved word
 				removeCurrentWord(wordsList);
-				if(representsDate(wordsList)) {
+				if (representsDate(wordsList)) {
 					startDate = getDateAndTrimUserInput(wordsList);
 					endDate = startDate;
 				} else {
 					replaceWordOn(wordsList);
 					description = appendToDescription(wordsList, description);
 				}
-				
+
 			} else if (currentReservedWord.equals("from")) {
 				// remove reserved word
 				removeCurrentWord(wordsList);
@@ -126,7 +127,7 @@ public class AddParser extends CommandParser {
 	}
 
 	private static void removeCurrentWord(LinkedList<String> wordsList) {
-		if(wordsList.isEmpty()) {
+		if (wordsList.isEmpty()) {
 			throw new IllegalArgumentException(MESSAGE_INVALID_FORMAT);
 		} else {
 			wordsList.poll();
