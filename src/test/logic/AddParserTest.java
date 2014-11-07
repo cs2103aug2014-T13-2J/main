@@ -290,36 +290,57 @@ public class AddParserTest {
 		assertEquals("endDateYear: ", "2014", p16.getEndDateYear());
 		assertEquals("endDateMonth: ", "11", p16.getEndDateMonth());
 		assertEquals("endDateDay: ", "14", p16.getEndDateDay());
+		
+		String s17 = "meeting on level 3 at 2pm on 7 November";
+		AddParser p17 = new AddParser(s17);
+		p17.parse();
+		assertEquals("Description: ", "meeting on level 3", p17.getDescription());
+		assertEquals("Venue: ", null, p16.getVenue());
+		assertEquals("startTimeHour: ", "14", p17.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p17.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "14", p17.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p17.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p17.getStartDateYear());
+		assertEquals("startDateMonth: ", "11", p17.getStartDateMonth());
+		assertEquals("startDateDay: ", "7", p17.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p17.getEndDateYear());
+		assertEquals("endDateMonth: ", "11", p17.getEndDateMonth());
+		assertEquals("endDateDay: ", "7", p17.getEndDateDay());
 	}
 	
 	@Test
 	public void testGetDescriptionAndTrimUserInput() {
 		String s1 = "meeting at 10pm";
 		LinkedList<String> l1 = new LinkedList<String>(Arrays.asList(s1.split(" ")));
+		assertEquals("Description", "meeting", AddParser.getDescriptionAndTrimUserInput(l1));
+
 		String s2 = "NUS Overseas College Fireside Chat at CLB";
 		LinkedList<String> l2 = new LinkedList<String>(Arrays.asList(s2.split(" ")));
+		assertEquals("Description", "NUS Overseas College Fireside Chat", AddParser.getDescriptionAndTrimUserInput(l2));
+
 		String s3 = "Study session at engineering at 2pm";
 		LinkedList<String> l3 = new LinkedList<String>(Arrays.asList(s3.split(" ")));
+		assertEquals("Description", "Study session", AddParser.getDescriptionAndTrimUserInput(l3));
+
 		String s4 = "Overseas in Germany from Thursday to Friday";		
 		LinkedList<String> l4 = new LinkedList<String>(Arrays.asList(s4.split(" ")));
+		assertEquals("Description", "Overseas in Germany", AddParser.getDescriptionAndTrimUserInput(l4));
+
 		String s5 = "EE2021 Midterms next Monday at 9am";
 		LinkedList<String> l5 = new LinkedList<String>(Arrays.asList(s5.split(" ")));
+		assertEquals("Description", "EE2021 Midterms", AddParser.getDescriptionAndTrimUserInput(l5));
+
 		String s6 = "Beach party on 12/10";
 		LinkedList<String> l6 = new LinkedList<String>(Arrays.asList(s6.split(" ")));
-		String s7 = "";
-		LinkedList<String> l7 = new LinkedList<String>(Arrays.asList(s7.split(" ")));		
-		String s8 = "meeting with Prof";
-		LinkedList<String> l8 = new LinkedList<String>(Arrays.asList(s8.split(" ")));
-
-		
-		assertEquals("Description", "meeting", AddParser.getDescriptionAndTrimUserInput(l1));
-		assertEquals("Description", "NUS Overseas College Fireside Chat", AddParser.getDescriptionAndTrimUserInput(l2));
-		assertEquals("Description", "Study session", AddParser.getDescriptionAndTrimUserInput(l3));
-		assertEquals("Description", "Overseas in Germany", AddParser.getDescriptionAndTrimUserInput(l4));
-		assertEquals("Description", "EE2021 Midterms", AddParser.getDescriptionAndTrimUserInput(l5));
 		assertEquals("Description", "Beach party", AddParser.getDescriptionAndTrimUserInput(l6));
-		//assertEquals("Description", new IllegalArgumentException(), AddParser.getDescriptionAndTrimUserInput(l7));		assertEquals("Description", new IllegalArgumentException(), AddParser.getDescriptionAndTrimUserInput(l7));
-		assertEquals("Description", "meeting with Prof", AddParser.getDescriptionAndTrimUserInput(l8));
+
+		String s7 = "meeting with Prof";
+		LinkedList<String> l7 = new LinkedList<String>(Arrays.asList(s7.split(" ")));
+		assertEquals("Description", "meeting with Prof", AddParser.getDescriptionAndTrimUserInput(l7));
+		
+		String s8 = "\"meeting on level 3 at 2pm at on from to there next\"";
+		LinkedList<String> l8 = new LinkedList<String>(Arrays.asList(s8.split(" ")));
+		assertEquals("Description", "meeting on level 3 at 2pm at on from to there next", AddParser.getDescriptionAndTrimUserInput(l8));
 	}
 
 	@Test

@@ -17,7 +17,8 @@ public abstract class CommandParser {
 	protected final static String MESSAGE_REQUIRE_START_TIME_OR_DATE = "Sorry you need to specify either the time or date";
 	protected final static String MESSAGE_INVALID_RECURRENCE_FORMAT = "Sorry, we did not manage to capture the recurrence. Please try again.";
 	protected final static String MESSAGE_INVALID_COMPLETED_FORMAT = "Sorry, we did not manage to capture the completion of the task. Please try again.";
-	protected final static String MESSAGE_INVALID_FORMAT = "Sorry we were unable to parse the information";
+	protected final static String MESSAGE_INVALID_FORMAT = "Sorry we were unable to parse the information.";
+	protected final static String MESSAGE_INVALID_QUOTATIONS = "You need to close your quotations properly for the description.";
 	public static final String STRING_SPACE = " ";
 	protected final static Integer INDEX_HOUR = 0;
 	protected final static Integer INDEX_MINUTE = 1;
@@ -261,24 +262,56 @@ public abstract class CommandParser {
 	public static String getDescriptionAndTrimUserInput(
 			LinkedList<String> wordsList) throws IllegalArgumentException {
 		String currentWord, description = "";
-		while (!wordsList.isEmpty()) {
-			currentWord = wordsList.peek();
-			if (isReservedWord(currentWord)) {
-				break;
-			} else {
-				wordsList.poll();
-				description += currentWord + " ";
+		boolean hasEndQuotations = false;
+		currentWord = wordsList.peek();
+		if (currentWord.startsWith("\"")) {
+			wordsList.poll();
+			currentWord = removeStartQuotations(currentWord);
+			description = description + currentWord + STRING_SPACE;
+			while (!wordsList.isEmpty()) {
+				currentWord = wordsList.poll();
+				if (currentWord.endsWith("\"")) {
+					hasEndQuotations = true;
+					currentWord = removeEndQuotations(currentWord);
+					description = description + currentWord + STRING_SPACE;
+					break;
+				} else {
+					description = description + currentWord + STRING_SPACE;
+				}
+			}
+			
+			if(hasEndQuotations == false) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_QUOTATIONS);
+			}
+
+		} else {
+			while (!wordsList.isEmpty()) {
+				currentWord = wordsList.peek();
+				if (isReservedWord(currentWord)) {
+					break;
+				} else {
+					wordsList.poll();
+					description += currentWord + STRING_SPACE;
+				}
 			}
 		}
 		description = description.trim();
 		// this condition is put here because "".split(" ") returns a string
-		// array
-		// of non zero length, so before trim(), description will be equal to
+		// array of non zero length, so before trim(), description will be equal
+		// to
 		// something like " "
 		if (description.equals("")) {
 			throw new IllegalArgumentException(MESSAGE_INVALID_DESCRIPTION);
 		}
 		return description;
+	}
+
+	private static String removeStartQuotations(String word) {
+		return word.substring(1, word.length());
+	}
+
+	private static String removeEndQuotations(String word) {
+		return word.substring(0, word.length() - 1);
 	}
 
 	protected static boolean isReservedWord(String word) {
@@ -296,7 +329,8 @@ public abstract class CommandParser {
 	public static boolean representsTime(LinkedList<String> wordsList)
 			throws IllegalArgumentException {
 		String word;
-		if(!wordsList.isEmpty()) {
+		
+		if (!wordsList.isEmpty()) {
 			word = wordsList.peek().toLowerCase();
 		} else {
 			return false;
@@ -341,11 +375,11 @@ public abstract class CommandParser {
 		String pmPortion = word.substring(word.length() - 2, word.length())
 				.toLowerCase();
 		String numPortion = word.substring(0, word.length() - 2).toLowerCase();
-		
-		if(!pmPortion.equals("am") && !pmPortion.equals("pm")) {
+
+		if (!pmPortion.equals("am") && !pmPortion.equals("pm")) {
 			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
 		}
-		
+
 		boolean isPm;
 		if (pmPortion.equals("pm")) {
 			isPm = true;
@@ -360,14 +394,13 @@ public abstract class CommandParser {
 			String[] numPortionParts = numPortion.split("\\.");
 			String hour = numPortionParts[INDEX_HOUR];
 			String minute = numPortionParts[INDEX_MINUTE];
-			if(!isInteger(hour) && !isInteger(minute)) {
+			if (!isInteger(hour) && !isInteger(minute)) {
 				throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
 			}
-			
+
 			Integer numHour = Integer.parseInt(hour);
 			Integer numMinute = Integer.parseInt(minute);
-			
-			
+
 			if (isPm == true && numHour != 12) {
 				numHour += 12;
 			} else if (isPm == false && numHour == 12) { // to cater to the 12am
@@ -730,7 +763,7 @@ public abstract class CommandParser {
 			return true;
 		} else if (isInteger(currentWord)) {
 			stack.push(wordsList.poll());
-			if(!wordsList.isEmpty()) {
+			if (!wordsList.isEmpty()) {
 				currentWord = wordsList.peek().toLowerCase();
 			} else {
 				wordsList.offerFirst(stack.pop());
@@ -790,4 +823,7 @@ public abstract class CommandParser {
 		return description;
 	}
 
+	protected static void replaceWordOn(LinkedList<String> wordsList) {
+		wordsList.offerFirst("on");
+	}
 }
