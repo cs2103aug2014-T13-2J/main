@@ -53,7 +53,7 @@ public class SearchParser extends CommandParser {
 				resultTop += DisplayHandler.displayLineSeparator();
 				resultTop += String.format(
 						DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a("ID").reset(), " |",
+						ansi().fg(RED).a("ID").reset(), "  |",
 						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
 								.fg(CYAN).a(" VENUE").reset(), "|",
 						ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
@@ -70,7 +70,7 @@ public class SearchParser extends CommandParser {
 				
 				resultBottom += String.format(
 						DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a("ID").reset(), " |",
+						ansi().fg(RED).a("ID").reset(), "  |",
 						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
 								.fg(CYAN).a(" VENUE").reset(), "|",
 						ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
@@ -99,7 +99,7 @@ public class SearchParser extends CommandParser {
 			resultTop += DisplayHandler.displayLineSeparator();
 			resultTop += String.format(
 					DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-					ansi().fg(RED).a("ID").reset(), " |",
+					ansi().fg(RED).a("ID").reset(), "  |",
 					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
 							.fg(CYAN).a(" VENUE").reset(), "|",
 					ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
@@ -116,7 +116,7 @@ public class SearchParser extends CommandParser {
 
 			resultBottom += String.format(
 					DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-					ansi().fg(RED).a("ID").reset(), " |",
+					ansi().fg(RED).a("ID").reset(), "  |",
 					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
 							.fg(CYAN).a(" VENUE").reset(), "|",
 					ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)

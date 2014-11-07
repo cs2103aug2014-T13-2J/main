@@ -38,7 +38,7 @@ public class DeleteHandler extends CommandHandler {
 				returnMessage += MESSAGE_DELETE;
 				resultTop += DisplayHandler.displayLineSeparator();
 				resultTop += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a("ID").reset()," |",
+						ansi().fg(RED).a("ID").reset(),"  |",
 						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),"|",
 						ansi().fg(CYAN).a(" VENUE").reset(),"|",
 						ansi().fg(YELLOW).a(" TIME").reset(),"|",
@@ -58,7 +58,7 @@ public class DeleteHandler extends CommandHandler {
 				}
 				storage.saveCurrentState();
 				resultBottom += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a("ID").reset()," |",
+						ansi().fg(RED).a("ID").reset(),"  |",
 						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),"|",
 						ansi().fg(CYAN).a(" VENUE").reset(),"|",
 						ansi().fg(YELLOW).a(" TIME").reset(),"|",
