@@ -7,6 +7,7 @@ import static org.fusesource.jansi.Ansi.Color.MAGENTA;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import main.googlecalendar.GoogleCalendar;
@@ -68,6 +69,8 @@ public class DeleteHandler extends CommandHandler {
 				returnMessage += resultBottom;
 			} catch (IndexOutOfBoundsException e) {
 				returnMessage = MESSAGE_INDEX_OUT_OF_BOUNDS;
+			} catch (IOException e) {
+				//print message?
 			}
 		}
 

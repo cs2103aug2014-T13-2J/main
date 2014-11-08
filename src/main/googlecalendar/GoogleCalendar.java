@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.ListIterator;
 import java.util.Scanner;
 import java.util.TimeZone;
 
@@ -199,17 +200,13 @@ public class GoogleCalendar {
 		return id;
 	}
 
-	public void syncDeleteTask(Task task) {
-		if (task.hasId()) {
-			try {
-				if (isFloatingTask(task)) {
-					syncDeleteFloatingTask(task);
-				} else {
-					syncDeleteNonFloatingTask(task);
-				}
-			} catch (IOException e) {
-				ArrayList<Task> deletedTasks = storage.getDeletedTasks();
-				deletedTasks.add(task);
+	public void syncDeleteTask(Task task) throws IOException {
+		String id = task.getId();
+		if (id != null) {
+			if (isFloatingTask(task)) {
+				syncDeleteFloatingTask(task);
+			} else {
+				syncDeleteNonFloatingTask(task);
 			}
 		} else {
 			// perform sync only when online
@@ -376,16 +373,21 @@ public class GoogleCalendar {
 				}
 			}
 			ArrayList<Task> deletedTasks = storage.getDeletedTasks();
-			if (!deletedTasks.isEmpty()) {
-				for (Task task : deletedTasks) {
-					syncDeleteTask(task);
+			ListIterator<Task> iterator = deletedTasks.listIterator();
+			if (deletedTasks.size() > 0) {
+				while(iterator.hasNext()) {
+					Task task = iterator.next();
+					try {
+						syncDeleteTask(task);
+						iterator.remove();
+					} catch (IOException e) {
+						//print message?
+					}
 				}
-				deletedTasks.clear();
-				message = MESSAGE_SYNC_SUCCESS;
+				storage.clearAllDeletedTasks();
 			}
 			if (message.equals(MESSAGE_SYNC_SUCCESS)) {
 				Storage.writeToFile(Storage.DATABASE_FILENAME, tasks);
-				Storage.writeToFile(Storage.DELETED_TASKS_FILENAME, deletedTasks);
 			}
 			return message;
 		} else {
@@ -467,11 +469,10 @@ public class GoogleCalendar {
 	public boolean hasUnsyncedTasks() {
 		ArrayList<Task> tasks = storage.getTasks();
 		ArrayList<Task> deletedTasks = storage.getDeletedTasks();
-		if (!deletedTasks.isEmpty()) {
+		if (deletedTasks.size() > 0) {
 			return true;
 		}
 		for (Task task : tasks) {
-			System.out.println(task.hasId());
 			if (!task.hasId() || task.hasBeenUpdated()) {
 				return true;
 			}
