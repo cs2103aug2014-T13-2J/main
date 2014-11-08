@@ -30,7 +30,7 @@ public class Storage {
 	private static final int REMINDER_INDEX = 7;
 	private static final int RECURRENCE_INDEX = 8;
 	private static final int COMPLETED_INDEX = 9;
-	private static final int HAS_CHANGES_INDEX = 10;
+	private static final int HAS_BEEN_UPDATED_INDEX = 10;
 	private static final String MESSAGE_READ_FROM_FILE_SUCCESS = "Data read from storage.";
 	private static final String MESSAGE_WRITE_FROM_FILE_SUCCESS = "Tasks added.";
 	private static final String MESSAGE_NO_MORE_COMMANDS_TO_UNDO = "There are no more commands to undo.";
@@ -129,7 +129,7 @@ public class Storage {
 			DateTime reminder;
 			String recurrence;
 			boolean completed;
-			boolean hasChanges;
+			boolean hasBeenUpdated;
 			
 			nextLine = reader.readNext();
 			while (nextLine != null) {
@@ -143,10 +143,10 @@ public class Storage {
 				reminder = convertToDateTime(nextLine[REMINDER_INDEX]);
 				recurrence = nextLine[RECURRENCE_INDEX];
 				completed = convertToBoolean(nextLine[COMPLETED_INDEX]);
-				hasChanges = convertToBoolean(nextLine[HAS_CHANGES_INDEX]);
+				hasBeenUpdated = convertToBoolean(nextLine[HAS_BEEN_UPDATED_INDEX]);
 				tasks.add(new Task(eventId, description, venue, startDate,
 						startTime, endDate, endTime, reminder, recurrence,
-						completed, hasChanges));
+						completed, hasBeenUpdated));
 				nextLine = reader.readNext();
 			}
 

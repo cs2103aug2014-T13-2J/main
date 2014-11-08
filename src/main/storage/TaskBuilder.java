@@ -17,7 +17,7 @@ public class TaskBuilder {
 	private DateTime reminder = null;
 	private String recurrence = null;
 	private boolean completed = false;
-	private boolean hasChanges = false;
+	private boolean hasBeenUpdated = false;
 
 	/***************************** Constructors ************************/
 	public TaskBuilder() {
@@ -70,6 +70,6 @@ public class TaskBuilder {
 
 	public Task buildTask() {
 		return new Task(id, description, venue, startDate, startTime, endDate,
-				endTime, reminder, recurrence, completed, hasChanges);
+				endTime, reminder, recurrence, completed, hasBeenUpdated);
 	}
 }

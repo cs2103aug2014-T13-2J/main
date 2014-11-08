@@ -33,13 +33,13 @@ public class Task {
 	private boolean hasRecurrence = false;
 	private String recurrence = null;
 	private boolean completed = false;
-	private boolean hasChanges = false;
+	private boolean hasBeenUpdated = false;
 
 	/***************************** Constructors ************************/
 	public Task(String id, String description, String venue,
 			LocalDate startDate, LocalTime startTime, LocalDate endDate,
 			LocalTime endTime, DateTime reminder, String recurrence,
-			boolean completed, boolean hasChanges) throws IllegalArgumentException {
+			boolean completed, boolean hasBeenUpdated) throws IllegalArgumentException {
 		this.setId(id);
 		this.setDescription(description);
 		this.setVenue(venue);
@@ -63,7 +63,7 @@ public class Task {
 		this.setReminder(reminder);
 		this.setRecurrence(recurrence);
 		this.completed = completed;
-		this.hasChanges = hasChanges;
+		this.hasBeenUpdated = hasBeenUpdated;
 	}
 
 	/***************************** Accessors ************************/
@@ -139,8 +139,8 @@ public class Task {
 		return completed;
 	}
 	
-	public boolean hasChanges() {
-		return hasChanges;
+	public boolean hasBeenUpdated() {
+		return hasBeenUpdated;
 	}
 
 	/***************************** Mutators ************************/
@@ -300,8 +300,8 @@ public class Task {
 		this.completed = completed;
 	}
 	
-	public void setHasChanges(boolean hasChanges) {
-		this.hasChanges = hasChanges;
+	public void sethasBeenUpdated(boolean hasBeenUpdated) {
+		this.hasBeenUpdated = hasBeenUpdated;
 	}
 
 	public String convertToCSVFormat() {
@@ -316,7 +316,7 @@ public class Task {
 		result = result + this.getReminder() + DELIMITER;
 		result = result + this.getRecurrence() + DELIMITER;
 		result = result + this.hasCompleted() + DELIMITER;
-		result = result + this.hasChanges();
+		result = result + this.hasBeenUpdated();
 
 		return result;
 	}

@@ -15,7 +15,7 @@ import main.storage.Task;
 
 public class DeleteHandler extends CommandHandler {
 	private static String MESSAGE_DELETE = "List of deleted tasks: \n";
-	private static String MESSAGE_INDEX_OUT_OF_BOUNDS = "Sorry, the arguments are out of bounds of the task list. Please try again.";
+	private static String MESSAGE_INDEX_OUT_OF_BOUNDS = "Sorry, the task IDs you provided are invalid. Please try again.";
 
 	private DeleteParser parser;
 	private static Storage storage = Storage.getInstance();
@@ -37,11 +37,12 @@ public class DeleteHandler extends CommandHandler {
 				returnMessage += "\n";
 				returnMessage += MESSAGE_DELETE;
 				resultTop += DisplayHandler.displayLineSeparator();
-				resultTop += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a("ID").reset(),"  |",
-						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),"|",
-						ansi().fg(CYAN).a(" VENUE").reset(),"|",
-						ansi().fg(YELLOW).a(" TIME").reset(),"|",
+				resultTop += String.format(
+						DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+								.fg(RED).a("ID").reset(), "  |",
+						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|",
+						ansi().fg(CYAN).a(" VENUE").reset(), "|",
+						ansi().fg(YELLOW).a(" TIME").reset(), "|",
 						ansi().fg(GREEN).a(" DATE").reset());
 				resultTop += DisplayHandler.displayLineSeparator();
 				returnMessage += resultTop;
@@ -51,17 +52,18 @@ public class DeleteHandler extends CommandHandler {
 					Task task = list.get(index);
 					String taskId = task.getId();
 					returnMessage += DisplayHandler.displayTaskInTable(index,
-							task) ;
+							task);
 					storage.deleteTask(index);
 					googleCalendar.syncDeleteTask(task, taskId);
 
 				}
 				storage.saveCurrentState();
-				resultBottom += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a("ID").reset(),"  |",
-						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(),"|",
-						ansi().fg(CYAN).a(" VENUE").reset(),"|",
-						ansi().fg(YELLOW).a(" TIME").reset(),"|",
+				resultBottom += String.format(
+						DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+								.fg(RED).a("ID").reset(), "  |",
+						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|",
+						ansi().fg(CYAN).a(" VENUE").reset(), "|",
+						ansi().fg(YELLOW).a(" TIME").reset(), "|",
 						ansi().fg(GREEN).a(" DATE").reset());
 				resultBottom += DisplayHandler.displayLineSeparator();
 				returnMessage += resultBottom;
