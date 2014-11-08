@@ -201,8 +201,7 @@ public class GoogleCalendar {
 	}
 
 	public void syncDeleteTask(Task task) throws IOException {
-		String id = task.getId();
-		if (id != null) {
+		if (task.hasId()) {
 			if (isFloatingTask(task)) {
 				syncDeleteFloatingTask(task);
 			} else {
