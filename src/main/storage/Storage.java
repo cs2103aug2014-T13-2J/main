@@ -30,14 +30,15 @@ public class Storage {
 	private static final int REMINDER_INDEX = 7;
 	private static final int RECURRENCE_INDEX = 8;
 	private static final int COMPLETED_INDEX = 9;
-	private static final int HAS_CHANGES_INDEX = 10;
+	private static final int HAS_BEEN_UPDATED_INDEX = 10;
 	private static final String MESSAGE_READ_FROM_FILE_SUCCESS = "Data read from storage.";
 	private static final String MESSAGE_WRITE_FROM_FILE_SUCCESS = "Tasks added.";
 	private static final String MESSAGE_NO_MORE_COMMANDS_TO_UNDO = "There are no more commands to undo.";
 	private static final String MESSAGE_FILE_NOT_FOUND = "File does not exist";
 	private static final String MESSAGE_IO_EXCEPTION = "IO exception in readFromFile function.";
 	private static final String MESSAGE_ARRAY_INDEX_OUT_OF_BOUNDS_EXCEPTION = "ArrayIndexOutOfBounds exception in readFromFile function.";
-	private static final String FILENAME = "database.csv";
+	public static final String DATABASE_FILENAME = "database.csv";
+	public static final String DELETED_TASKS_FILENAME = "deletedTasks.csv";
 	private static final int DATE_INDEX = 0;
 	private static final int TIME_INDEX = 1;
 	private static final int YEAR_INDEX = 0;
@@ -47,14 +48,18 @@ public class Storage {
 	private static final int MINUTE_INDEX = 1;
 
 	/***************************** Data Members ************************/
-	private ArrayList<Task> tasks;
 	private static Storage theOne = null;
+	private ArrayList<Task> tasks;
+	private ArrayList<Task> deletedTasks;
 	private LinkedList<ArrayList<Task>> taskHistory;
+	private LinkedList<ArrayList<Task>> deletedTaskHistory;
 
 	/***************************** Constructors ************************/
 	private Storage() {
 		tasks = new ArrayList<Task>();
+		deletedTasks = new ArrayList<Task>();
 		taskHistory = new LinkedList<ArrayList<Task>>();
+		deletedTaskHistory = new LinkedList<ArrayList<Task>>();
 	}
 
 	public static Storage getInstance() {
@@ -68,56 +73,89 @@ public class Storage {
 	public ArrayList<Task> getTasks() {
 		return this.tasks;
 	}
-
+	
+	public ArrayList<Task> getDeletedTasks() {
+		return this.deletedTasks;
+	}
+	
 	public LinkedList<ArrayList<Task>> getTaskHistory() {
 		return this.taskHistory;
+	}
+	
+	public LinkedList<ArrayList<Task>> getDeletedTaskHistory() {
+		return this.deletedTaskHistory;
 	}
 
 	/****************************************************************/
 	public void addTask(Task task) {
 		tasks.add(task);
 	}
+	
+	public void addDeletedTask(Task task) {
+		deletedTasks.add(task);
+	}
 
-	public void deleteTask(int index) {
+	public void removeTask(int index) {
 		tasks.remove(index);
+	}
+	
+	public void removeDeletedTask(int index) {
+		deletedTasks.remove(index);
 	}
 
 	public void clearAllTasks() {
 		tasks.clear();
 	}
 
+	public void clearAllDeletedTasks() {
+		deletedTasks.clear();
+	}
+	
 	private void setTasks(ArrayList<Task> tasks) {
 		this.tasks = tasks;
 	}
-
-	public void updateTaskHistory() {
-		Cloner cloner = new Cloner();
-		ArrayList<Task> currentTasks = this.getTasks();
-		ArrayList<Task> clone = cloner.deepClone(currentTasks);
-		this.getTaskHistory().push(clone);
+	
+	private void setDeletedTasks(ArrayList<Task> deletedTasks) {
+		this.deletedTasks = deletedTasks;
 	}
 
-	public void revertTaskHistory() {
+	public void updateTaskHistories() {
+		Cloner cloner = new Cloner();
+		ArrayList<Task> currentTasks = this.getTasks();
+		ArrayList<Task> tasksClone = cloner.deepClone(currentTasks);
+		this.getTaskHistory().push(tasksClone);
+		
+		ArrayList<Task> currentDeletedTasks = this.getDeletedTasks();
+		ArrayList<Task> deletedTasksClone = cloner.deepClone(currentDeletedTasks);
+		this.getDeletedTaskHistory().push(deletedTasksClone);
+	}
+
+	public void revertTaskHistories() {
+		//assumes if taskHistory is empty, then deletedTaskHistory is empty also
 		if (this.taskHistory.isEmpty()) {
 			throw new IllegalArgumentException(MESSAGE_NO_MORE_COMMANDS_TO_UNDO);
 		} else {
 			LinkedList<ArrayList<Task>> taskHistory = this.getTaskHistory();
+			LinkedList<ArrayList<Task>> deletedTaskHistory = this.getDeletedTaskHistory();
 			taskHistory.pop();
+			deletedTaskHistory.pop();
 			if (taskHistory.peek() == null) {
 				this.setTasks(new ArrayList<Task>());
 			} else {
 				this.setTasks(taskHistory.peek());
 			}
+			if (deletedTaskHistory.peek() == null) {
+				this.setDeletedTasks(new ArrayList<Task>());
+			} else {
+				this.setDeletedTasks(deletedTaskHistory.peek());
+			}
 		}
 	}
 
-	public static String readFromFile() {
-		Storage storage = Storage.getInstance();
-		ArrayList<Task> tasks = storage.getTasks();
-
+	public static String readFromFile(String fileName, ArrayList<Task> tasks) {
 		try {
 			String[] nextLine;
-			CSVReader reader = new CSVReader(new FileReader(FILENAME));
+			CSVReader reader = new CSVReader(new FileReader(fileName));
 
 			String eventId;
 			String description;
@@ -129,7 +167,7 @@ public class Storage {
 			DateTime reminder;
 			String recurrence;
 			boolean completed;
-			boolean hasChanges;
+			boolean hasBeenUpdated;
 			
 			nextLine = reader.readNext();
 			while (nextLine != null) {
@@ -143,10 +181,10 @@ public class Storage {
 				reminder = convertToDateTime(nextLine[REMINDER_INDEX]);
 				recurrence = nextLine[RECURRENCE_INDEX];
 				completed = convertToBoolean(nextLine[COMPLETED_INDEX]);
-				hasChanges = convertToBoolean(nextLine[HAS_CHANGES_INDEX]);
+				hasBeenUpdated = convertToBoolean(nextLine[HAS_BEEN_UPDATED_INDEX]);
 				tasks.add(new Task(eventId, description, venue, startDate,
 						startTime, endDate, endTime, reminder, recurrence,
-						completed, hasChanges));
+						completed, hasBeenUpdated));
 				nextLine = reader.readNext();
 			}
 
@@ -238,20 +276,18 @@ public class Storage {
 		}
 	}
 
-	public static String writeToFile() {
+	public static String writeToFile(String fileName, ArrayList<Task> tasks) {
 		// this function assumes that the ArrayList containing tasks is fully
 		// updated
-		Storage storage = Storage.getInstance();
-		ArrayList<Task> tasks = storage.getTasks();
 
-		File file = new File(FILENAME);
+		File file = new File(fileName);
 
 		try {
 			if (file.exists()) {
 				file.delete();
 			}
 			file.createNewFile();
-			CSVWriter writer = new CSVWriter(new FileWriter(FILENAME));
+			CSVWriter writer = new CSVWriter(new FileWriter(fileName));
 			String[] currentEntry;
 			for (Task task : tasks) {
 				currentEntry = task.convertToCSVFormat().split("#!");
@@ -266,8 +302,9 @@ public class Storage {
 	}
 	
 	public void saveCurrentState() {
-		Storage.getInstance().updateTaskHistory();
-		Storage.writeToFile();
+		Storage.getInstance().updateTaskHistories();
+		Storage.writeToFile(DATABASE_FILENAME, tasks);
+		Storage.writeToFile(DELETED_TASKS_FILENAME, deletedTasks);
 	}
 
 }

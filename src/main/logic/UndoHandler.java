@@ -16,7 +16,7 @@ public class UndoHandler extends CommandHandler {
 	@Override
 	public String execute() {
 		try {
-			storage.revertTaskHistory();
+			storage.revertTaskHistories();
 		} catch(IllegalArgumentException e) {
 			return e.getMessage();
 		}

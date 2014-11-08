@@ -47,7 +47,7 @@ public class StorageTest {
 		assertEquals("convertToBoolean: ", true, condition);
 	}
 
-	@Test
+/**	@Test
 	public void testWriteToFileAndReadFromFile() {
 		Storage s1 = Storage.getInstance();
 		TaskBuilder builder = new TaskBuilder();
@@ -80,6 +80,38 @@ public class StorageTest {
 		s1.clearAllTasks();
 		
 		assertEquals("readFromFile: ", "Data read from storage.", Storage.readFromFile());
+		
+	} **/
+	
+	@Test
+	public void testUpdateAndRevertTaskHistories() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setStartTime(new LocalTime(20, 0));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setEndTime(new LocalTime(23, 59));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		Task task = builder.buildTask();
+		
+		Storage storage = Storage.getInstance();
+		storage.addTask(task);
+		storage.addTask(task);
+		storage.updateTaskHistories();
+		
+		int taskHistoryLength = storage.getTaskHistory().size();
+		int deletedTaskHistoryLength = storage.getDeletedTaskHistory().size();
+		
+		assertEquals(deletedTaskHistoryLength, taskHistoryLength);
+		
+		storage.revertTaskHistories();
+		taskHistoryLength = storage.getTaskHistory().size();
+		deletedTaskHistoryLength = storage.getDeletedTaskHistory().size();
+		
+		assertEquals(deletedTaskHistoryLength, taskHistoryLength);
+
 		
 	}
 
