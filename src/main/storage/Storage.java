@@ -276,11 +276,9 @@ public class Storage {
 		}
 	}
 
-	public static String writeToFile(String fileName) {
+	public static String writeToFile(String fileName, ArrayList<Task> tasks) {
 		// this function assumes that the ArrayList containing tasks is fully
 		// updated
-		Storage storage = Storage.getInstance();
-		ArrayList<Task> tasks = storage.getTasks();
 
 		File file = new File(fileName);
 
@@ -305,8 +303,8 @@ public class Storage {
 	
 	public void saveCurrentState() {
 		Storage.getInstance().updateTaskHistories();
-		Storage.writeToFile(DATABASE_FILENAME);
-		Storage.writeToFile(DELETED_TASKS_FILENAME);
+		Storage.writeToFile(DATABASE_FILENAME, tasks);
+		Storage.writeToFile(DELETED_TASKS_FILENAME, deletedTasks);
 	}
 
 }
