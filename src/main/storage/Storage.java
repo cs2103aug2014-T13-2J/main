@@ -73,15 +73,15 @@ public class Storage {
 	public ArrayList<Task> getTasks() {
 		return this.tasks;
 	}
-	
+
 	public ArrayList<Task> getDeletedTasks() {
 		return this.deletedTasks;
 	}
-	
+
 	public LinkedList<ArrayList<Task>> getTaskHistory() {
 		return this.taskHistory;
 	}
-	
+
 	public LinkedList<ArrayList<Task>> getDeletedTaskHistory() {
 		return this.deletedTaskHistory;
 	}
@@ -90,7 +90,7 @@ public class Storage {
 	public void addTask(Task task) {
 		tasks.add(task);
 	}
-	
+
 	public void addDeletedTask(Task task) {
 		deletedTasks.add(task);
 	}
@@ -98,7 +98,7 @@ public class Storage {
 	public void removeTask(int index) {
 		tasks.remove(index);
 	}
-	
+
 	public void removeDeletedTask(int index) {
 		deletedTasks.remove(index);
 	}
@@ -110,11 +110,11 @@ public class Storage {
 	public void clearAllDeletedTasks() {
 		deletedTasks.clear();
 	}
-	
+
 	private void setTasks(ArrayList<Task> tasks) {
 		this.tasks = tasks;
 	}
-	
+
 	private void setDeletedTasks(ArrayList<Task> deletedTasks) {
 		this.deletedTasks = deletedTasks;
 	}
@@ -124,31 +124,27 @@ public class Storage {
 		ArrayList<Task> currentTasks = this.getTasks();
 		ArrayList<Task> tasksClone = cloner.deepClone(currentTasks);
 		this.getTaskHistory().push(tasksClone);
-		
+
 		ArrayList<Task> currentDeletedTasks = this.getDeletedTasks();
-		ArrayList<Task> deletedTasksClone = cloner.deepClone(currentDeletedTasks);
+		ArrayList<Task> deletedTasksClone = cloner
+				.deepClone(currentDeletedTasks);
 		this.getDeletedTaskHistory().push(deletedTasksClone);
 	}
 
 	public void revertTaskHistories() {
-		//assumes if taskHistory is empty, then deletedTaskHistory is empty also
-		if (this.taskHistory.isEmpty()) {
+		// assumes that size of taskHistory and size of deletedTaskHistory
+		// is always the same
+		if (this.taskHistory.size() == 1) {
 			throw new IllegalArgumentException(MESSAGE_NO_MORE_COMMANDS_TO_UNDO);
 		} else {
 			LinkedList<ArrayList<Task>> taskHistory = this.getTaskHistory();
-			LinkedList<ArrayList<Task>> deletedTaskHistory = this.getDeletedTaskHistory();
+			LinkedList<ArrayList<Task>> deletedTaskHistory = this
+					.getDeletedTaskHistory();
+
 			taskHistory.pop();
 			deletedTaskHistory.pop();
-			if (taskHistory.peek() == null) {
-				this.setTasks(new ArrayList<Task>());
-			} else {
-				this.setTasks(taskHistory.peek());
-			}
-			if (deletedTaskHistory.peek() == null) {
-				this.setDeletedTasks(new ArrayList<Task>());
-			} else {
-				this.setDeletedTasks(deletedTaskHistory.peek());
-			}
+			this.setTasks(taskHistory.peek());
+			this.setDeletedTasks(deletedTaskHistory.peek());
 		}
 	}
 
@@ -168,7 +164,7 @@ public class Storage {
 			String recurrence;
 			boolean completed;
 			boolean hasBeenUpdated;
-			
+
 			nextLine = reader.readNext();
 			while (nextLine != null) {
 				eventId = nextLine[EVENT_ID_INDEX];
@@ -194,7 +190,8 @@ public class Storage {
 		} catch (IOException e) {
 			TaskerLog.logSystemInfo(MESSAGE_IO_EXCEPTION);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			TaskerLog.logSystemInfo(MESSAGE_ARRAY_INDEX_OUT_OF_BOUNDS_EXCEPTION);
+			TaskerLog
+					.logSystemInfo(MESSAGE_ARRAY_INDEX_OUT_OF_BOUNDS_EXCEPTION);
 		}
 
 		return MESSAGE_READ_FROM_FILE_SUCCESS;
@@ -300,7 +297,7 @@ public class Storage {
 
 		return MESSAGE_WRITE_FROM_FILE_SUCCESS;
 	}
-	
+
 	public void saveCurrentState() {
 		Storage.getInstance().updateTaskHistories();
 		Storage.writeToFile(DATABASE_FILENAME, tasks);
