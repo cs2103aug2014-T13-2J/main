@@ -1,14 +1,12 @@
 package main.ui;
 
 import java.io.IOException;
-import java.util.Scanner;
-
-import org.fusesource.jansi.AnsiConsole;
 
 import main.TaskerLog;
 import main.googlecalendar.GoogleCalendar;
-import main.logic.Logic;
 import main.storage.Storage;
+
+import org.fusesource.jansi.AnsiConsole;
 
 public class UI {
 	public static String filename;
@@ -23,6 +21,7 @@ public class UI {
 		System.out.println(MESSAGE_WELCOME);
 		System.out.println(googleCalendar.logInToGoogleCalendar());
 		readFromStorage();
+		System.out.println(googleCalendar.syncToGoogle());
 		TaskerLog.logSystemInfo("Tasker initialized.");
 	}
 

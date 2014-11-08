@@ -1,5 +1,6 @@
 package main.logic;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import main.googlecalendar.GoogleCalendar;
@@ -100,6 +101,8 @@ public class UpdateHandler extends CommandHandler {
 			return MESSAGE_TASK_NOT_FOUND;
 		} catch (IllegalArgumentException e) {
 			return e.getMessage();
+		} catch (IOException e) {
+			return e.getMessage();
 		}
 	}
 
@@ -145,7 +148,7 @@ public class UpdateHandler extends CommandHandler {
 		}
 	}
 
-	private static void updateStartTime(Task task, UpdateParser parser) {
+	private static void updateStartTime(Task task, UpdateParser parser) throws IOException {
 		try {
 			Integer startTimeHour = Integer.parseInt(parser.getStartTimeHour());
 			Integer startTimeMinute = Integer.parseInt(parser
@@ -166,7 +169,7 @@ public class UpdateHandler extends CommandHandler {
 		}
 	}
 
-	private static void updateEndTime(Task task, UpdateParser parser) {
+	private static void updateEndTime(Task task, UpdateParser parser) throws IOException {
 		try {
 			int endTimeHour = Integer.parseInt(parser.getEndTimeHour());
 			int endTimeMinute = Integer.parseInt(parser.getEndTimeMinute());

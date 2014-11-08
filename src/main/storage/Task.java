@@ -300,7 +300,7 @@ public class Task {
 		this.completed = completed;
 	}
 	
-	public void sethasBeenUpdated(boolean hasBeenUpdated) {
+	public void setHasBeenUpdated(boolean hasBeenUpdated) {
 		this.hasBeenUpdated = hasBeenUpdated;
 	}
 
