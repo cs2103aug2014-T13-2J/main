@@ -1,9 +1,11 @@
 package main.ui;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 import main.TaskerLog;
 import main.googlecalendar.GoogleCalendar;
+import main.logic.Logic;
 import main.storage.Storage;
 
 import org.fusesource.jansi.AnsiConsole;
@@ -21,6 +23,7 @@ public class UI {
 		System.out.println(MESSAGE_WELCOME);
 		System.out.println(googleCalendar.logInToGoogleCalendar());
 		readFromStorage();
+		
 		System.out.println(googleCalendar.syncToGoogle());
 		TaskerLog.logSystemInfo("Tasker initialized.");
 	}
@@ -42,6 +45,8 @@ public class UI {
 	private static void readFromStorage() {
 		Storage.readFromFile(Storage.DATABASE_FILENAME, Storage.getInstance().getTasks());
 		Storage.readFromFile(Storage.DELETED_TASKS_FILENAME, Storage.getInstance().getDeletedTasks());
+		Storage storage = Storage.getInstance();
+		storage.saveCurrentState();
 	}
 
 }
