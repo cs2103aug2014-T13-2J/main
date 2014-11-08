@@ -54,7 +54,11 @@ public class DeleteHandler extends CommandHandler {
 					returnMessage += DisplayHandler.displayTaskInTable(index,
 							task);
 					storage.removeTask(index);
-					googleCalendar.syncDeleteTask(task);
+					try {
+						googleCalendar.syncDeleteTask(task);
+					} catch (IOException e) {
+						storage.addDeletedTask(task);
+					}
 
 				}
 				storage.saveCurrentState();
@@ -69,8 +73,6 @@ public class DeleteHandler extends CommandHandler {
 				returnMessage += resultBottom;
 			} catch (IndexOutOfBoundsException e) {
 				returnMessage = MESSAGE_INDEX_OUT_OF_BOUNDS;
-			} catch (IOException e) {
-				//print message?
 			}
 		}
 

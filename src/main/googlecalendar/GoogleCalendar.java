@@ -381,10 +381,9 @@ public class GoogleCalendar {
 						syncDeleteTask(task);
 						iterator.remove();
 					} catch (IOException e) {
-						//print message?
+						continue;
 					}
 				}
-				storage.clearAllDeletedTasks();
 			}
 			if (message.equals(MESSAGE_SYNC_SUCCESS)) {
 				Storage.writeToFile(Storage.DATABASE_FILENAME, tasks);
