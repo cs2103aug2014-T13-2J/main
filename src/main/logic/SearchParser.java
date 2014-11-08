@@ -19,6 +19,11 @@ public class SearchParser extends CommandParser {
 	public static final String MESSAGE_SEARCH = "List of tasks containing";
 	public static final String MESSAGE_NOT_TODAY = "There are no tasks due today.";
 	public static final String MESSAGE_TODAY = "These are the tasks due today.";
+	public static final String MESSAGE_PAST = "These are the tasks that were due in the past";
+	public static final String MESSAGE_NOT_PAST = "There are no past tasks in the list.";
+	public static final String MESSAGE_FUTURE = "These are the lists of upcoming tasks.";
+	public static final String MESSAGE_NOT_FUTURE = "There are no upcoming tasks from tomorrow onwards.";
+	public static final String MESSAGE_LONGER = "A search keyword should be longer than one character. Try again?";
 
 	public static String returnMessage = "";
 	public static String lowerCaseKey = "";
@@ -46,20 +51,9 @@ public class SearchParser extends CommandParser {
 
 		else if (userInput.toLowerCase().equals("today")) {
 			if (isToday()) {
-				String resultTop = "";
-				String resultBottom = "";
 				System.out.println();
 				System.out.println(MESSAGE_TODAY);
-				resultTop += DisplayHandler.displayLineSeparator();
-				resultTop += String.format(
-						DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a("ID").reset(), "  |",
-						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
-								.fg(CYAN).a(" VENUE").reset(), "|",
-						ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
-								.a(" DATE").reset());
-				resultTop += DisplayHandler.displayLineSeparator();
-				System.out.print(resultTop);
+				DisplayHandler.displayTop();
 				
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 0) {
@@ -68,15 +62,7 @@ public class SearchParser extends CommandParser {
 					}
 				}
 				
-				resultBottom += String.format(
-						DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-						ansi().fg(RED).a("ID").reset(), "  |",
-						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
-								.fg(CYAN).a(" VENUE").reset(), "|",
-						ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
-								.a(" DATE").reset());
-				resultBottom += DisplayHandler.displayLineSeparator();
-				System.out.print(resultBottom);
+				DisplayHandler.displayBottom();
 				
 			} else {
 				System.out.println(MESSAGE_NOT_TODAY);
@@ -84,28 +70,67 @@ public class SearchParser extends CommandParser {
 
 			return returnMessage;
 		}
+		
+		else if(userInput.toLowerCase().equals("past")){
+			if (isPast()) {
+				
+				System.out.println();
+				System.out.println(MESSAGE_PAST);
+				DisplayHandler.displayTop();
+				
+				for (int i = 0; i < list.size(); i++) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -1) {
+						System.out.print(DisplayHandler.displayTaskInTable(i,
+								list.get(i)));
+					}
+				}
+				
+				DisplayHandler.displayBottom();
+				
+			} else {
+				System.out.println(MESSAGE_NOT_PAST);
+			}
 
+			return returnMessage;
+		}
+		
+		else if(userInput.toLowerCase().equals("future")){
+			if (isFuture()) {
+				
+				System.out.println();
+				System.out.println(MESSAGE_FUTURE);
+				DisplayHandler.displayTop();
+				
+				for (int i = 0; i < list.size(); i++) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 1) {
+						System.out.print(DisplayHandler.displayTaskInTable(i,
+								list.get(i)));
+					}
+				}
+				
+				DisplayHandler.displayBottom();
+				
+			} else {
+				System.out.println(MESSAGE_NOT_FUTURE);
+			}
+
+			return returnMessage;
+		}
+		
 		else if (!isWithin(userInput)) {
 			return MESSAGE_UNAVAILABLE;
+		}
+		else if(userInput.length()==1){
+			return MESSAGE_LONGER;
 		}
 
 		else {
 			lowerCaseKey = userInput.toLowerCase();
-			String resultTop = "";
-			String resultBottom = "";
+			
 			System.out.println();
 			System.out.println(MESSAGE_SEARCH + " " + "'"
 					+ ansi().fg(RED).a(userInput).reset() + "'" + ": ");
-			resultTop += DisplayHandler.displayLineSeparator();
-			resultTop += String.format(
-					DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-					ansi().fg(RED).a("ID").reset(), "  |",
-					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
-							.fg(CYAN).a(" VENUE").reset(), "|",
-					ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
-							.a(" DATE").reset());
-			resultTop += DisplayHandler.displayLineSeparator();
-			System.out.print(resultTop);
+			DisplayHandler.displayTop();
 
 			for (int i = 0; i < list.size(); i++) {
 				if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
@@ -114,15 +139,7 @@ public class SearchParser extends CommandParser {
 				}
 			}
 
-			resultBottom += String.format(
-					DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-					ansi().fg(RED).a("ID").reset(), "  |",
-					ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
-							.fg(CYAN).a(" VENUE").reset(), "|",
-					ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
-							.a(" DATE").reset());
-			resultBottom += DisplayHandler.displayLineSeparator();
-			System.out.print(resultBottom);
+			DisplayHandler.displayBottom();
 
 			return returnMessage;
 		}
@@ -134,7 +151,22 @@ public class SearchParser extends CommandParser {
 		lowerCaseKey = userInput.toLowerCase();
 
 		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
+			if (list.get(i).getDescription().toString().toLowerCase().contains(lowerCaseKey)) {
+				return true;
+			}
+			else if(list.get(i).getVenue().toString().toLowerCase().contains(lowerCaseKey)){
+				return true;
+			}
+			else if(list.get(i).hasStartDate() && list.get(i).getStartDate().toString().contains(lowerCaseKey)){
+				return true;
+			}
+			else if(list.get(i).hasStartTime() && list.get(i).getStartTime().toString().contains(lowerCaseKey)){
+				return true;
+			}
+			else if(list.get(i).hasEndDate() && list.get(i).getEndDate().toString().contains(lowerCaseKey)){
+				return true;
+			}
+			else if(list.get(i).hasEndTime() && list.get(i).getEndTime().toString().contains(lowerCaseKey)){
 				return true;
 			}
 		}
@@ -145,6 +177,24 @@ public class SearchParser extends CommandParser {
 	private boolean isToday() {
 		for (int i = 0; i < list.size(); i++) {
 			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isPast(){
+		for(int i=0;i<list.size();i++){
+			if(DisplayHandler.determinePastPresentFuture(list.get(i))==-1){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isFuture(){
+		for(int i=0;i<list.size();i++){
+			if(DisplayHandler.determinePastPresentFuture(list.get(i))==1){
 				return true;
 			}
 		}

@@ -7,6 +7,7 @@ import static org.fusesource.jansi.Ansi.Color.MAGENTA;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static org.fusesource.jansi.Ansi.Color.BLUE;
+
 import java.util.ArrayList;
 
 import main.storage.Storage;
@@ -28,7 +29,6 @@ public class DisplayHandler extends CommandHandler {
 	public static final Integer TIME_STRING_END_INDEX = 5;
 	public static final String STRING_SPACE = " ";
 	public static final String MESSAGE_ADDED = " added!";
-
 	private static String result;
 	private static Storage storage = Storage.getInstance();
 
@@ -2011,6 +2011,33 @@ public class DisplayHandler extends CommandHandler {
 
 	private static String addCompleted(Task task) {
 		return "(" + task.hasCompleted() + ")" + STRING_SPACE;
+	}
+	
+	public static void displayTop(){
+		String resultTop = "";
+		resultTop += DisplayHandler.displayLineSeparator();
+		resultTop += String.format(
+				DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+				ansi().fg(RED).a("ID").reset(), "  |",
+				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
+						.fg(CYAN).a(" VENUE").reset(), "|",
+				ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
+						.a(" DATE").reset());
+		resultTop += DisplayHandler.displayLineSeparator();
+		System.out.print(resultTop);
+	}
+	
+	public static void displayBottom(){
+		String resultBottom = "";
+		resultBottom += String.format(
+				DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+				ansi().fg(RED).a("ID").reset(), "  |",
+				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
+						.fg(CYAN).a(" VENUE").reset(), "|",
+				ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
+						.a(" DATE").reset());
+		resultBottom += DisplayHandler.displayLineSeparator();
+		System.out.print(resultBottom);
 	}
 
 	// this function returns -1 if the start date time of the task is before
