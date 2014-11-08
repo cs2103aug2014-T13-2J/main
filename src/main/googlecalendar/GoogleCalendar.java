@@ -122,24 +122,24 @@ public class GoogleCalendar {
 					.execute().getId();
 		} catch (IOException e) {
 			if (googleId == null) {
-				return getCalendarIdFromUser();
+				return getGoogleIdFromUser();
 			}
 		}
 		return MESSAGE_LOGIN_SUCCESS;
 	}
 
-	private String getCalendarIdFromUser() {
+	private String getGoogleIdFromUser() {
 		String message = "";
 		System.out.println(MESSAGE_OFFLINE_FIRST_TIME);
 		googleId = scanner.nextLine();
 		if (!isValidEmail(googleId)) {
 			System.out.println(MESSAGE_INVALID_EMAIL);
-			return getCalendarIdFromUser();
+			return getGoogleIdFromUser();
 		} else {
 			if (confirmCalendarIdFromUser()) {
 				message = MESSAGE_CALENDAR_ID_SET;
 			} else {
-				message = getCalendarIdFromUser();
+				message = getGoogleIdFromUser();
 			}
 		}
 		return message;
