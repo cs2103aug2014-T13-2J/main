@@ -84,10 +84,9 @@ public class Logic {
 			return googleCalendar.syncToGoogle();
 		case EXIT:
 			if (googleCalendar.hasUnsyncedTasks()) {
-				return MESSAGE_UNSYNCED_TASKS;
-			} else {
-				System.exit(0);
+				System.out.println(MESSAGE_UNSYNCED_TASKS);
 			}
+			System.exit(0);
 		default:
 			TaskerLog.logSystemInfo("Unable to execute invalid command type.");
 			return MESSAGE_UNRECOGNIZED_COMMAND;
