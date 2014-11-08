@@ -1,27 +1,32 @@
 package main.logic;
 
+import java.util.regex.PatternSyntaxException;
+
 import main.TaskerLog;
 import main.googlecalendar.GoogleCalendar;
 
-
 public class Logic {
-	
+
 	private final static String MESSAGE_UNRECOGNIZED_COMMAND = "Unrecognized command.";
 	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
 
 	private enum CommandType {
 		ADD, DELETE, DISPLAY, UPDATE, SEARCH, UNDO, REPEAT, REMIND, SYNC, INVALID, EXIT
 	}
-	
+
 	public static String uiToLogic(String userCommand) {
-		String commandTypeString = getFirstWord(userCommand);
-		CommandType commandType = determineCommandType(commandTypeString);
-		String details = removeFirstWord(userCommand);
-		String message = executeCommand(commandType, details);
-		return message;
+		try {
+			String commandTypeString = getFirstWord(userCommand);
+			CommandType commandType = determineCommandType(commandTypeString);
+			String details = removeFirstWord(userCommand);
+			String message = executeCommand(commandType, details);
+			return message;
+		} catch (PatternSyntaxException e) {
+			return MESSAGE_UNRECOGNIZED_COMMAND;
+		}
+
 	}
-	
-	
+
 	private static CommandType determineCommandType(String commandTypeString) {
 		TaskerLog.logSystemInfo("determineCommandType received input");
 		if (commandTypeString.equalsIgnoreCase("add")) {
@@ -112,7 +117,7 @@ public class Logic {
 		String message = executor.execute();
 		return message;
 	}
-	
+
 	private static String remindTask(String details) {
 		CommandHandler executor = new RemindHandler(details);
 		String message = executor.execute();
@@ -141,9 +146,10 @@ public class Logic {
 		String firstWord = userCommand.trim().split(" ")[0];
 		return firstWord;
 	}
-	
+
 	private static String removeFirstWord(String userCommand) {
-		String withoutFirstWord = userCommand.replaceFirst(getFirstWord(userCommand), "").trim();
+		String withoutFirstWord = userCommand.replaceFirst(
+				getFirstWord(userCommand), "").trim();
 		return withoutFirstWord;
 	}
 

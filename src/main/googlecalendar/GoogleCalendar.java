@@ -202,7 +202,6 @@ public class GoogleCalendar {
 
 	public void syncDeleteTask(Task task) throws IOException {
 		if (task.hasId()) {
-			System.out.println(task.getId());
 			if (isFloatingTask(task)) {
 				syncDeleteFloatingTask(task);
 			} else {
