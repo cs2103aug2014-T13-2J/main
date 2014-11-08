@@ -22,7 +22,7 @@ public class UI {
 		AnsiConsole.systemInstall();
 		System.out.println(MESSAGE_WELCOME);
 		System.out.println(googleCalendar.logInToGoogleCalendar());
-		Storage.readFromFile();
+		readFromStorage();
 		TaskerLog.logSystemInfo("Tasker initialized.");
 	}
 
@@ -38,6 +38,11 @@ public class UI {
 			TaskerLog.logSystemInfo("User entered:" + userCommand);
 			System.out.println(Logic.uiToLogic(userCommand));
 		}*/
+	}
+	
+	private static void readFromStorage() {
+		Storage.readFromFile(Storage.DATABASE_FILENAME, Storage.getInstance().getTasks());
+		Storage.readFromFile(Storage.DELETED_TASKS_FILENAME, Storage.getInstance().getDeletedTasks());
 	}
 
 }
