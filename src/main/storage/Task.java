@@ -151,10 +151,10 @@ public class Task {
 	public void setId(String id) {
 		this.id = id;
 
-		if (id != null) {
-			this.setHasId(true);
-		} else {
+		if (id == null) {
 			this.setHasId(false);
+		} else {
+			this.setHasId(true);
 		}
 	}
 
@@ -169,10 +169,10 @@ public class Task {
 	public void setVenue(String venue) {
 		this.venue = venue;
 
-		if (venue != null) {
-			this.setHasVenue(true);
-		} else {
+		if (venue == null) {
 			this.setHasVenue(false);
+		} else {
+			this.setHasVenue(true);
 		}
 	}
 

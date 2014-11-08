@@ -202,6 +202,7 @@ public class GoogleCalendar {
 
 	public void syncDeleteTask(Task task) throws IOException {
 		if (task.hasId()) {
+			System.out.println(task.getId());
 			if (isFloatingTask(task)) {
 				syncDeleteFloatingTask(task);
 			} else {
@@ -349,11 +350,11 @@ public class GoogleCalendar {
 			for (Task task : tasks) {
 				if (!task.hasId()) {
 					taskId = syncAddTask(task);
-					if (taskId != null) {
+					if (taskId == null) {
+						message = MESSAGE_SYNC_FAIL;
+					} else {
 						task.setId(taskId);
 						message = MESSAGE_SYNC_SUCCESS;
-					} else {
-						message = MESSAGE_SYNC_FAIL;
 					}
 				} else if (task.hasBeenUpdated()) {
 					try {
@@ -373,19 +374,23 @@ public class GoogleCalendar {
 			}
 			ArrayList<Task> deletedTasks = storage.getDeletedTasks();
 			ListIterator<Task> iterator = deletedTasks.listIterator();
-			if (deletedTasks.size() > 0) {
-				while(iterator.hasNext()) {
-					Task task = iterator.next();
-					try {
+			if (!deletedTasks.isEmpty()) {
+				try {
+					while (iterator.hasNext()) {
+						Task task = iterator.next();
 						syncDeleteTask(task);
 						iterator.remove();
-					} catch (IOException e) {
-						continue;
+						message = MESSAGE_SYNC_SUCCESS;
 					}
+				} catch (IOException e) {
+					message = MESSAGE_SYNC_FAIL;
 				}
 			}
 			if (message.equals(MESSAGE_SYNC_SUCCESS)) {
+				deletedTasks.clear();
 				Storage.writeToFile(Storage.DATABASE_FILENAME, tasks);
+				Storage.writeToFile(Storage.DELETED_TASKS_FILENAME,
+						deletedTasks);
 			}
 			return message;
 		} else {
@@ -467,7 +472,7 @@ public class GoogleCalendar {
 	public boolean hasUnsyncedTasks() {
 		ArrayList<Task> tasks = storage.getTasks();
 		ArrayList<Task> deletedTasks = storage.getDeletedTasks();
-		if (deletedTasks.size() > 0) {
+		if (!deletedTasks.isEmpty()) {
 			return true;
 		}
 		for (Task task : tasks) {
