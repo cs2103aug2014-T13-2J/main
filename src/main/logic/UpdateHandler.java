@@ -148,7 +148,8 @@ public class UpdateHandler extends CommandHandler {
 		}
 	}
 
-	private static void updateStartTime(Task task, UpdateParser parser) throws IOException {
+	private static void updateStartTime(Task task, UpdateParser parser)
+			throws IOException {
 		try {
 			Integer startTimeHour = Integer.parseInt(parser.getStartTimeHour());
 			Integer startTimeMinute = Integer.parseInt(parser
@@ -158,18 +159,25 @@ public class UpdateHandler extends CommandHandler {
 					startTimeMinute);
 
 			task.setStartTime(newStartTime);
-			googleCalendar.syncUpdateTaskStartTime(task, newStartTime);
-
-			if (task.startTimeEqualsEndTime()) {
-				task.setEndTime(newStartTime);
-				googleCalendar.syncUpdateTaskEndTime(task, newStartTime);
+			try {
+				googleCalendar.syncUpdateTaskStartTime(task, newStartTime);
+			} catch (IOException e) {
+				// do nothing
+			}
+			try {
+				if (task.startTimeEqualsEndTime()) {
+					task.setEndTime(newStartTime);
+					googleCalendar.syncUpdateTaskEndTime(task, newStartTime);
+				}
+			} catch (IOException e) {
+				System.out.println(GoogleCalendar.MESSAGE_OFFLINE);
 			}
 		} catch (IllegalFieldValueException e) {
 			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
 		}
 	}
 
-	private static void updateEndTime(Task task, UpdateParser parser) throws IOException {
+	private static void updateEndTime(Task task, UpdateParser parser) {
 		try {
 			int endTimeHour = Integer.parseInt(parser.getEndTimeHour());
 			int endTimeMinute = Integer.parseInt(parser.getEndTimeMinute());
@@ -180,6 +188,8 @@ public class UpdateHandler extends CommandHandler {
 			googleCalendar.syncUpdateTaskEndTime(task, newEndTime);
 		} catch (IllegalFieldValueException e) {
 			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
+		} catch (IOException e) {
+			System.out.println(GoogleCalendar.MESSAGE_OFFLINE);
 		}
 	}
 

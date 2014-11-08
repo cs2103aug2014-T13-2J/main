@@ -44,7 +44,7 @@ public class GoogleCalendar {
 	private static String MESSAGE_LOGIN_FAIL = "Sorry, an error has occurred while logging in to Google. Please check your Internet connection.";
 	private static String MESSAGE_OFFLINE_FIRST_TIME = "You are currently offline. Please provide your Google account ID to continue: ";
 	private static String MESSAGE_OFFLINE_CONFIRM_ID = "Are you sure %s is the correct ID? [Y/N]\n";
-	private static String MESSAGE_OFFLINE = "You are currently offline and your changes will only be synchronised to Google when you are online.";
+	public static String MESSAGE_OFFLINE = "You are currently offline and your changes will only be synchronised to Google when you are online.";
 	private static String MESSAGE_SYNC_SUCCESS = "You have successfully synchronised all changes to Google.";
 	private static String MESSAGE_SYNC_FAIL = "Sorry, an error has occurred while synchronising to Google. Please check your Internet connection.";
 	private static String MESSAGE_SYNC_EMPTY = "Your Google Calendar is in sync.";
