@@ -208,7 +208,7 @@ public class GoogleCalendar {
 				syncDeleteNonFloatingTask(task);
 			}
 		} else {
-			// perform sync only when online
+			// do nothing for unsynced tasks
 		}
 	}
 
@@ -340,10 +340,40 @@ public class GoogleCalendar {
 			throw new IOException(MESSAGE_OFFLINE);
 		}
 	}
+	
+	public boolean syncDeleteAllTasks() {
+		ArrayList<Task> tasks = storage.getTasks();
+		try {
+			for (Task task : tasks) {
+				if (task.hasId()) {
+					String id = task.getId();
+					if (isFloatingTask(task)) {
+						googleTasksClient.tasks().delete("@default", id)
+								.execute();
+					} else {
+						googleCalendarClient.events().delete(googleId, id)
+								.execute();
+					}
+				}
+			}
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
+	public void syncAddPreviousTasks() {
+		ArrayList<Task> tasks = storage.getTasks();
+		for (Task task : tasks) {
+			task.setId(null);
+		}
+		syncToGoogle();
+	}
 
 	public String syncToGoogle() {
 		if (hasUnsyncedTasks()) {
 			String message = "";
+
 			ArrayList<Task> tasks = storage.getTasks();
 			String taskId;
 			for (Task task : tasks) {
@@ -371,6 +401,7 @@ public class GoogleCalendar {
 					}
 				}
 			}
+
 			ArrayList<Task> deletedTasks = storage.getDeletedTasks();
 			ListIterator<Task> iterator = deletedTasks.listIterator();
 			if (!deletedTasks.isEmpty()) {
