@@ -2038,6 +2038,12 @@ public class DisplayHandler extends CommandHandler {
 		resultBottom += DisplayHandler.displayLineSeparator();
 		System.out.print(resultBottom);
 	}
+	
+	public static void displayContents(int number, Task task){
+		String print = "";
+		print += displayTaskInTable(number,task);
+		System.out.println(print);
+	}
 
 	// this function returns -1 if the start date time of the task is before
 	// the current date time, 0 if the the start date time of the task is after
