@@ -52,8 +52,8 @@ public class TabCompletion {
 		reader.addCompletor(new SimpleCompletor(
 				new String[] { "These are the commands available:\nadd  delete  display  search sync update help exit\n" }));
 
-		completors.add(new SimpleCompletor(new String[] { "add", "search",
-				"update", "exit", "display", "help", "sync", "delete" }));
+		completors.add(new SimpleCompletor(new String[] { "add","ADD","SEARCH", "search",
+				"update", "UPDATE", "EXIT", "exit", "DISPLAY", "display", "HELP", "help", "SYNC", "DELETE", "sync", "delete" }));
 
 		reader.addCompletor(new ArgumentCompletor(completors));
 

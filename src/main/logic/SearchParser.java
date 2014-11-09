@@ -10,7 +10,7 @@ import main.logic.DisplayHandler;
 public class SearchParser extends CommandParser {
 	public static final String MESSAGE_ERROR = "No search term specified.";
 	public static final String MESSAGE_NULL = "Task list is empty. There is nothing to search from.";
-	public static final String MESSAGE_UNAVAILABLE = "Search term cannot be found in task list.";
+	public static final String MESSAGE_UNAVAILABLE = "Tasker can't find what you asked for. Perhaps try another keyword?";
 	public static final String MESSAGE_SEARCH = "List of tasks containing";
 	public static final String MESSAGE_NOT_TODAY = "There are no tasks due today.";
 	public static final String MESSAGE_TODAY = "These are the tasks due today.";
