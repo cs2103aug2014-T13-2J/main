@@ -129,6 +129,9 @@ public class Storage {
 		ArrayList<Task> deletedTasksClone = cloner
 				.deepClone(currentDeletedTasks);
 		this.getDeletedTaskHistory().push(deletedTasksClone);
+		
+		Storage.writeToFile(DATABASE_FILENAME, tasks);
+		Storage.writeToFile(DELETED_TASKS_FILENAME, deletedTasks);
 	}
 
 	public void revertTaskHistories() {
@@ -145,6 +148,9 @@ public class Storage {
 			deletedTaskHistory.pop();
 			this.setTasks(taskHistory.peek());
 			this.setDeletedTasks(deletedTaskHistory.peek());
+			
+			Storage.writeToFile(DATABASE_FILENAME, tasks);
+			Storage.writeToFile(DELETED_TASKS_FILENAME, deletedTasks);
 		}
 	}
 
@@ -300,8 +306,6 @@ public class Storage {
 
 	public void saveCurrentState() {
 		Storage.getInstance().updateTaskHistories();
-		Storage.writeToFile(DATABASE_FILENAME, tasks);
-		Storage.writeToFile(DELETED_TASKS_FILENAME, deletedTasks);
 	}
 
 }
