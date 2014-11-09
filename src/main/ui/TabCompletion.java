@@ -16,7 +16,9 @@ public class TabCompletion {
 	public static final String DISPLAY_ADD = "\033[1madd:\033[0m\n\n";
 	public static final String MESSAGE_ADD = "This is the command to add a new task to Tasker.\nYou can add tasks in a few different formats.\nTo add a new floating task, type \033[1madd\033[0m [description] \033[1mat\033[0m [venue]\n"
 			+ "To add a new timed task, type \033[1madd\033[0m [description] \033[1mat\033[0m [venue] \033[1mfrom\033[0m [start date] [start time] \033[1mto\033[0m [end date][end time]\n"
-			+ "To add a new deadline task, type \033[1madd\033[0m [description] \033[1mat\033[0m [venue] \033[1mat\033[0m [time]\n\n";
+			+ "To add a new deadline task, type \033[1madd\033[0m [description] \033[1mat\033[0m [venue] \033[1mat\033[0m [time]\n"
+			+ "For time, the acceptable formats are: \033[1m11am, 11.30pm\033[0m\n"
+			+ "For date, the acceptable formats are: \033[1m5 December, 5 December 2014, 5/12, 5/12/2014, Thursday, next Thursday\033[0m\n\n";
 	public static final String DISPLAY_DELETE = "\033[1mdelete:\033[0m\n\n";
 	public static final String MESSAGE_DELETE = "This is the command to delete task(s) from Tasker.\n"
 			+ "To delete a single task, type \033[1mdelete\033[0m [task index]\n"
@@ -33,10 +35,12 @@ public class TabCompletion {
 			+ "To search for tasks due in the future, type \033[1msearch future\033[0m\n\n";
 	public static final String DISPLAY_UPDATE = "\033[1mupdate:\033[0m\n\n";
 	public static final String MESSAGE_UPDATE = "This is the command to update and edit different aspects of the task.\n"
-			+ "To update the description,type \033[1mupdate\033[0m [task index] \033[1mdescription\033[0m [new description]\n"
+			+ "To update the description, type \033[1mupdate\033[0m [task index] \033[1mdescription\033[0m [new description]\n"
 			+ "To update the venue, type \033[1mupdate\033[0m [task index] \033[1mvenue\033[0m [new venue]\n"
 			+ "To update the start time or date, type \033[1mupdate\033[0m [task index] \033[1mstart\033[0m [new time/date]\n"
 			+ "To update the end time or date, type \033[1mupdate\033[0m [task index] \033[1mend\033[0m [new time/date]\n"
+			+ "For time, the acceptable formats are: \033[1m11am, 11.30pm\033[0m\n"
+			+ "For date, the acceptable formats are: \033[1m5 December, 5 December 2014, 5/12, 5/12/2014, Thursday, next Thursday\033[0m\n"
 			+ "Do note that for floating tasks, you are unable to update the venue, start time/date and end time/date\n\n";
 	public static final String DISPLAY_SYNC = "\033[1msync:\033[0m\n\n";
 	public static final String MESSAGE_SYNC = "This is the command to synchronise your task list with your Google Calender.\n"
