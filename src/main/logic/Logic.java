@@ -47,13 +47,13 @@ public class Logic {
 		} else if (commandTypeString.equalsIgnoreCase("undo")) {
 			TaskerLog.logSystemInfo("undo command detected");
 			return CommandType.UNDO;
-		} else if (commandTypeString.equalsIgnoreCase("repeat")) {
+		} /* else if (commandTypeString.equalsIgnoreCase("repeat")) {
 			TaskerLog.logSystemInfo("repeat command detected");
 			return CommandType.REPEAT;
 		} else if (commandTypeString.equalsIgnoreCase("remind")) {
 			TaskerLog.logSystemInfo("remind command detected");
-			return CommandType.REMIND;
-		} else if (commandTypeString.equalsIgnoreCase("sync")) {
+			return CommandType.REMIND; 
+		} */ else if (commandTypeString.equalsIgnoreCase("sync")) {
 			TaskerLog.logSystemInfo("login command detected");
 			return CommandType.SYNC;
 		} else if (commandTypeString.equalsIgnoreCase("exit")) {

@@ -56,10 +56,7 @@ public class UpdateParser extends CommandParser {
 		if (field.equals(FIELD_DESCRIPTION) || field.equals(FIELD_VENUE)
 				|| field.equals(FIELD_START_DATE)
 				|| field.equals(FIELD_START_TIME)
-				|| field.equals(FIELD_END_DATE) || field.equals(FIELD_END_TIME)
-				|| field.equals(FIELD_RECURRENCE)
-				|| field.equals(FIELD_REMINDER) || field.equals(FIELD_COMPLETE)
-				|| field.equals(FIELD_INCOMPLETE)) {
+				|| field.equals(FIELD_END_DATE) || field.equals(FIELD_END_TIME)) {
 			this.field = field;
 		} else {
 			throw new IllegalArgumentException(MESSAGE_INVALID_FIELD);
