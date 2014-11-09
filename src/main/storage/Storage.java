@@ -129,7 +129,7 @@ public class Storage {
 		ArrayList<Task> deletedTasksClone = cloner
 				.deepClone(currentDeletedTasks);
 		this.getDeletedTaskHistory().push(deletedTasksClone);
-		
+
 		Storage.writeToFile(DATABASE_FILENAME, tasks);
 		Storage.writeToFile(DELETED_TASKS_FILENAME, deletedTasks);
 	}
@@ -148,7 +148,7 @@ public class Storage {
 			deletedTaskHistory.pop();
 			this.setTasks(taskHistory.peek());
 			this.setDeletedTasks(deletedTaskHistory.peek());
-			
+
 			Storage.writeToFile(DATABASE_FILENAME, tasks);
 			Storage.writeToFile(DELETED_TASKS_FILENAME, deletedTasks);
 		}
@@ -173,9 +173,9 @@ public class Storage {
 
 			nextLine = reader.readNext();
 			while (nextLine != null) {
-				eventId = nextLine[EVENT_ID_INDEX];
+				eventId = convertToEventId(nextLine[EVENT_ID_INDEX]);
 				description = nextLine[DESCRIPTION_INDEX];
-				venue = nextLine[VENUE_INDEX];
+				venue = convertToVenue(nextLine[VENUE_INDEX]);
 				startDate = convertToDate(nextLine[START_DATE_INDEX]);
 				startTime = convertToTime(nextLine[START_TIME_INDEX]);
 				endDate = convertToDate(nextLine[END_DATE_INDEX]);
@@ -201,6 +201,22 @@ public class Storage {
 		}
 
 		return MESSAGE_READ_FROM_FILE_SUCCESS;
+	}
+
+	public static String convertToVenue(String venue) {
+		if (venue.equals("null")) {
+			return null;
+		} else {
+			return venue;
+		}
+	}
+
+	public static String convertToEventId(String eventId) {
+		if (eventId.equals("null")) {
+			return null;
+		} else {
+			return eventId;
+		}
 	}
 
 	public static LocalDate convertToDate(String date) {
