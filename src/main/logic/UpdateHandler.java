@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import main.googlecalendar.GoogleCalendar;
+import main.googlecalendar.SyncNonFloatingTasks;
 import main.storage.Storage;
 import main.storage.Task;
 
@@ -51,7 +52,7 @@ public class UpdateHandler extends CommandHandler {
 				}
 				String newVenue = parser.getVenue();
 				task.setVenue(newVenue);
-				googleCalendar.syncUpdateTaskVenue(task, newVenue);
+				SyncNonFloatingTasks.syncUpdateTaskVenue(task, newVenue);
 
 			} else if (field.equals(UpdateParser.FIELD_START_DATE)) {
 				if (isFloatingTask(task)) {
@@ -121,7 +122,7 @@ public class UpdateHandler extends CommandHandler {
 			LocalDate newStartDate = new LocalDate(startDateYear,
 					startDateMonth, startDateDay);
 			task.setStartDate(newStartDate);
-			googleCalendar.syncUpdateTaskStartDate(task, newStartDate);
+			SyncNonFloatingTasks.syncUpdateTaskStartDate(task, newStartDate);
 
 			if (task.startDateEqualsEndDate()) {
 				task.setEndDate(newStartDate);
@@ -141,7 +142,7 @@ public class UpdateHandler extends CommandHandler {
 			LocalDate newEndDate = new LocalDate(endDateYear, endDateMonth,
 					endDateDay);
 			task.setEndDate(newEndDate);
-			googleCalendar.syncUpdateTaskEndDate(task, newEndDate);
+			SyncNonFloatingTasks.syncUpdateTaskEndDate(task, newEndDate);
 
 		} catch (IllegalFieldValueException e) {
 			throw new IllegalArgumentException(MESSAGE_INVALID_DATE_VALUE);
@@ -160,17 +161,17 @@ public class UpdateHandler extends CommandHandler {
 
 			task.setStartTime(newStartTime);
 			try {
-				googleCalendar.syncUpdateTaskStartTime(task, newStartTime);
+				SyncNonFloatingTasks.syncUpdateTaskStartTime(task, newStartTime);
 			} catch (IOException e) {
 				// do nothing
 			}
 			try {
 				if (task.startTimeEqualsEndTime()) {
 					task.setEndTime(newStartTime);
-					googleCalendar.syncUpdateTaskEndTime(task, newStartTime);
+					SyncNonFloatingTasks.syncUpdateTaskEndTime(task, newStartTime);
 				}
 			} catch (IOException e) {
-				System.out.println(GoogleCalendar.MESSAGE_OFFLINE);
+				
 			}
 		} catch (IllegalFieldValueException e) {
 			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
@@ -185,11 +186,11 @@ public class UpdateHandler extends CommandHandler {
 			LocalTime newEndTime = new LocalTime(endTimeHour, endTimeMinute);
 
 			task.setEndTime(newEndTime);
-			googleCalendar.syncUpdateTaskEndTime(task, newEndTime);
+			SyncNonFloatingTasks.syncUpdateTaskEndTime(task, newEndTime);
 		} catch (IllegalFieldValueException e) {
 			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
 		} catch (IOException e) {
-			System.out.println(GoogleCalendar.MESSAGE_OFFLINE);
+			
 		}
 	}
 
