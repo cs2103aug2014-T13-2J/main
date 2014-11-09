@@ -20,7 +20,7 @@ public abstract class CommandParser {
 	protected final static String MESSAGE_INVALID_FORMAT = "Sorry we were unable to parse the information.";
 	protected final static String MESSAGE_DESCRIPTION_INVALID_QUOTATIONS = "You need to close your quotations properly for the description.";
 	protected final static String MESSAGE_VENUE_INVALID_QUOTATIONS = "You need to close your quotations properly for the venue.";
-	public static final String STRING_SPACE = " ";	
+	public static final String STRING_SPACE = " ";
 	protected final static Integer INDEX_HOUR = 0;
 	protected final static Integer INDEX_MINUTE = 1;
 	protected final static Integer INDEX_DAY = 0;
@@ -269,7 +269,7 @@ public abstract class CommandParser {
 		if (currentWord.startsWith("\"")) {
 			wordsList.poll();
 			currentWord = removeStartQuotations(currentWord);
-			if(currentWord.endsWith("\"")) {
+			if (currentWord.endsWith("\"")) {
 				currentWord = removeEndQuotations(currentWord);
 				hasEndQuotations = true;
 			}
@@ -287,7 +287,8 @@ public abstract class CommandParser {
 			}
 
 			if (hasEndQuotations == false) {
-				throw new IllegalArgumentException(MESSAGE_DESCRIPTION_INVALID_QUOTATIONS);
+				throw new IllegalArgumentException(
+						MESSAGE_DESCRIPTION_INVALID_QUOTATIONS);
 			}
 		} else {
 			while (!wordsList.isEmpty()) {
@@ -437,12 +438,15 @@ public abstract class CommandParser {
 		LinkedList<String> stack = new LinkedList<String>();
 		String currentWord, venue = "";
 		boolean hasEndQuotations = false;
-
-		currentWord = wordsList.peek();
+		if (!wordsList.isEmpty()) {
+			currentWord = wordsList.peek();
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_VENUE);
+		}
 		if (currentWord.startsWith("\"")) {
 			wordsList.poll();
 			currentWord = removeStartQuotations(currentWord);
-			if(currentWord.endsWith("\"")) {
+			if (currentWord.endsWith("\"")) {
 				currentWord = removeEndQuotations(currentWord);
 				hasEndQuotations = true;
 			}
@@ -460,7 +464,8 @@ public abstract class CommandParser {
 			}
 
 			if (hasEndQuotations == false) {
-				throw new IllegalArgumentException(MESSAGE_VENUE_INVALID_QUOTATIONS);
+				throw new IllegalArgumentException(
+						MESSAGE_VENUE_INVALID_QUOTATIONS);
 			}
 		} else {
 			while (!wordsList.isEmpty()) {
@@ -498,12 +503,12 @@ public abstract class CommandParser {
 			throws IllegalArgumentException {
 		String date = "";
 		String currentWord;
-		if(!wordsList.isEmpty()) {
+		if (!wordsList.isEmpty()) {
 			currentWord = wordsList.poll();
 		} else {
 			throw new IllegalArgumentException(MESSAGE_INVALID_DATE_FORMAT);
 		}
-		
+
 		String[] arr = currentWord.split("/");
 		// if the format is D/M/Y, where D, M, Y can be any integer, but cannot
 		// start with 0
@@ -849,7 +854,7 @@ public abstract class CommandParser {
 		// first
 		String currentWord = wordsList.poll();
 		description = description + STRING_SPACE + currentWord;
-		
+
 		while (!wordsList.isEmpty()) {
 			currentWord = wordsList.poll();
 			if (!isReservedWord(currentWord)) {

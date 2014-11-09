@@ -8,7 +8,7 @@ import main.storage.Task;
 import main.logic.DisplayHandler;
 
 public class SearchParser extends CommandParser {
-	public static final String MESSAGE_ERROR = "No search term specified.";
+	public static final String MESSAGE_ERROR = "Would you like to search \"past\", \"today\" or \"future\"?.";
 	public static final String MESSAGE_NULL = "Task list is empty. There is nothing to search from.";
 	public static final String MESSAGE_UNAVAILABLE = "Tasker can't find what you asked for. Perhaps try another keyword?";
 	public static final String MESSAGE_SEARCH = "List of tasks containing";
