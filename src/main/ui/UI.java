@@ -1,11 +1,9 @@
 package main.ui;
 
 import java.io.IOException;
-import java.util.Scanner;
 
 import main.TaskerLog;
 import main.googlecalendar.GoogleCalendar;
-import main.logic.Logic;
 import main.storage.Storage;
 
 import org.fusesource.jansi.AnsiConsole;
