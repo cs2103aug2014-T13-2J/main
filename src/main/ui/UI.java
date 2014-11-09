@@ -21,7 +21,6 @@ public class UI {
 		System.out.println(MESSAGE_WELCOME);
 		readFromStorage();
 		googleCalendar = GoogleCalendar.getInstance();
-		System.out.println(googleCalendar.syncToGoogle());
 		TaskerLog.logSystemInfo("Tasker initialized.");
 	}
 
