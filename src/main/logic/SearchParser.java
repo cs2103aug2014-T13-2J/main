@@ -137,6 +137,10 @@ public class SearchParser extends CommandParser {
 		else if (!isWithin(userInput)) {
 			return MESSAGE_UNAVAILABLE;
 		}
+		
+		else if(userInput.length() == 1){
+			return MESSAGE_UNAVAILABLE;
+		}
 
 		else {
 			lowerCaseKey = userInput.toLowerCase();
@@ -167,37 +171,31 @@ public class SearchParser extends CommandParser {
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).getDescription().toString().toLowerCase()
 					.contains(lowerCaseKey)) {
-				System.out.println(list.get(i).getDescription());
 				return true;
 			} else if (list.get(i).hasVenue()
 					&& list.get(i).getVenue().toString().toLowerCase()
 							.contains(lowerCaseKey)
 					&& !list.get(i).getVenue().contains("null")) {
-				System.out.println(list.get(i).getVenue());
 
 				return true;
 			} else if (list.get(i).hasStartDate()
 					&& list.get(i).getStartDate().toString()
 							.contains(lowerCaseKey)) {
-				System.out.println(list.get(i).getStartDate());
 
 				return true;
 			} else if (list.get(i).hasStartTime()
 					&& list.get(i).getStartTime().toString()
 							.contains(lowerCaseKey)) {
-				System.out.println(list.get(i).getStartTime());
 
 				return true;
 			} else if (list.get(i).hasEndDate()
 					&& list.get(i).getEndDate().toString()
 							.contains(lowerCaseKey)) {
-				System.out.println(list.get(i).getEndDate());
 
 				return true;
 			} else if (list.get(i).hasEndTime()
 					&& list.get(i).getEndTime().toString()
 							.contains(lowerCaseKey)) {
-				System.out.println(list.get(i).getEndTime());
 
 				return true;
 			}
