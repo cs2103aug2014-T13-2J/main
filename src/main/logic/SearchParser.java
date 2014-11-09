@@ -15,6 +15,8 @@ public class SearchParser extends CommandParser {
 	public static final String MESSAGE_NOT_TODAY = "There are no tasks due today.";
 	public static final String MESSAGE_TODAY = "These are the tasks due today.";
 	public static final String MESSAGE_PAST = "These are the tasks that were due in the past";
+	public static final String MESSAGE_FLOAT = "This is the list of floating tasks";
+	public static final String MESSAGE_NOT_FLOAT = "There are no floating tasks in the list currently.";
 	public static final String MESSAGE_NOT_PAST = "There are no past tasks in the list.";
 	public static final String MESSAGE_FUTURE = "These are the lists of upcoming tasks.";
 	public static final String MESSAGE_NOT_FUTURE = "There are no upcoming tasks from tomorrow onwards.";
@@ -89,6 +91,26 @@ public class SearchParser extends CommandParser {
 			return returnMessage;
 		}
 
+		else if (userInput.toLowerCase().equals("floating")) {
+			if (isFloating()) {
+				System.out.println();
+				System.out.println(MESSAGE_FLOAT);
+				DisplayHandler.displayTop();
+
+				for (int i = 0; i < list.size(); i++) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -2) {
+						System.out.print(DisplayHandler.displayTaskInTable(i,
+								list.get(i)));
+					}
+				}
+
+				DisplayHandler.displayBottom();
+			} else {
+				System.out.println(MESSAGE_NOT_FLOAT);
+			}
+			return returnMessage;
+		}
+
 		else if (userInput.toLowerCase().equals("future")) {
 			if (isFuture()) {
 
@@ -114,8 +136,6 @@ public class SearchParser extends CommandParser {
 
 		else if (!isWithin(userInput)) {
 			return MESSAGE_UNAVAILABLE;
-		} else if (userInput.length() == 1) {
-			return MESSAGE_LONGER;
 		}
 
 		else {
@@ -147,26 +167,38 @@ public class SearchParser extends CommandParser {
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).getDescription().toString().toLowerCase()
 					.contains(lowerCaseKey)) {
+				System.out.println(list.get(i).getDescription());
 				return true;
 			} else if (list.get(i).hasVenue()
 					&& list.get(i).getVenue().toString().toLowerCase()
-					.contains(lowerCaseKey)) {
+							.contains(lowerCaseKey)
+					&& !list.get(i).getVenue().contains("null")) {
+				System.out.println(list.get(i).getVenue());
+
 				return true;
 			} else if (list.get(i).hasStartDate()
 					&& list.get(i).getStartDate().toString()
 							.contains(lowerCaseKey)) {
+				System.out.println(list.get(i).getStartDate());
+
 				return true;
 			} else if (list.get(i).hasStartTime()
 					&& list.get(i).getStartTime().toString()
 							.contains(lowerCaseKey)) {
+				System.out.println(list.get(i).getStartTime());
+
 				return true;
 			} else if (list.get(i).hasEndDate()
 					&& list.get(i).getEndDate().toString()
 							.contains(lowerCaseKey)) {
+				System.out.println(list.get(i).getEndDate());
+
 				return true;
 			} else if (list.get(i).hasEndTime()
 					&& list.get(i).getEndTime().toString()
 							.contains(lowerCaseKey)) {
+				System.out.println(list.get(i).getEndTime());
+
 				return true;
 			}
 		}
@@ -195,6 +227,15 @@ public class SearchParser extends CommandParser {
 	private boolean isFuture() {
 		for (int i = 0; i < list.size(); i++) {
 			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 1) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isFloating() {
+		for (int i = 0; i < list.size(); i++) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -2) {
 				return true;
 			}
 		}
