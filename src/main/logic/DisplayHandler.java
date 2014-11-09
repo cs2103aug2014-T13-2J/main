@@ -116,18 +116,18 @@ public class DisplayHandler extends CommandHandler {
 		if (task.hasVenue()) {
 			taskVenue = task.getVenue();
 
-			if (taskVenue.length() >= 12 && taskVenue.length() < 24) {
-				taskVenueExtraOne = taskVenue.substring(12);
-				taskVenue = taskVenue.substring(0, 12);
-			} else if (taskVenue.length() >= 24 && taskVenue.length() < 36) {
-				taskVenueExtraTwo = taskVenue.substring(24);
-				taskVenueExtraOne = taskVenue.substring(12, 24);
-				taskVenue = taskVenue.substring(0, 12);
-			} else if (taskVenue.length() >= 36) {
-				taskVenueExtra = taskVenue.substring(36);
-				taskVenueExtraTwo = taskVenue.substring(24, 36);
-				taskVenueExtraOne = taskVenue.substring(12, 24);
-				taskVenue = taskVenue.substring(0, 12);
+			if (taskVenue.length() >= 17 && taskVenue.length() < 34) {
+				taskVenueExtraOne = taskVenue.substring(17);
+				taskVenue = taskVenue.substring(0, 17);
+			} else if (taskVenue.length() >= 34 && taskVenue.length() < 51) {
+				taskVenueExtraTwo = taskVenue.substring(34);
+				taskVenueExtraOne = taskVenue.substring(17, 34);
+				taskVenue = taskVenue.substring(0, 17);
+			} else if (taskVenue.length() >= 51) {
+				taskVenueExtra = taskVenue.substring(51);
+				taskVenueExtraTwo = taskVenue.substring(34, 51);
+				taskVenueExtraOne = taskVenue.substring(17, 34);
+				taskVenue = taskVenue.substring(0, 17);
 			}
 		}
 
@@ -171,7 +171,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(YELLOW).a(startTaskTime).reset(), "|", ansi()
 								.fg(YELLOW).a(startTaskDate).reset());
 				result += "\n";
-				
+
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(YELLOW).a(nullSpace).reset(), " |",
 						ansi().fg(YELLOW).a(taskDescriptionExtraOne).reset(),
@@ -238,7 +238,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(CYAN).a(endTaskDate).reset());
 				result += "\n";
 
-			}	
+			}
 
 			else if (status == 1) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
@@ -434,14 +434,14 @@ public class DisplayHandler extends CommandHandler {
 		if (!taskDescriptionExtra.isEmpty() || !taskVenueExtra.isEmpty()) {
 			double descriptionLines = Math
 					.ceil(taskDescriptionExtra.length() / 25.0);
-			double venueLines = Math.ceil(taskVenueExtra.length() / 12.0);
+			double venueLines = Math.ceil(taskVenueExtra.length() / 17.0);
 
 			if (venueLines == descriptionLines) {
 				for (int i = 0; i < venueLines - 1; i++) {
-					String displayVenue = taskVenueExtra.substring(0, 12);
+					String displayVenue = taskVenueExtra.substring(0, 17);
 					String displayDescription = taskDescriptionExtra.substring(
 							0, 25);
-					taskVenueExtra = taskVenueExtra.substring(12);
+					taskVenueExtra = taskVenueExtra.substring(17);
 					taskDescriptionExtra = taskDescriptionExtra.substring(25);
 
 					if (number < 9) {
@@ -449,11 +449,11 @@ public class DisplayHandler extends CommandHandler {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(YELLOW).a(nullSpace).reset(),
-									" |", ansi().fg(YELLOW)
-											.a(displayDescription).reset(),
-									"|", ansi().fg(YELLOW).a(displayVenue)
-											.reset(), "|", "           |", "",
-									"");
+									" |",
+									ansi().fg(YELLOW).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(YELLOW).a(displayVenue).reset(),
+									"|", "           |", "", "");
 						} else if (status == 0) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -473,11 +473,12 @@ public class DisplayHandler extends CommandHandler {
 						} else if (status == 1) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(GREEN).a(nullSpace).reset(), " |",
-									ansi().fg(GREEN).a(displayDescription)
-											.reset(), "|",
-									ansi().fg(GREEN).a(displayVenue).reset(),
-									"|", "           |", "", "");
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |", ansi().fg(GREEN)
+											.a(displayDescription).reset(),
+									"|", ansi().fg(GREEN).a(displayVenue)
+											.reset(), "|", "           |", "",
+									"");
 						} else {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -534,229 +535,55 @@ public class DisplayHandler extends CommandHandler {
 						}
 					}
 				}
-				if(number<9){
+				if (number < 9) {
 					if (completed) {
-						result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+						result += String.format(
+								DISPLAY_TABLE_ROW_STRING_FORMAT,
 								ansi().fg(YELLOW).a(nullSpace).reset(), " |",
-								ansi().fg(YELLOW).a(taskDescriptionExtra).reset(),
-								"|", ansi().fg(YELLOW).a(taskVenueExtra).reset(),
+								ansi().fg(YELLOW).a(taskDescriptionExtra)
+										.reset(), "|",
+								ansi().fg(YELLOW).a(taskVenueExtra).reset(),
 								"|", "           |", "", "");
 						result += displayLineSeparator();
 
 					} else if (status == 0) {
-						result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(RED).a(nullSpace).reset(), " |", ansi()
-										.fg(RED).a(taskDescriptionExtra).reset(),
-								"|", ansi().fg(RED).a(taskVenueExtra).reset(), "|",
-								"           |", "", "");
-						result += displayLineSeparator();
-					} else if (status == -1) {
-						result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(CYAN).a(nullSpace).reset(), " |", ansi()
-										.fg(CYAN).a(taskDescriptionExtra).reset(),
-								"|", ansi().fg(CYAN).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-						result += displayLineSeparator();
-					} else if (status == 1) {
-						result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(GREEN).a(nullSpace).reset(), " |", ansi()
-										.fg(GREEN).a(taskDescriptionExtra).reset(),
-								"|", ansi().fg(GREEN).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-						result += displayLineSeparator();
-					} else {
-						result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(MAGENTA).a(nullSpace).reset(), " |",
-								ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),
-								"|", ansi().fg(MAGENTA).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-						result += displayLineSeparator();
-
-					}
-				}
-				else{
-				if (completed) {
-					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-							ansi().fg(YELLOW).a(nullSpace).reset(), "|",
-							ansi().fg(YELLOW).a(taskDescriptionExtra).reset(),
-							"|", ansi().fg(YELLOW).a(taskVenueExtra).reset(),
-							"|", "           |", "", "");
-					result += displayLineSeparator();
-
-				} else if (status == 0) {
-					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-							ansi().fg(RED).a(nullSpace).reset(), "|", ansi()
-									.fg(RED).a(taskDescriptionExtra).reset(),
-							"|", ansi().fg(RED).a(taskVenueExtra).reset(), "|",
-							"           |", "", "");
-					result += displayLineSeparator();
-				} else if (status == -1) {
-					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-							ansi().fg(CYAN).a(nullSpace).reset(), "|", ansi()
-									.fg(CYAN).a(taskDescriptionExtra).reset(),
-							"|", ansi().fg(CYAN).a(taskVenueExtra).reset(),
-							"|", "           |", "", "");
-					result += displayLineSeparator();
-				} else if (status == 1) {
-					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-							ansi().fg(GREEN).a(nullSpace).reset(), "|", ansi()
-									.fg(GREEN).a(taskDescriptionExtra).reset(),
-							"|", ansi().fg(GREEN).a(taskVenueExtra).reset(),
-							"|", "           |", "", "");
-					result += displayLineSeparator();
-				} else {
-					result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-							ansi().fg(MAGENTA).a(nullSpace).reset(), "|",
-							ansi().fg(MAGENTA).a(taskDescriptionExtra).reset(),
-							"|", ansi().fg(MAGENTA).a(taskVenueExtra).reset(),
-							"|", "           |", "", "");
-					result += displayLineSeparator();
-
-				}
-				}
-			}
-
-			else if (venueLines > descriptionLines) {
-
-				for (int i = 0; i < descriptionLines - 1; i++) {
-					String displayVenue = taskVenueExtra.substring(0, 12);
-					String displayDescription = taskDescriptionExtra.substring(
-							0, 25);
-					
-					
-					if(number<9){
-						if (completed) {
-							result += String
-									.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-											.fg(YELLOW).a(nullSpace).reset(), " |",
-											ansi().fg(YELLOW).a(displayDescription)
-													.reset(), "|", ansi()
-													.fg(YELLOW).a(displayVenue)
-													.reset(), "|", "           |",
-											"", "");
-						}
-
-						else if (status == 0) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-											.a(nullSpace).reset(), " |",
-									ansi().fg(RED).a(displayDescription).reset(),
-									"|", ansi().fg(RED).a(displayVenue).reset(),
-									"|", "           |", "", "");
-						} else if (status == -1) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-											.fg(CYAN).a(nullSpace).reset(), " |",
-									ansi().fg(CYAN).a(displayDescription).reset(),
-									"|", ansi().fg(CYAN).a(displayVenue).reset(),
-									"|", "           |", "", "");
-						} else if (status == 1) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(GREEN).a(nullSpace).reset(), " |",
-									ansi().fg(GREEN).a(displayDescription).reset(),
-									"|", ansi().fg(GREEN).a(displayVenue).reset(),
-									"|", "           |", "", "");
-						} else {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(MAGENTA).a(nullSpace).reset(), " |",
-									ansi().fg(MAGENTA).a(displayDescription)
-											.reset(), "|",
-									ansi().fg(MAGENTA).a(displayVenue).reset(),
-									"|", "           |", "", "");
-						}
-					}
-					else{
-					if (completed) {
-						result += String
-								.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-										.fg(YELLOW).a(nullSpace).reset(), "|",
-										ansi().fg(YELLOW).a(displayDescription)
-												.reset(), "|", ansi()
-												.fg(YELLOW).a(displayVenue)
-												.reset(), "|", "           |",
-										"", "");
-					}
-
-					else if (status == 0) {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-										.a(nullSpace).reset(), "|",
-								ansi().fg(RED).a(displayDescription).reset(),
-								"|", ansi().fg(RED).a(displayVenue).reset(),
+										.a(nullSpace).reset(), " |",
+								ansi().fg(RED).a(taskDescriptionExtra).reset(),
+								"|", ansi().fg(RED).a(taskVenueExtra).reset(),
 								"|", "           |", "", "");
+						result += displayLineSeparator();
 					} else if (status == -1) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-										.fg(CYAN).a(nullSpace).reset(), "|",
-								ansi().fg(CYAN).a(displayDescription).reset(),
-								"|", ansi().fg(CYAN).a(displayVenue).reset(),
-								"|", "           |", "", "");
+						result += String
+								.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+										.fg(CYAN).a(nullSpace).reset(), " |",
+										ansi().fg(CYAN).a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(CYAN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+						result += displayLineSeparator();
 					} else if (status == 1) {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(GREEN).a(nullSpace).reset(), "|",
-								ansi().fg(GREEN).a(displayDescription).reset(),
-								"|", ansi().fg(GREEN).a(displayVenue).reset(),
+								ansi().fg(GREEN).a(nullSpace).reset(), " |",
+								ansi().fg(GREEN).a(taskDescriptionExtra)
+										.reset(), "|",
+								ansi().fg(GREEN).a(taskVenueExtra).reset(),
 								"|", "           |", "", "");
+						result += displayLineSeparator();
 					} else {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(MAGENTA).a(nullSpace).reset(), "|",
-								ansi().fg(MAGENTA).a(displayDescription)
+								ansi().fg(MAGENTA).a(nullSpace).reset(), " |",
+								ansi().fg(MAGENTA).a(taskDescriptionExtra)
 										.reset(), "|",
-								ansi().fg(MAGENTA).a(displayVenue).reset(),
+								ansi().fg(MAGENTA).a(taskVenueExtra).reset(),
 								"|", "           |", "", "");
+						result += displayLineSeparator();
+
 					}
-					}
-					taskVenueExtra = taskVenueExtra.substring(12);
-					taskDescriptionExtra = taskDescriptionExtra.substring(25);
-				}
-				if (venueLines - descriptionLines - 1 == 0) {
-					if(number<9){
-						if (completed) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(YELLOW).a(nullSpace).reset(), " |",
-									ansi().fg(YELLOW).a(taskDescriptionExtra)
-											.reset(), "|",
-									ansi().fg(YELLOW).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
-						} else if (status == 0) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-											.a(nullSpace).reset(), " |",
-									ansi().fg(RED).a(taskDescriptionExtra).reset(),
-									"|", ansi().fg(RED).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
-						} else if (status == -1) {
-							result += String
-									.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-											.fg(CYAN).a(nullSpace).reset(), " |",
-											ansi().fg(CYAN).a(taskDescriptionExtra)
-													.reset(), "|", ansi().fg(CYAN)
-													.a(taskVenueExtra).reset(),
-											"|", "           |", "", "");
-						} else if (status == 1) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(GREEN).a(nullSpace).reset(), " |",
-									ansi().fg(GREEN).a(taskDescriptionExtra)
-											.reset(), "|",
-									ansi().fg(GREEN).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
-						} else {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(MAGENTA).a(nullSpace).reset(), " |",
-									ansi().fg(MAGENTA).a(taskDescriptionExtra)
-											.reset(), "|",
-									ansi().fg(MAGENTA).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
-						}
-					}
-					else{
+				} else {
 					if (completed) {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -765,6 +592,8 @@ public class DisplayHandler extends CommandHandler {
 										.reset(), "|",
 								ansi().fg(YELLOW).a(taskVenueExtra).reset(),
 								"|", "           |", "", "");
+						result += displayLineSeparator();
+
 					} else if (status == 0) {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
@@ -772,6 +601,7 @@ public class DisplayHandler extends CommandHandler {
 								ansi().fg(RED).a(taskDescriptionExtra).reset(),
 								"|", ansi().fg(RED).a(taskVenueExtra).reset(),
 								"|", "           |", "", "");
+						result += displayLineSeparator();
 					} else if (status == -1) {
 						result += String
 								.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
@@ -780,6 +610,7 @@ public class DisplayHandler extends CommandHandler {
 												.reset(), "|", ansi().fg(CYAN)
 												.a(taskVenueExtra).reset(),
 										"|", "           |", "", "");
+						result += displayLineSeparator();
 					} else if (status == 1) {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -788,6 +619,7 @@ public class DisplayHandler extends CommandHandler {
 										.reset(), "|",
 								ansi().fg(GREEN).a(taskVenueExtra).reset(),
 								"|", "           |", "", "");
+						result += displayLineSeparator();
 					} else {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -796,717 +628,166 @@ public class DisplayHandler extends CommandHandler {
 										.reset(), "|",
 								ansi().fg(MAGENTA).a(taskVenueExtra).reset(),
 								"|", "           |", "", "");
-					}
-					}
-					result += displayLineSeparator();
+						result += displayLineSeparator();
 
-				} else {
-					if(number<9){
+					}
+				}
+			}
+
+			else if (venueLines > descriptionLines) {
+
+				for (int i = 0; i < descriptionLines - 1; i++) {
+					String displayVenue = taskVenueExtra.substring(0, 17);
+					String displayDescription = taskDescriptionExtra.substring(
+							0, 25);
+
+					if (number < 9) {
 						if (completed) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(YELLOW).a(nullSpace).reset(),
 									" |",
-									ansi().fg(YELLOW).a(taskDescriptionExtra)
-											.reset(),
+									ansi().fg(YELLOW).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(YELLOW).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						}
+
+						else if (status == 0) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), " |",
+									ansi().fg(RED).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(RED).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == -1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), " |",
+									ansi().fg(CYAN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(CYAN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == 1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |", ansi().fg(GREEN)
+											.a(displayDescription).reset(),
+									"|", ansi().fg(GREEN).a(displayVenue)
+											.reset(), "|", "           |", "",
+									"");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
+									ansi().fg(MAGENTA).a(displayDescription)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(displayVenue).reset(), "|",
+									"           |", "", "");
+						}
+					} else {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									"|", ansi().fg(YELLOW)
+											.a(displayDescription).reset(),
+									"|", ansi().fg(YELLOW).a(displayVenue)
+											.reset(), "|", "           |", "",
+									"");
+						}
+
+						else if (status == 0) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), "|",
+									ansi().fg(RED).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(RED).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == -1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), "|",
+									ansi().fg(CYAN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(CYAN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == 1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(), "|",
+									ansi().fg(GREEN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(GREEN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
 									"|",
-									ansi().fg(YELLOW)
-											.a(taskVenueExtra.substring(0, 12))
-											.reset(), "|", "           |", "", "");
+									ansi().fg(MAGENTA).a(displayDescription)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(displayVenue).reset(), "|",
+									"           |", "", "");
+						}
+					}
+					taskVenueExtra = taskVenueExtra.substring(17);
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+				}
+				if (venueLines - descriptionLines - 1 == 0) {
+					if (number < 9) {
+						if (completed) {
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(YELLOW)
+													.a(taskDescriptionExtra)
+													.reset(), "|",
+											ansi().fg(YELLOW).a(taskVenueExtra)
+													.reset(), "|",
+											"           |", "", "");
 						} else if (status == 0) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(RED).a(nullSpace).reset(),
-									" |",
-									ansi().fg(RED).a(taskDescriptionExtra).reset(),
-									"|",
-									ansi().fg(RED)
-											.a(taskVenueExtra.substring(0, 12))
-											.reset(), "|", "           |", "", "");
+									ansi().fg(RED).a(nullSpace).reset(), " |",
+									ansi().fg(RED).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(RED).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
 						} else if (status == -1) {
-							result += String
-									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-											ansi().fg(CYAN).a(nullSpace).reset(),
-											" |",
-											ansi().fg(CYAN).a(taskDescriptionExtra)
-													.reset(),
-											"|",
-											ansi().fg(CYAN)
-													.a(taskVenueExtra.substring(0,
-															12)).reset(), "|",
-											"           |", "", "");
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), " |",
+									ansi().fg(CYAN).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(CYAN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
 						} else if (status == 1) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
 									" |",
 									ansi().fg(GREEN).a(taskDescriptionExtra)
-											.reset(),
-									"|",
-									ansi().fg(GREEN)
-											.a(taskVenueExtra.substring(0, 12))
-											.reset(), "|", "           |", "", "");
+											.reset(), "|",
+									ansi().fg(GREEN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
 						} else {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(MAGENTA).a(nullSpace).reset(),
 									" |",
 									ansi().fg(MAGENTA).a(taskDescriptionExtra)
-											.reset(),
-									"|",
-									ansi().fg(MAGENTA)
-											.a(taskVenueExtra.substring(0, 12))
-											.reset(), "|", "           |", "", "");
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(taskVenueExtra).reset(), "|",
+									"           |", "", "");
 						}
-					}
-					else{
-					if (completed) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(YELLOW).a(nullSpace).reset(),
-								"|",
-								ansi().fg(YELLOW).a(taskDescriptionExtra)
-										.reset(),
-								"|",
-								ansi().fg(YELLOW)
-										.a(taskVenueExtra.substring(0, 12))
-										.reset(), "|", "           |", "", "");
-					} else if (status == 0) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(RED).a(nullSpace).reset(),
-								"|",
-								ansi().fg(RED).a(taskDescriptionExtra).reset(),
-								"|",
-								ansi().fg(RED)
-										.a(taskVenueExtra.substring(0, 12))
-										.reset(), "|", "           |", "", "");
-					} else if (status == -1) {
-						result += String
-								.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(CYAN).a(nullSpace).reset(),
-										"|",
-										ansi().fg(CYAN).a(taskDescriptionExtra)
-												.reset(),
-										"|",
-										ansi().fg(CYAN)
-												.a(taskVenueExtra.substring(0,
-														12)).reset(), "|",
-										"           |", "", "");
-					} else if (status == 1) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(GREEN).a(nullSpace).reset(),
-								"|",
-								ansi().fg(GREEN).a(taskDescriptionExtra)
-										.reset(),
-								"|",
-								ansi().fg(GREEN)
-										.a(taskVenueExtra.substring(0, 12))
-										.reset(), "|", "           |", "", "");
 					} else {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(MAGENTA).a(nullSpace).reset(),
-								"|",
-								ansi().fg(MAGENTA).a(taskDescriptionExtra)
-										.reset(),
-								"|",
-								ansi().fg(MAGENTA)
-										.a(taskVenueExtra.substring(0, 12))
-										.reset(), "|", "           |", "", "");
-					}
-					}
-					
-					
-					taskVenueExtra = taskVenueExtra.substring(12);
-
-					for (int i = 0; i < venueLines - descriptionLines - 1; i++) {
-						if (taskVenueExtra.length() > 12) {
-							
-							if(number<9){
-								if (completed) {
-									result += String.format(
-											DISPLAY_TABLE_ROW_STRING_FORMAT,
-											ansi().fg(YELLOW).a(nullSpace).reset(),
-											" |",
-											ansi().fg(YELLOW).a("").reset(),
-											"|",
-											ansi().fg(YELLOW)
-													.a(taskVenueExtra.substring(0,
-															12)).reset(), "|",
-											"           |", "", "");
-								} else if (status == 0) {
-									result += String.format(
-											DISPLAY_TABLE_ROW_STRING_FORMAT,
-											ansi().fg(RED).a(nullSpace).reset(),
-											" |",
-											ansi().fg(RED).a("").reset(),
-											"|",
-											ansi().fg(RED)
-													.a(taskVenueExtra.substring(0,
-															12)).reset(), "|",
-											"           |", "", "");
-								} else if (status == -1) {
-									result += String.format(
-											DISPLAY_TABLE_ROW_STRING_FORMAT,
-											ansi().fg(CYAN).a(nullSpace).reset(),
-											" |",
-											ansi().fg(CYAN).a("").reset(),
-											"|",
-											ansi().fg(CYAN)
-													.a(taskVenueExtra.substring(0,
-															12)).reset(), "|",
-											"           |", "", "");
-								} else if (status == 1) {
-									result += String.format(
-											DISPLAY_TABLE_ROW_STRING_FORMAT,
-											ansi().fg(GREEN).a(nullSpace).reset(),
-											" |",
-											ansi().fg(GREEN).a("").reset(),
-											"|",
-											ansi().fg(GREEN)
-													.a(taskVenueExtra.substring(0,
-															12)).reset(), "|",
-											"           |", "", "");
-								} else {
-									result += String
-											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-													ansi().fg(MAGENTA).a(nullSpace)
-															.reset(),
-													" |",
-													ansi().fg(MAGENTA).a("")
-															.reset(),
-													"|",
-													ansi().fg(MAGENTA)
-															.a(taskVenueExtra
-																	.substring(0,
-																			12))
-															.reset(), "|",
-													"           |", "", "");
-								}
-							}
-							else{
-							if (completed) {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(YELLOW).a(nullSpace).reset(),
-										"|",
-										ansi().fg(YELLOW).a("").reset(),
-										"|",
-										ansi().fg(YELLOW)
-												.a(taskVenueExtra.substring(0,
-														12)).reset(), "|",
-										"           |", "", "");
-							} else if (status == 0) {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(RED).a(nullSpace).reset(),
-										"|",
-										ansi().fg(RED).a("").reset(),
-										"|",
-										ansi().fg(RED)
-												.a(taskVenueExtra.substring(0,
-														12)).reset(), "|",
-										"           |", "", "");
-							} else if (status == -1) {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(CYAN).a(nullSpace).reset(),
-										"|",
-										ansi().fg(CYAN).a("").reset(),
-										"|",
-										ansi().fg(CYAN)
-												.a(taskVenueExtra.substring(0,
-														12)).reset(), "|",
-										"           |", "", "");
-							} else if (status == 1) {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(GREEN).a(nullSpace).reset(),
-										"|",
-										ansi().fg(GREEN).a("").reset(),
-										"|",
-										ansi().fg(GREEN)
-												.a(taskVenueExtra.substring(0,
-														12)).reset(), "|",
-										"           |", "", "");
-							} else {
-								result += String
-										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-												ansi().fg(MAGENTA).a(nullSpace)
-														.reset(),
-												"|",
-												ansi().fg(MAGENTA).a("")
-														.reset(),
-												"|",
-												ansi().fg(MAGENTA)
-														.a(taskVenueExtra
-																.substring(0,
-																		12))
-														.reset(), "|",
-												"           |", "", "");
-							}
-							}
-							taskVenueExtra = taskVenueExtra.substring(12);
-						}
-
-					}
-					
-					if(number<9){
-						if (completed) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(YELLOW).a(nullSpace).reset(), " |",
-									ansi().fg(YELLOW).a("").reset(), "|", ansi()
-											.fg(YELLOW).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
-						}
-
-						else if (status == 0) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-											.a(nullSpace).reset(), " |",
-									ansi().fg(RED).a("").reset(), "|",
-									ansi().fg(RED).a(taskVenueExtra).reset(), "|",
-									"           |", "", "");
-						} else if (status == -1) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-											.fg(CYAN).a(nullSpace).reset(), " |",
-									ansi().fg(CYAN).a("").reset(), "|",
-									ansi().fg(CYAN).a(taskVenueExtra).reset(), "|",
-									"           |", "", "");
-						} else if (status == 1) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(GREEN).a(nullSpace).reset(), " |",
-									ansi().fg(GREEN).a("").reset(), "|",
-									ansi().fg(GREEN).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
-						} else {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(MAGENTA).a(nullSpace).reset(), " |",
-									ansi().fg(MAGENTA).a("").reset(), "|", ansi()
-											.fg(MAGENTA).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
-						}
-					}
-					else{
-					if (completed) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(YELLOW).a(nullSpace).reset(), "|",
-								ansi().fg(YELLOW).a("").reset(), "|", ansi()
-										.fg(YELLOW).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-					}
-
-					else if (status == 0) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-										.a(nullSpace).reset(), "|",
-								ansi().fg(RED).a("").reset(), "|",
-								ansi().fg(RED).a(taskVenueExtra).reset(), "|",
-								"           |", "", "");
-					} else if (status == -1) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-										.fg(CYAN).a(nullSpace).reset(), "|",
-								ansi().fg(CYAN).a("").reset(), "|",
-								ansi().fg(CYAN).a(taskVenueExtra).reset(), "|",
-								"           |", "", "");
-					} else if (status == 1) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(GREEN).a(nullSpace).reset(), "|",
-								ansi().fg(GREEN).a("").reset(), "|",
-								ansi().fg(GREEN).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-					} else {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(MAGENTA).a(nullSpace).reset(), "|",
-								ansi().fg(MAGENTA).a("").reset(), "|", ansi()
-										.fg(MAGENTA).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-					}
-					}
-
-					result += displayLineSeparator();
-				}
-
-			}
-
-			else if (descriptionLines > venueLines) {
-				for (int i = 0; i < venueLines - 1; i++) {
-					String displayVenue = taskVenueExtra.substring(0, 12);
-					String displayDescription = taskDescriptionExtra.substring(
-							0, 25);
-					
-					if(number<9){
-						if (completed) {
-							result += String
-									.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-											.fg(YELLOW).a(nullSpace).reset(), " |",
-											ansi().fg(YELLOW).a(displayDescription)
-													.reset(), "|", ansi()
-													.fg(YELLOW).a(displayVenue)
-													.reset(), "|", "           |",
-											"", "");
-						} else if (status == 0) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-											.a(nullSpace).reset(), " |",
-									ansi().fg(RED).a(displayDescription).reset(),
-									"|", ansi().fg(RED).a(displayVenue).reset(),
-									"|", "           |", "", "");
-						} else if (status == -1) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-											.fg(CYAN).a(nullSpace).reset(), " |",
-									ansi().fg(CYAN).a(displayDescription).reset(),
-									"|", ansi().fg(CYAN).a(displayVenue).reset(),
-									"|", "           |", "", "");
-						} else if (status == 1) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(GREEN).a(nullSpace).reset(), " |",
-									ansi().fg(GREEN).a(displayDescription).reset(),
-									"|", ansi().fg(GREEN).a(displayVenue).reset(),
-									"|", "           |", "", "");
-						} else {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(MAGENTA).a(nullSpace).reset(), " |",
-									ansi().fg(MAGENTA).a(displayDescription)
-											.reset(), "|",
-									ansi().fg(MAGENTA).a(displayVenue).reset(),
-									"|", "           |", "", "");
-						}
-
-					}
-					else{
-					if (completed) {
-						result += String
-								.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-										.fg(YELLOW).a(nullSpace).reset(), "|",
-										ansi().fg(YELLOW).a(displayDescription)
-												.reset(), "|", ansi()
-												.fg(YELLOW).a(displayVenue)
-												.reset(), "|", "           |",
-										"", "");
-					} else if (status == 0) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-										.a(nullSpace).reset(), "|",
-								ansi().fg(RED).a(displayDescription).reset(),
-								"|", ansi().fg(RED).a(displayVenue).reset(),
-								"|", "           |", "", "");
-					} else if (status == -1) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-										.fg(CYAN).a(nullSpace).reset(), "|",
-								ansi().fg(CYAN).a(displayDescription).reset(),
-								"|", ansi().fg(CYAN).a(displayVenue).reset(),
-								"|", "           |", "", "");
-					} else if (status == 1) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(GREEN).a(nullSpace).reset(), "|",
-								ansi().fg(GREEN).a(displayDescription).reset(),
-								"|", ansi().fg(GREEN).a(displayVenue).reset(),
-								"|", "           |", "", "");
-					} else {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(MAGENTA).a(nullSpace).reset(), "|",
-								ansi().fg(MAGENTA).a(displayDescription)
-										.reset(), "|",
-								ansi().fg(MAGENTA).a(displayVenue).reset(),
-								"|", "           |", "", "");
-					}
-					}
-					taskVenueExtra = taskVenueExtra.substring(12);
-					taskDescriptionExtra = taskDescriptionExtra.substring(25);
-				}
-
-				if (descriptionLines - venueLines - 1 == 0) {
-					if (taskDescriptionExtra.length() > 25) {
-						if(number<9){
-							if (completed) {
-								result += String
-										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-												ansi().fg(YELLOW).a(nullSpace)
-														.reset(),
-												" |",
-												ansi().fg(YELLOW)
-														.a(taskDescriptionExtra
-																.substring(0, 25))
-														.reset(), "|",
-												ansi().fg(YELLOW).a(taskVenueExtra)
-														.reset(), "|",
-												"           |", "", "");
-
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(YELLOW).a(nullSpace).reset(),
-										" |",
-										ansi().fg(YELLOW)
-												.a(taskDescriptionExtra
-														.substring(25)).reset(),
-										"|", ansi().fg(YELLOW).a("").reset(), "|",
-										"           |", "", "");
-							} else if (status == 0) {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(RED).a(nullSpace).reset(),
-										" |",
-										ansi().fg(RED)
-												.a(taskDescriptionExtra.substring(
-														0, 25)).reset(), "|",
-										ansi().fg(RED).a(taskVenueExtra).reset(),
-										"|", "           |", "", "");
-
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(RED).a(nullSpace).reset(),
-										" |",
-										ansi().fg(RED)
-												.a(taskDescriptionExtra
-														.substring(25)).reset(),
-										"|", ansi().fg(RED).a("").reset(), "|",
-										"           |", "", "");
-							} else if (status == -1) {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(CYAN).a(nullSpace).reset(),
-										" |",
-										ansi().fg(CYAN)
-												.a(taskDescriptionExtra.substring(
-														0, 25)).reset(), "|",
-										ansi().fg(CYAN).a(taskVenueExtra).reset(),
-										"|", "           |", "", "");
-
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(CYAN).a(nullSpace).reset(),
-										" |",
-										ansi().fg(CYAN)
-												.a(taskDescriptionExtra
-														.substring(25)).reset(),
-										"|", ansi().fg(CYAN).a("").reset(), "|",
-										"           |", "", "");
-							} else if (status == 1) {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(GREEN).a(nullSpace).reset(),
-										" |",
-										ansi().fg(GREEN)
-												.a(taskDescriptionExtra.substring(
-														0, 25)).reset(), "|",
-										ansi().fg(GREEN).a(taskVenueExtra).reset(),
-										"|", "           |", "", "");
-
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(GREEN).a(nullSpace).reset(),
-										" |",
-										ansi().fg(GREEN)
-												.a(taskDescriptionExtra
-														.substring(25)).reset(),
-										"|", ansi().fg(GREEN).a("").reset(), "|",
-										"           |", "", "");
-							}
-
-							else {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(MAGENTA).a(nullSpace).reset(),
-										" |",
-										ansi().fg(MAGENTA)
-												.a(taskDescriptionExtra.substring(
-														0, 25)).reset(), "|",
-										ansi().fg(MAGENTA).a(taskVenueExtra)
-												.reset(), "|", "           |", "",
-										"");
-
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(MAGENTA).a(nullSpace).reset(),
-										" |",
-										ansi().fg(MAGENTA)
-												.a(taskDescriptionExtra
-														.substring(25)).reset(),
-										"|", ansi().fg(MAGENTA).a("").reset(), "|",
-										"           |", "", "");
-							}
-
-						}
-						else{
-						if (completed) {
-							result += String
-									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-											ansi().fg(YELLOW).a(nullSpace)
-													.reset(),
-											"|",
-											ansi().fg(YELLOW)
-													.a(taskDescriptionExtra
-															.substring(0, 25))
-													.reset(), "|",
-											ansi().fg(YELLOW).a(taskVenueExtra)
-													.reset(), "|",
-											"           |", "", "");
-
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(YELLOW).a(nullSpace).reset(),
-									"|",
-									ansi().fg(YELLOW)
-											.a(taskDescriptionExtra
-													.substring(25)).reset(),
-									"|", ansi().fg(YELLOW).a("").reset(), "|",
-									"           |", "", "");
-						} else if (status == 0) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(RED).a(nullSpace).reset(),
-									"|",
-									ansi().fg(RED)
-											.a(taskDescriptionExtra.substring(
-													0, 25)).reset(), "|",
-									ansi().fg(RED).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
-
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(RED).a(nullSpace).reset(),
-									"|",
-									ansi().fg(RED)
-											.a(taskDescriptionExtra
-													.substring(25)).reset(),
-									"|", ansi().fg(RED).a("").reset(), "|",
-									"           |", "", "");
-						} else if (status == -1) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(CYAN).a(nullSpace).reset(),
-									"|",
-									ansi().fg(CYAN)
-											.a(taskDescriptionExtra.substring(
-													0, 25)).reset(), "|",
-									ansi().fg(CYAN).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
-
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(CYAN).a(nullSpace).reset(),
-									"|",
-									ansi().fg(CYAN)
-											.a(taskDescriptionExtra
-													.substring(25)).reset(),
-									"|", ansi().fg(CYAN).a("").reset(), "|",
-									"           |", "", "");
-						} else if (status == 1) {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(GREEN).a(nullSpace).reset(),
-									"|",
-									ansi().fg(GREEN)
-											.a(taskDescriptionExtra.substring(
-													0, 25)).reset(), "|",
-									ansi().fg(GREEN).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
-
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(GREEN).a(nullSpace).reset(),
-									"|",
-									ansi().fg(GREEN)
-											.a(taskDescriptionExtra
-													.substring(25)).reset(),
-									"|", ansi().fg(GREEN).a("").reset(), "|",
-									"           |", "", "");
-						}
-
-						else {
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(MAGENTA).a(nullSpace).reset(),
-									"|",
-									ansi().fg(MAGENTA)
-											.a(taskDescriptionExtra.substring(
-													0, 25)).reset(), "|",
-									ansi().fg(MAGENTA).a(taskVenueExtra)
-											.reset(), "|", "           |", "",
-									"");
-
-							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(MAGENTA).a(nullSpace).reset(),
-									"|",
-									ansi().fg(MAGENTA)
-											.a(taskDescriptionExtra
-													.substring(25)).reset(),
-									"|", ansi().fg(MAGENTA).a("").reset(), "|",
-									"           |", "", "");
-						}
-						}
-						result += displayLineSeparator();
-					} else {
-						
-						if(number<9){
-							if (completed) {
-								result += String
-										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-												ansi().fg(YELLOW).a(nullSpace)
-														.reset(),
-												" |",
-												ansi().fg(YELLOW)
-														.a(taskDescriptionExtra)
-														.reset(), "|",
-												ansi().fg(YELLOW).a(taskVenueExtra)
-														.reset(), "|",
-												"           |", "", "");
-							}
-
-							else if (status == 0) {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(RED).a(nullSpace).reset(), " |",
-										ansi().fg(RED).a(taskDescriptionExtra)
-												.reset(), "|",
-										ansi().fg(RED).a(taskVenueExtra).reset(),
-										"|", "           |", "", "");
-							} else if (status == -1) {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(CYAN).a(nullSpace).reset(), " |",
-										ansi().fg(CYAN).a(taskDescriptionExtra)
-												.reset(), "|",
-										ansi().fg(CYAN).a(taskVenueExtra).reset(),
-										"|", "           |", "", "");
-							} else if (status == 1) {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(GREEN).a(nullSpace).reset(), " |",
-										ansi().fg(GREEN).a(taskDescriptionExtra)
-												.reset(), "|",
-										ansi().fg(GREEN).a(taskVenueExtra).reset(),
-										"|", "           |", "", "");
-							} else {
-								result += String.format(
-										DISPLAY_TABLE_ROW_STRING_FORMAT,
-										ansi().fg(MAGENTA).a(nullSpace).reset(),
-										" |",
-										ansi().fg(MAGENTA).a(taskDescriptionExtra)
-												.reset(), "|", ansi().fg(MAGENTA)
-												.a(taskVenueExtra).reset(), "|",
-										"           |", "", "");
-							}
-						}
-						else{
 						if (completed) {
 							result += String
 									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1519,9 +800,7 @@ public class DisplayHandler extends CommandHandler {
 											ansi().fg(YELLOW).a(taskVenueExtra)
 													.reset(), "|",
 											"           |", "", "");
-						}
-
-						else if (status == 0) {
+						} else if (status == 0) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), "|",
@@ -1555,194 +834,610 @@ public class DisplayHandler extends CommandHandler {
 											.a(taskVenueExtra).reset(), "|",
 									"           |", "", "");
 						}
-						}
-						result += displayLineSeparator();
 					}
+					result += displayLineSeparator();
 
-				}
-
-				else {
-					
-					if(number<9){
+				} else {
+					if (number < 9) {
 						if (completed) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(YELLOW).a(nullSpace).reset(),
 									" |",
+									ansi().fg(YELLOW).a(taskDescriptionExtra)
+											.reset(),
+									"|",
 									ansi().fg(YELLOW)
-											.a(taskDescriptionExtra
-													.substring(0, 25)).reset(),
-									"|", ansi().fg(YELLOW).a(taskVenueExtra)
-											.reset(), "|", "           |", "", "");
-						}
-
-						else if (status == 0) {
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == 0) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(),
 									" |",
+									ansi().fg(RED).a(taskDescriptionExtra)
+											.reset(),
+									"|",
 									ansi().fg(RED)
-											.a(taskDescriptionExtra
-													.substring(0, 25)).reset(),
-									"|", ansi().fg(RED).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
 						} else if (status == -1) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(),
 									" |",
+									ansi().fg(CYAN).a(taskDescriptionExtra)
+											.reset(),
+									"|",
 									ansi().fg(CYAN)
-											.a(taskDescriptionExtra
-													.substring(0, 25)).reset(),
-									"|", ansi().fg(CYAN).a(taskVenueExtra).reset(),
-									"|", "           |", "", "");
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
 						} else if (status == 1) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
 									" |",
-									ansi().fg(GREEN)
-											.a(taskDescriptionExtra
-													.substring(0, 25)).reset(),
+									ansi().fg(GREEN).a(taskDescriptionExtra)
+											.reset(),
 									"|",
+									ansi().fg(GREEN)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
+									ansi().fg(MAGENTA).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						}
+					} else {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									"|",
+									ansi().fg(YELLOW).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(YELLOW)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == 0) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(),
+									"|",
+									ansi().fg(RED).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(RED)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == -1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(),
+									"|",
+									ansi().fg(CYAN).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(CYAN)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == 1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									"|",
+									ansi().fg(GREEN).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(GREEN)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|",
+									ansi().fg(MAGENTA).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						}
+					}
+
+					taskVenueExtra = taskVenueExtra.substring(17);
+
+					for (int i = 0; i < venueLines - descriptionLines - 1; i++) {
+						if (taskVenueExtra.length() > 17) {
+
+							if (number < 9) {
+								if (completed) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(YELLOW).a("").reset(),
+											"|",
+											ansi().fg(YELLOW)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else if (status == 0) {
+									result += String
+											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+													ansi().fg(RED).a(nullSpace)
+															.reset(),
+													" |",
+													ansi().fg(RED).a("")
+															.reset(),
+													"|",
+													ansi().fg(RED)
+															.a(taskVenueExtra
+																	.substring(
+																			0,
+																			17))
+															.reset(), "|",
+													"           |", "", "");
+								} else if (status == -1) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(CYAN).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(CYAN).a("").reset(),
+											"|",
+											ansi().fg(CYAN)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else if (status == 1) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(GREEN).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(GREEN).a("").reset(),
+											"|",
+											ansi().fg(GREEN)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(MAGENTA).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(MAGENTA).a("").reset(),
+											"|",
+											ansi().fg(MAGENTA)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								}
+							} else {
+								if (completed) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(YELLOW).a("").reset(),
+											"|",
+											ansi().fg(YELLOW)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else if (status == 0) {
+									result += String
+											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+													ansi().fg(RED).a(nullSpace)
+															.reset(),
+													"|",
+													ansi().fg(RED).a("")
+															.reset(),
+													"|",
+													ansi().fg(RED)
+															.a(taskVenueExtra
+																	.substring(
+																			0,
+																			17))
+															.reset(), "|",
+													"           |", "", "");
+								} else if (status == -1) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(CYAN).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(CYAN).a("").reset(),
+											"|",
+											ansi().fg(CYAN)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else if (status == 1) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(GREEN).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(GREEN).a("").reset(),
+											"|",
+											ansi().fg(GREEN)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(MAGENTA).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(MAGENTA).a("").reset(),
+											"|",
+											ansi().fg(MAGENTA)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								}
+							}
+							taskVenueExtra = taskVenueExtra.substring(17);
+						}
+
+					}
+
+					if (number < 9) {
+						if (completed) {
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(), " |",
+											ansi().fg(YELLOW).a("").reset(),
+											"|",
+											ansi().fg(YELLOW).a(taskVenueExtra)
+													.reset(), "|",
+											"           |", "", "");
+						}
+
+						else if (status == 0) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), " |",
+									ansi().fg(RED).a("").reset(), "|", ansi()
+											.fg(RED).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == -1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), " |",
+									ansi().fg(CYAN).a("").reset(), "|",
+									ansi().fg(CYAN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == 1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |", ansi().fg(GREEN).a("").reset(), "|",
 									ansi().fg(GREEN).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
 						} else {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(MAGENTA).a(nullSpace).reset(),
-									" |",
-									ansi().fg(MAGENTA)
-											.a(taskDescriptionExtra
-													.substring(0, 25)).reset(),
+									" |", ansi().fg(MAGENTA).a("").reset(),
 									"|", ansi().fg(MAGENTA).a(taskVenueExtra)
-											.reset(), "|", "           |", "", "");
+											.reset(), "|", "           |", "",
+									"");
 						}
-						
-					}
-					else{
-					if (completed) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(YELLOW).a(nullSpace).reset(),
-								"|",
-								ansi().fg(YELLOW)
-										.a(taskDescriptionExtra
-												.substring(0, 25)).reset(),
-								"|", ansi().fg(YELLOW).a(taskVenueExtra)
-										.reset(), "|", "           |", "", "");
-					}
-
-					else if (status == 0) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(RED).a(nullSpace).reset(),
-								"|",
-								ansi().fg(RED)
-										.a(taskDescriptionExtra
-												.substring(0, 25)).reset(),
-								"|", ansi().fg(RED).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-					} else if (status == -1) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(CYAN).a(nullSpace).reset(),
-								"|",
-								ansi().fg(CYAN)
-										.a(taskDescriptionExtra
-												.substring(0, 25)).reset(),
-								"|", ansi().fg(CYAN).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
-					} else if (status == 1) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(GREEN).a(nullSpace).reset(),
-								"|",
-								ansi().fg(GREEN)
-										.a(taskDescriptionExtra
-												.substring(0, 25)).reset(),
-								"|",
-								ansi().fg(GREEN).a(taskVenueExtra).reset(),
-								"|", "           |", "", "");
 					} else {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(MAGENTA).a(nullSpace).reset(),
-								"|",
-								ansi().fg(MAGENTA)
-										.a(taskDescriptionExtra
-												.substring(0, 25)).reset(),
-								"|", ansi().fg(MAGENTA).a(taskVenueExtra)
-										.reset(), "|", "           |", "", "");
-					}
-					
-					}
-					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+						if (completed) {
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(), "|",
+											ansi().fg(YELLOW).a("").reset(),
+											"|",
+											ansi().fg(YELLOW).a(taskVenueExtra)
+													.reset(), "|",
+											"           |", "", "");
+						}
 
-					for (int i = 0; i < descriptionLines - venueLines - 1; i++) {
-						if (taskDescriptionExtra.length() > 25) {
-							if(number<9){
-								if (completed) {
-									result += String.format(
-											DISPLAY_TABLE_ROW_STRING_FORMAT,
-											ansi().fg(YELLOW).a(nullSpace).reset(),
-											" |",
-											ansi().fg(YELLOW)
-													.a(taskDescriptionExtra
-															.substring(0, 25))
-													.reset(), "|", ansi()
-													.fg(YELLOW).a("").reset(), "|",
-											"           |", "", "");
-								} else if (status == 0) {
-									result += String.format(
-											DISPLAY_TABLE_ROW_STRING_FORMAT,
-											ansi().fg(RED).a(nullSpace).reset(),
-											" |",
-											ansi().fg(RED)
-													.a(taskDescriptionExtra
-															.substring(0, 25))
-													.reset(), "|", ansi().fg(RED)
-													.a("").reset(), "|",
-											"           |", "", "");
-								} else if (status == -1) {
-									result += String.format(
-											DISPLAY_TABLE_ROW_STRING_FORMAT,
-											ansi().fg(CYAN).a(nullSpace).reset(),
-											" |",
-											ansi().fg(CYAN)
-													.a(taskDescriptionExtra
-															.substring(0, 25))
-													.reset(), "|", ansi().fg(CYAN)
-													.a("").reset(), "|",
-											"           |", "", "");
-								} else if (status == 1) {
-									result += String.format(
-											DISPLAY_TABLE_ROW_STRING_FORMAT,
-											ansi().fg(GREEN).a(nullSpace).reset(),
-											" |",
-											ansi().fg(GREEN)
-													.a(taskDescriptionExtra
-															.substring(0, 25))
-													.reset(), "|", ansi().fg(GREEN)
-													.a("").reset(), "|",
-											"           |", "", "");
-								} else {
-									result += String
-											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-													ansi().fg(MAGENTA).a(nullSpace)
-															.reset(),
-													" |",
-													ansi().fg(MAGENTA)
-															.a(taskDescriptionExtra
-																	.substring(0,
-																			25))
-															.reset(), "|", ansi()
-															.fg(MAGENTA).a("")
-															.reset(), "|",
-													"           |", "", "");
-								}
+						else if (status == 0) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), "|",
+									ansi().fg(RED).a("").reset(), "|", ansi()
+											.fg(RED).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == -1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), "|",
+									ansi().fg(CYAN).a("").reset(), "|",
+									ansi().fg(CYAN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == 1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(), "|",
+									ansi().fg(GREEN).a("").reset(), "|", ansi()
+											.fg(GREEN).a(taskVenueExtra)
+											.reset(), "|", "           |", "",
+									"");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|", ansi().fg(MAGENTA).a("").reset(), "|",
+									ansi().fg(MAGENTA).a(taskVenueExtra)
+											.reset(), "|", "           |", "",
+									"");
+						}
+					}
+
+					result += displayLineSeparator();
+				}
+
+			}
+
+			else if (descriptionLines > venueLines) {
+				for (int i = 0; i < venueLines - 1; i++) {
+					String displayVenue = taskVenueExtra.substring(0, 17);
+					String displayDescription = taskDescriptionExtra.substring(
+							0, 25);
+
+					if (number < 9) {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									" |",
+									ansi().fg(YELLOW).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(YELLOW).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == 0) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), " |",
+									ansi().fg(RED).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(RED).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == -1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), " |",
+									ansi().fg(CYAN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(CYAN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == 1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |", ansi().fg(GREEN)
+											.a(displayDescription).reset(),
+									"|", ansi().fg(GREEN).a(displayVenue)
+											.reset(), "|", "           |", "",
+									"");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
+									ansi().fg(MAGENTA).a(displayDescription)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(displayVenue).reset(), "|",
+									"           |", "", "");
+						}
+
+					} else {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									"|", ansi().fg(YELLOW)
+											.a(displayDescription).reset(),
+									"|", ansi().fg(YELLOW).a(displayVenue)
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == 0) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), "|",
+									ansi().fg(RED).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(RED).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == -1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), "|",
+									ansi().fg(CYAN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(CYAN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == 1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(), "|",
+									ansi().fg(GREEN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(GREEN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|",
+									ansi().fg(MAGENTA).a(displayDescription)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(displayVenue).reset(), "|",
+									"           |", "", "");
+						}
+					}
+					taskVenueExtra = taskVenueExtra.substring(17);
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+				}
+
+				if (descriptionLines - venueLines - 1 == 0) {
+					if (taskDescriptionExtra.length() > 25) {
+						if (number < 9) {
+							if (completed) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(YELLOW).a(nullSpace).reset(),
+										" |",
+										ansi().fg(YELLOW)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi()
+												.fg(YELLOW).a(taskVenueExtra)
+												.reset(), "|", "           |",
+										"", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(YELLOW).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(YELLOW)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(YELLOW).a("")
+														.reset(), "|",
+												"           |", "", "");
+							} else if (status == 0) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(RED).a(nullSpace).reset(),
+										" |",
+										ansi().fg(RED)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi().fg(RED)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(RED).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(RED)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(RED).a("").reset(),
+												"|", "           |", "", "");
+							} else if (status == -1) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(CYAN).a(nullSpace).reset(),
+										" |",
+										ansi().fg(CYAN)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi().fg(CYAN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(CYAN).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(CYAN)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|",
+												ansi().fg(CYAN).a("").reset(),
+												"|", "           |", "", "");
+							} else if (status == 1) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(GREEN).a(nullSpace).reset(),
+										" |",
+										ansi().fg(GREEN)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi().fg(GREEN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(GREEN).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(GREEN)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(GREEN).a("")
+														.reset(), "|",
+												"           |", "", "");
 							}
-							else{
+
+							else {
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(MAGENTA).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(MAGENTA)
+														.a(taskDescriptionExtra
+																.substring(0,
+																		25))
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskVenueExtra)
+														.reset(), "|",
+												"           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(MAGENTA).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(MAGENTA)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(MAGENTA).a("")
+														.reset(), "|",
+												"           |", "", "");
+							}
+
+						} else {
 							if (completed) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1752,8 +1447,22 @@ public class DisplayHandler extends CommandHandler {
 												.a(taskDescriptionExtra
 														.substring(0, 25))
 												.reset(), "|", ansi()
-												.fg(YELLOW).a("").reset(), "|",
-										"           |", "", "");
+												.fg(YELLOW).a(taskVenueExtra)
+												.reset(), "|", "           |",
+										"", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(YELLOW).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(YELLOW)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(YELLOW).a("")
+														.reset(), "|",
+												"           |", "", "");
 							} else if (status == 0) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1763,8 +1472,20 @@ public class DisplayHandler extends CommandHandler {
 												.a(taskDescriptionExtra
 														.substring(0, 25))
 												.reset(), "|", ansi().fg(RED)
-												.a("").reset(), "|",
-										"           |", "", "");
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(RED).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(RED)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(RED).a("").reset(),
+												"|", "           |", "", "");
 							} else if (status == -1) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1774,8 +1495,20 @@ public class DisplayHandler extends CommandHandler {
 												.a(taskDescriptionExtra
 														.substring(0, 25))
 												.reset(), "|", ansi().fg(CYAN)
-												.a("").reset(), "|",
-										"           |", "", "");
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(CYAN).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(CYAN)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|",
+												ansi().fg(CYAN).a("").reset(),
+												"|", "           |", "", "");
 							} else if (status == 1) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1785,9 +1518,24 @@ public class DisplayHandler extends CommandHandler {
 												.a(taskDescriptionExtra
 														.substring(0, 25))
 												.reset(), "|", ansi().fg(GREEN)
-												.a("").reset(), "|",
-										"           |", "", "");
-							} else {
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(GREEN).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(GREEN)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(GREEN).a("")
+														.reset(), "|",
+												"           |", "", "");
+							}
+
+							else {
 								result += String
 										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 												ansi().fg(MAGENTA).a(nullSpace)
@@ -1797,93 +1545,499 @@ public class DisplayHandler extends CommandHandler {
 														.a(taskDescriptionExtra
 																.substring(0,
 																		25))
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskVenueExtra)
+														.reset(), "|",
+												"           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(MAGENTA).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskDescriptionExtra
+																.substring(25))
 														.reset(), "|", ansi()
 														.fg(MAGENTA).a("")
 														.reset(), "|",
 												"           |", "", "");
 							}
+						}
+						result += displayLineSeparator();
+					} else {
+
+						if (number < 9) {
+							if (completed) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(YELLOW).a(nullSpace).reset(),
+										" |",
+										ansi().fg(YELLOW)
+												.a(taskDescriptionExtra)
+												.reset(), "|", ansi()
+												.fg(YELLOW).a(taskVenueExtra)
+												.reset(), "|", "           |",
+										"", "");
+							}
+
+							else if (status == 0) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+												.fg(RED).a(nullSpace).reset(),
+										" |",
+										ansi().fg(RED).a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(RED)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else if (status == -1) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+												.fg(CYAN).a(nullSpace).reset(),
+										" |",
+										ansi().fg(CYAN).a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(CYAN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else if (status == 1) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(GREEN).a(nullSpace).reset(),
+										" |",
+										ansi().fg(GREEN)
+												.a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(GREEN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else {
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(MAGENTA).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(MAGENTA)
+														.a(taskDescriptionExtra)
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskVenueExtra)
+														.reset(), "|",
+												"           |", "", "");
+							}
+						} else {
+							if (completed) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(YELLOW).a(nullSpace).reset(),
+										"|",
+										ansi().fg(YELLOW)
+												.a(taskDescriptionExtra)
+												.reset(), "|", ansi()
+												.fg(YELLOW).a(taskVenueExtra)
+												.reset(), "|", "           |",
+										"", "");
+							}
+
+							else if (status == 0) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+												.fg(RED).a(nullSpace).reset(),
+										"|",
+										ansi().fg(RED).a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(RED)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else if (status == -1) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+												.fg(CYAN).a(nullSpace).reset(),
+										"|",
+										ansi().fg(CYAN).a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(CYAN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else if (status == 1) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(GREEN).a(nullSpace).reset(),
+										"|",
+										ansi().fg(GREEN)
+												.a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(GREEN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else {
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(MAGENTA).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskDescriptionExtra)
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskVenueExtra)
+														.reset(), "|",
+												"           |", "", "");
+							}
+						}
+						result += displayLineSeparator();
+					}
+
+				}
+
+				else {
+
+					if (number < 9) {
+						if (completed) {
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(YELLOW)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(YELLOW).a(taskVenueExtra)
+													.reset(), "|",
+											"           |", "", "");
+						}
+
+						else if (status == 0) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(),
+									" |",
+									ansi().fg(RED)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(RED).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == -1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(),
+									" |",
+									ansi().fg(CYAN)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(CYAN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == 1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |",
+									ansi().fg(GREEN)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(GREEN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
+									ansi().fg(MAGENTA)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(MAGENTA).a(taskVenueExtra)
+											.reset(), "|", "           |", "",
+									"");
+						}
+
+					} else {
+						if (completed) {
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(YELLOW)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(YELLOW).a(taskVenueExtra)
+													.reset(), "|",
+											"           |", "", "");
+						}
+
+						else if (status == 0) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(),
+									"|",
+									ansi().fg(RED)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(RED).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == -1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(),
+									"|",
+									ansi().fg(CYAN)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(CYAN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == 1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									"|",
+									ansi().fg(GREEN)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(GREEN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|",
+									ansi().fg(MAGENTA)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(MAGENTA).a(taskVenueExtra)
+											.reset(), "|", "           |", "",
+									"");
+						}
+
+					}
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+
+					for (int i = 0; i < descriptionLines - venueLines - 1; i++) {
+						if (taskDescriptionExtra.length() > 25) {
+							if (number < 9) {
+								if (completed) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(YELLOW)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(YELLOW).a("").reset(),
+											"|", "           |", "", "");
+								} else if (status == 0) {
+									result += String
+											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+													ansi().fg(RED).a(nullSpace)
+															.reset(),
+													" |",
+													ansi().fg(RED)
+															.a(taskDescriptionExtra
+																	.substring(
+																			0,
+																			25))
+															.reset(), "|",
+													ansi().fg(RED).a("")
+															.reset(), "|",
+													"           |", "", "");
+								} else if (status == -1) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(CYAN).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(CYAN)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(CYAN).a("").reset(), "|",
+											"           |", "", "");
+								} else if (status == 1) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(GREEN).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(GREEN)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(GREEN).a("").reset(),
+											"|", "           |", "", "");
+								} else {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(MAGENTA).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(MAGENTA)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(MAGENTA).a("").reset(),
+											"|", "           |", "", "");
+								}
+							} else {
+								if (completed) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(YELLOW)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(YELLOW).a("").reset(),
+											"|", "           |", "", "");
+								} else if (status == 0) {
+									result += String
+											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+													ansi().fg(RED).a(nullSpace)
+															.reset(),
+													"|",
+													ansi().fg(RED)
+															.a(taskDescriptionExtra
+																	.substring(
+																			0,
+																			25))
+															.reset(), "|",
+													ansi().fg(RED).a("")
+															.reset(), "|",
+													"           |", "", "");
+								} else if (status == -1) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(CYAN).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(CYAN)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(CYAN).a("").reset(), "|",
+											"           |", "", "");
+								} else if (status == 1) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(GREEN).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(GREEN)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(GREEN).a("").reset(),
+											"|", "           |", "", "");
+								} else {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(MAGENTA).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(MAGENTA)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(MAGENTA).a("").reset(),
+											"|", "           |", "", "");
+								}
 							}
 							taskDescriptionExtra = taskDescriptionExtra
 									.substring(25);
 						}
 					}
-					if(number<9){
+					if (number < 9) {
 						if (completed) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(YELLOW).a(nullSpace).reset(), " |",
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									" |",
 									ansi().fg(YELLOW).a(taskDescriptionExtra)
-											.reset(), "|", ansi().fg(YELLOW).a("")
-											.reset(), "|", "           |", "", "");
+											.reset(), "|",
+									ansi().fg(YELLOW).a("").reset(), "|",
+									"           |", "", "");
 						} else if (status == 0) {
 							result += String.format(
-									DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-											.a(nullSpace).reset(), " |",
-									ansi().fg(RED).a(taskDescriptionExtra).reset(),
-									"|", ansi().fg(RED).a("").reset(), "|",
-									"           |", "", "");
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), " |",
+									ansi().fg(RED).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(RED).a("")
+											.reset(), "|", "           |", "",
+									"");
 						} else if (status == -1) {
-							result += String
-									.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-											.fg(CYAN).a(nullSpace).reset(), " |",
-											ansi().fg(CYAN).a(taskDescriptionExtra)
-													.reset(), "|", ansi().fg(CYAN)
-													.a("").reset(), "|",
-											"           |", "", "");
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), " |",
+									ansi().fg(CYAN).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(CYAN)
+											.a("").reset(), "|",
+									"           |", "", "");
 						} else if (status == 1) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(GREEN).a(nullSpace).reset(), " |",
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |",
 									ansi().fg(GREEN).a(taskDescriptionExtra)
-											.reset(), "|", ansi().fg(GREEN).a("")
-											.reset(), "|", "           |", "", "");
+											.reset(), "|",
+									ansi().fg(GREEN).a("").reset(), "|",
+									"           |", "", "");
 						} else {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
-									ansi().fg(MAGENTA).a(nullSpace).reset(), " |",
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
 									ansi().fg(MAGENTA).a(taskDescriptionExtra)
-											.reset(), "|", ansi().fg(MAGENTA).a("")
-											.reset(), "|", "           |", "", "");
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a("").reset(), "|",
+									"           |", "", "");
 						}
-					}
-					else{
-					if (completed) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(YELLOW).a(nullSpace).reset(), "|",
-								ansi().fg(YELLOW).a(taskDescriptionExtra)
-										.reset(), "|", ansi().fg(YELLOW).a("")
-										.reset(), "|", "           |", "", "");
-					} else if (status == 0) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
-										.a(nullSpace).reset(), "|",
-								ansi().fg(RED).a(taskDescriptionExtra).reset(),
-								"|", ansi().fg(RED).a("").reset(), "|",
-								"           |", "", "");
-					} else if (status == -1) {
-						result += String
-								.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-										.fg(CYAN).a(nullSpace).reset(), "|",
-										ansi().fg(CYAN).a(taskDescriptionExtra)
-												.reset(), "|", ansi().fg(CYAN)
-												.a("").reset(), "|",
-										"           |", "", "");
-					} else if (status == 1) {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(GREEN).a(nullSpace).reset(), "|",
-								ansi().fg(GREEN).a(taskDescriptionExtra)
-										.reset(), "|", ansi().fg(GREEN).a("")
-										.reset(), "|", "           |", "", "");
 					} else {
-						result += String.format(
-								DISPLAY_TABLE_ROW_STRING_FORMAT,
-								ansi().fg(MAGENTA).a(nullSpace).reset(), "|",
-								ansi().fg(MAGENTA).a(taskDescriptionExtra)
-										.reset(), "|", ansi().fg(MAGENTA).a("")
-										.reset(), "|", "           |", "", "");
-					}
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									"|",
+									ansi().fg(YELLOW).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(YELLOW).a("").reset(), "|",
+									"           |", "", "");
+						} else if (status == 0) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), "|",
+									ansi().fg(RED).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(RED).a("")
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == -1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), "|",
+									ansi().fg(CYAN).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(CYAN)
+											.a("").reset(), "|",
+									"           |", "", "");
+						} else if (status == 1) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(), "|",
+									ansi().fg(GREEN).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(GREEN).a("").reset(), "|",
+									"           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|",
+									ansi().fg(MAGENTA).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a("").reset(), "|",
+									"           |", "", "");
+						}
 					}
 					result += displayLineSeparator();
 
@@ -2011,37 +2165,37 @@ public class DisplayHandler extends CommandHandler {
 	private static String addCompleted(Task task) {
 		return "(" + task.hasCompleted() + ")" + STRING_SPACE;
 	}
-	
-	public static void displayTop(){
+
+	public static void displayTop() {
 		String resultTop = "";
 		resultTop += DisplayHandler.displayLineSeparator();
 		resultTop += String.format(
-				DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-				ansi().fg(RED).a("ID").reset(), "  |",
-				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
-						.fg(CYAN).a(" VENUE").reset(), "|",
-				ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
-						.a(" DATE").reset());
+				DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
+						.a("ID").reset(), "  |",
+				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|",
+				ansi().fg(CYAN).a(" VENUE").reset(), "|",
+				ansi().fg(YELLOW).a(" TIME").reset(), "|",
+				ansi().fg(GREEN).a(" DATE").reset());
 		resultTop += DisplayHandler.displayLineSeparator();
 		System.out.print(resultTop);
 	}
-	
-	public static void displayBottom(){
+
+	public static void displayBottom() {
 		String resultBottom = "";
 		resultBottom += String.format(
-				DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
-				ansi().fg(RED).a("ID").reset(), "  |",
-				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|", ansi()
-						.fg(CYAN).a(" VENUE").reset(), "|",
-				ansi().fg(YELLOW).a(" TIME").reset(), "|", ansi().fg(GREEN)
-						.a(" DATE").reset());
+				DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
+						.a("ID").reset(), "  |",
+				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|",
+				ansi().fg(CYAN).a(" VENUE").reset(), "|",
+				ansi().fg(YELLOW).a(" TIME").reset(), "|",
+				ansi().fg(GREEN).a(" DATE").reset());
 		resultBottom += DisplayHandler.displayLineSeparator();
 		System.out.print(resultBottom);
 	}
-	
-	public static void displayContents(int number, Task task){
+
+	public static void displayContents(int number, Task task) {
 		String print = "";
-		print += displayTaskInTable(number,task);
+		print += displayTaskInTable(number, task);
 		System.out.println(print);
 	}
 
