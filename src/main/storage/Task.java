@@ -419,11 +419,13 @@ public class Task {
 
 	// this function assumes that startTime and endTime will never be null
 	public boolean startTimeEqualsEndTime() throws IllegalArgumentException {
+		LocalDate startDate = this.getStartDate();
+		LocalDate endDate = this.getEndDate();
 		LocalTime startTime = this.getStartTime();
 		LocalTime endTime = this.getEndTime();
-		DateTime t1 = startTime.toDateTimeToday();
-		DateTime t2 = endTime.toDateTimeToday();
-		int compareResult = DateTimeComparator.getTimeOnlyInstance().compare(
+		DateTime t1 = startDate.toDateTime(startTime);
+		DateTime t2 = endDate.toDateTime(endTime);
+		int compareResult = DateTimeComparator.getInstance().compare(
 				t1, t2);
 		switch (compareResult) {
 		case -1: // startTime is earlier than endTime
