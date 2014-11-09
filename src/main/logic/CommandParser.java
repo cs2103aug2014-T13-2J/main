@@ -18,8 +18,9 @@ public abstract class CommandParser {
 	protected final static String MESSAGE_INVALID_RECURRENCE_FORMAT = "Sorry, we did not manage to capture the recurrence. Please try again.";
 	protected final static String MESSAGE_INVALID_COMPLETED_FORMAT = "Sorry, we did not manage to capture the completion of the task. Please try again.";
 	protected final static String MESSAGE_INVALID_FORMAT = "Sorry we were unable to parse the information.";
-	protected final static String MESSAGE_INVALID_QUOTATIONS = "You need to close your quotations properly for the description.";
-	public static final String STRING_SPACE = " ";
+	protected final static String MESSAGE_DESCRIPTION_INVALID_QUOTATIONS = "You need to close your quotations properly for the description.";
+	protected final static String MESSAGE_VENUE_INVALID_QUOTATIONS = "You need to close your quotations properly for the venue.";
+	public static final String STRING_SPACE = " ";	
 	protected final static Integer INDEX_HOUR = 0;
 	protected final static Integer INDEX_MINUTE = 1;
 	protected final static Integer INDEX_DAY = 0;
@@ -268,8 +269,12 @@ public abstract class CommandParser {
 		if (currentWord.startsWith("\"")) {
 			wordsList.poll();
 			currentWord = removeStartQuotations(currentWord);
+			if(currentWord.endsWith("\"")) {
+				currentWord = removeEndQuotations(currentWord);
+				hasEndQuotations = true;
+			}
 			description = description + currentWord + STRING_SPACE;
-			while (!wordsList.isEmpty()) {
+			while (!wordsList.isEmpty() && hasEndQuotations == false) {
 				currentWord = wordsList.poll();
 				if (currentWord.endsWith("\"")) {
 					hasEndQuotations = true;
@@ -282,7 +287,7 @@ public abstract class CommandParser {
 			}
 
 			if (hasEndQuotations == false) {
-				throw new IllegalArgumentException(MESSAGE_INVALID_QUOTATIONS);
+				throw new IllegalArgumentException(MESSAGE_DESCRIPTION_INVALID_QUOTATIONS);
 			}
 		} else {
 			while (!wordsList.isEmpty()) {
@@ -437,6 +442,10 @@ public abstract class CommandParser {
 		if (currentWord.startsWith("\"")) {
 			wordsList.poll();
 			currentWord = removeStartQuotations(currentWord);
+			if(currentWord.endsWith("\"")) {
+				currentWord = removeEndQuotations(currentWord);
+				hasEndQuotations = true;
+			}
 			venue = venue + currentWord + STRING_SPACE;
 			while (!wordsList.isEmpty()) {
 				currentWord = wordsList.poll();
@@ -451,7 +460,7 @@ public abstract class CommandParser {
 			}
 
 			if (hasEndQuotations == false) {
-				throw new IllegalArgumentException(MESSAGE_INVALID_QUOTATIONS);
+				throw new IllegalArgumentException(MESSAGE_VENUE_INVALID_QUOTATIONS);
 			}
 		} else {
 			while (!wordsList.isEmpty()) {
