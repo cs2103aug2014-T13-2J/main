@@ -3,9 +3,6 @@ package main.googlecalendar;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import main.storage.Storage;
 import main.storage.Task;
