@@ -149,11 +149,11 @@ public class Task {
 	}
 
 	public void setId(String id) {
-		this.id = id;
-
-		if (id == null) {
+		if (id.equals("null")) {
+			this.id = null;
 			this.setHasId(false);
 		} else {
+			this.id = id;
 			this.setHasId(true);
 		}
 	}
