@@ -87,6 +87,7 @@ public class Logic {
 		case SYNC:
 			return googleCalendar.syncToGoogle();
 		case EXIT:
+			googleCalendar.killSyncThread();
 			System.exit(0);
 		default:
 			TaskerLog.logSystemInfo("Unable to execute invalid command type.");

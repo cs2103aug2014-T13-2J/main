@@ -3,6 +3,9 @@ package main.googlecalendar;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import main.storage.Storage;
 import main.storage.Task;
@@ -14,14 +17,24 @@ public class GoogleCalendar {
 	private static String MESSAGE_SYNC_SUCCESS = "You have successfully synchronised all changes to Google.";
 	private static String MESSAGE_SYNC_FAIL = "Sorry, an error has occurred while synchronising to Google. Please check your Internet connection.";
 	private static String MESSAGE_SYNC_EMPTY = "Your Google Calendar is in sync.";
+	private static String OPERATING_SYSTEM = System.getProperty("os.name").toLowerCase();
+	
+	private static long SLEEP_DURATION_IF_ONLINE = 10000;	// 10 seconds
+	private static long SLEEP_DURATION_IF_OFFLINE = 5000;	// 5 seconds
 
 	private static GoogleCalendar theOne = null;
 	private static LoginToGoogle loginToGoogle;
 	private static Storage storage;
+	private Runnable syncUnsyncedTasksRunnable;
+	private boolean isRunning;
 
 	private GoogleCalendar() {
 		storage = Storage.getInstance();
 		loginToGoogle = LoginToGoogle.getInstance();
+		setupSyncRunnable();
+		Thread autoSyncThread = new Thread(syncUnsyncedTasksRunnable);
+		autoSyncThread.setDaemon(true);
+		autoSyncThread.start();
 	}
 
 	public static GoogleCalendar getInstance() {
@@ -29,6 +42,34 @@ public class GoogleCalendar {
 			theOne = new GoogleCalendar();
 		}
 		return theOne;
+	}
+	
+	private void setupSyncRunnable() {
+		syncUnsyncedTasksRunnable = new Runnable() {
+			
+			@Override
+			public void run() {
+				isRunning = true;
+				while (isRunning) {
+					long sleepDuration;
+					if (isConnectedToInternet()) {
+						sleepDuration = SLEEP_DURATION_IF_ONLINE;
+						syncToGoogle();
+					} else {
+						sleepDuration = SLEEP_DURATION_IF_OFFLINE;
+					}
+					try {
+						Thread.sleep(sleepDuration);
+					} catch (InterruptedException e) {
+						isRunning = false;
+					}
+				}
+			}
+		};
+	}
+	
+	public void killSyncThread() {
+		isRunning = false;
 	}
 
 	public String syncAddTask(Task task) {
@@ -192,6 +233,23 @@ public class GoogleCalendar {
 			}
 		}
 		return false;
+	}
+	
+	private boolean isConnectedToInternet() {
+		int returnVal = -1;
+		Process p1;
+		try {
+			if (OPERATING_SYSTEM.indexOf("win") >= 0) {
+				p1 = java.lang.Runtime.getRuntime().exec("ping -n 1 www.google.com");
+			} else {
+				p1 = java.lang.Runtime.getRuntime().exec("ping -c 1 www.google.com");
+			}
+			returnVal = p1.waitFor();
+		} catch (IOException | InterruptedException e) {
+			
+		}
+		
+		return (returnVal == 0);
 	}
 
 }
