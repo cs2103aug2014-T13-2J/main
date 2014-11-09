@@ -1,12 +1,7 @@
 package main.logic;
 
 import static org.fusesource.jansi.Ansi.ansi;
-import static org.fusesource.jansi.Ansi.Color.CYAN;
-import static org.fusesource.jansi.Ansi.Color.GREEN;
-import static org.fusesource.jansi.Ansi.Color.MAGENTA;
 import static org.fusesource.jansi.Ansi.Color.RED;
-import static org.fusesource.jansi.Ansi.Color.YELLOW;
-
 import java.util.ArrayList;
 
 import main.storage.Task;
@@ -54,79 +49,78 @@ public class SearchParser extends CommandParser {
 				System.out.println();
 				System.out.println(MESSAGE_TODAY);
 				DisplayHandler.displayTop();
-				
+
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 0) {
 						System.out.print(DisplayHandler.displayTaskInTable(i,
 								list.get(i)));
 					}
 				}
-				
+
 				DisplayHandler.displayBottom();
-				
+
 			} else {
 				System.out.println(MESSAGE_NOT_TODAY);
 			}
 
 			return returnMessage;
 		}
-		
-		else if(userInput.toLowerCase().equals("past")){
+
+		else if (userInput.toLowerCase().equals("past")) {
 			if (isPast()) {
-				
+
 				System.out.println();
 				System.out.println(MESSAGE_PAST);
 				DisplayHandler.displayTop();
-				
+
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -1) {
 						System.out.print(DisplayHandler.displayTaskInTable(i,
 								list.get(i)));
 					}
 				}
-				
+
 				DisplayHandler.displayBottom();
-				
+
 			} else {
 				System.out.println(MESSAGE_NOT_PAST);
 			}
 
 			return returnMessage;
 		}
-		
-		else if(userInput.toLowerCase().equals("future")){
+
+		else if (userInput.toLowerCase().equals("future")) {
 			if (isFuture()) {
-				
+
 				System.out.println();
 				System.out.println(MESSAGE_FUTURE);
 				DisplayHandler.displayTop();
-				
+
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 1) {
 						System.out.print(DisplayHandler.displayTaskInTable(i,
 								list.get(i)));
 					}
 				}
-				
+
 				DisplayHandler.displayBottom();
-				
+
 			} else {
 				System.out.println(MESSAGE_NOT_FUTURE);
 			}
 
 			return returnMessage;
 		}
-		
+
 		else if (!isWithin(userInput)) {
 			return MESSAGE_UNAVAILABLE;
-		}
-		else if(userInput.length()==1){
+		} else if (userInput.length() == 1) {
 			return MESSAGE_LONGER;
 		}
 
 		else {
 			lowerCaseKey = userInput.toLowerCase();
-			
+
 			System.out.println();
 			System.out.println(MESSAGE_SEARCH + " " + "'"
 					+ ansi().fg(RED).a(userInput).reset() + "'" + ": ");
@@ -151,22 +145,28 @@ public class SearchParser extends CommandParser {
 		lowerCaseKey = userInput.toLowerCase();
 
 		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).getDescription().toString().toLowerCase().contains(lowerCaseKey)) {
+			if (list.get(i).getDescription().toString().toLowerCase()
+					.contains(lowerCaseKey)) {
 				return true;
-			}
-			else if(list.get(i).getVenue().toString().toLowerCase().contains(lowerCaseKey)){
+			} else if (list.get(i).hasVenue()
+					&& list.get(i).getVenue().toString().toLowerCase()
+					.contains(lowerCaseKey)) {
 				return true;
-			}
-			else if(list.get(i).hasStartDate() && list.get(i).getStartDate().toString().contains(lowerCaseKey)){
+			} else if (list.get(i).hasStartDate()
+					&& list.get(i).getStartDate().toString()
+							.contains(lowerCaseKey)) {
 				return true;
-			}
-			else if(list.get(i).hasStartTime() && list.get(i).getStartTime().toString().contains(lowerCaseKey)){
+			} else if (list.get(i).hasStartTime()
+					&& list.get(i).getStartTime().toString()
+							.contains(lowerCaseKey)) {
 				return true;
-			}
-			else if(list.get(i).hasEndDate() && list.get(i).getEndDate().toString().contains(lowerCaseKey)){
+			} else if (list.get(i).hasEndDate()
+					&& list.get(i).getEndDate().toString()
+							.contains(lowerCaseKey)) {
 				return true;
-			}
-			else if(list.get(i).hasEndTime() && list.get(i).getEndTime().toString().contains(lowerCaseKey)){
+			} else if (list.get(i).hasEndTime()
+					&& list.get(i).getEndTime().toString()
+							.contains(lowerCaseKey)) {
 				return true;
 			}
 		}
@@ -182,19 +182,19 @@ public class SearchParser extends CommandParser {
 		}
 		return false;
 	}
-	
-	private boolean isPast(){
-		for(int i=0;i<list.size();i++){
-			if(DisplayHandler.determinePastPresentFuture(list.get(i))==-1){
+
+	private boolean isPast() {
+		for (int i = 0; i < list.size(); i++) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -1) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
-	private boolean isFuture(){
-		for(int i=0;i<list.size();i++){
-			if(DisplayHandler.determinePastPresentFuture(list.get(i))==1){
+
+	private boolean isFuture() {
+		for (int i = 0; i < list.size(); i++) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 1) {
 				return true;
 			}
 		}
