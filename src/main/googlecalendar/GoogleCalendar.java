@@ -98,61 +98,78 @@ public class GoogleCalendar {
 			String message = "";
 
 			ArrayList<Task> tasks = storage.getTasks();
-			String taskId;
-			for (Task task : tasks) {
-				if (!task.hasId()) {
-					taskId = syncAddTask(task);
-					if (taskId == null) {
-						message = MESSAGE_SYNC_FAIL;
-					} else {
-						task.setId(taskId);
-						message = MESSAGE_SYNC_SUCCESS;
-					}
-				} else if (task.hasBeenUpdated()) {
-					try {
-						if (isFloatingTask(task)) {
-							com.google.api.services.tasks.model.Task updatedTask = SyncFloatingTasks
-									.convertFloatingTaskToGoogleTask(task);
-							SyncFloatingTasks
-									.syncPatchTask(updatedTask);
-						} else {
-							Event updatedEvent = SyncNonFloatingTasks
-									.convertNonFloatingTaskToEvent(task);
-							SyncNonFloatingTasks
-									.syncPatchTask(updatedEvent);
-						}
-						task.setHasBeenUpdated(false);
-						message = MESSAGE_SYNC_SUCCESS;
-					} catch (IOException e) {
-						message = MESSAGE_SYNC_FAIL;
-					}
-				}
-			}
+			message = syncUnsyncedAddedAndUpdatedTasks(message, tasks);
 
 			ArrayList<Task> deletedTasks = storage.getDeletedTasks();
-			ListIterator<Task> iterator = deletedTasks.listIterator();
-			if (!deletedTasks.isEmpty()) {
-				try {
-					while (iterator.hasNext()) {
-						Task task = iterator.next();
-						syncDeleteTask(task);
-						iterator.remove();
-						message = MESSAGE_SYNC_SUCCESS;
-					}
-				} catch (IOException e) {
-					message = MESSAGE_SYNC_FAIL;
-				}
-			}
+			message = syncUnsyncedDeletedTasks(message, deletedTasks);
+			
 			if (message.equals(MESSAGE_SYNC_SUCCESS)) {
-				deletedTasks.clear();
-				Storage.writeToFile(Storage.DATABASE_FILENAME, tasks);
-				Storage.writeToFile(Storage.DELETED_TASKS_FILENAME,
-						deletedTasks);
+				postSyncToGoogle(tasks, deletedTasks);
 			}
 			return message;
 		} else {
 			return MESSAGE_SYNC_EMPTY;
 		}
+	}
+
+	private String syncUnsyncedAddedAndUpdatedTasks(String message,
+			ArrayList<Task> tasks) {
+		for (Task task : tasks) {
+			if (!task.hasId()) {
+				String taskId = syncAddTask(task);
+				if (taskId == null) {
+					message = MESSAGE_SYNC_FAIL;
+				} else {
+					task.setId(taskId);
+					message = MESSAGE_SYNC_SUCCESS;
+				}
+			} else if (task.hasBeenUpdated()) {
+				try {
+					if (isFloatingTask(task)) {
+						com.google.api.services.tasks.model.Task updatedTask = SyncFloatingTasks
+								.convertFloatingTaskToGoogleTask(task);
+						SyncFloatingTasks
+								.syncPatchTask(updatedTask);
+					} else {
+						Event updatedEvent = SyncNonFloatingTasks
+								.convertNonFloatingTaskToEvent(task);
+						SyncNonFloatingTasks
+								.syncPatchTask(updatedEvent);
+					}
+					task.setHasBeenUpdated(false);
+					message = MESSAGE_SYNC_SUCCESS;
+				} catch (IOException e) {
+					message = MESSAGE_SYNC_FAIL;
+				}
+			}
+		}
+		return message;
+	}
+	
+	private String syncUnsyncedDeletedTasks(String message,
+			ArrayList<Task> deletedTasks) {
+		ListIterator<Task> iterator = deletedTasks.listIterator();
+		if (!deletedTasks.isEmpty()) {
+			try {
+				while (iterator.hasNext()) {
+					Task task = iterator.next();
+					syncDeleteTask(task);
+					iterator.remove();
+					message = MESSAGE_SYNC_SUCCESS;
+				}
+			} catch (IOException e) {
+				message = MESSAGE_SYNC_FAIL;
+			}
+		}
+		return message;
+	}
+	
+	private void postSyncToGoogle(ArrayList<Task> tasks,
+			ArrayList<Task> deletedTasks) {
+		deletedTasks.clear();
+		Storage.writeToFile(Storage.DATABASE_FILENAME, tasks);
+		Storage.writeToFile(Storage.DELETED_TASKS_FILENAME,
+				deletedTasks);
 	}
 
 	private boolean isFloatingTask(Task task) {
