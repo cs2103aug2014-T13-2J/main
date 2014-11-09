@@ -1,12 +1,5 @@
 package main.logic;
 
-import static org.fusesource.jansi.Ansi.ansi;
-import static org.fusesource.jansi.Ansi.Color.CYAN;
-import static org.fusesource.jansi.Ansi.Color.GREEN;
-import static org.fusesource.jansi.Ansi.Color.MAGENTA;
-import static org.fusesource.jansi.Ansi.Color.RED;
-import static org.fusesource.jansi.Ansi.Color.YELLOW;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -15,7 +8,9 @@ import main.storage.Storage;
 import main.storage.Task;
 
 public class DeleteHandler extends CommandHandler {
-	private static String MESSAGE_DELETE = "List of deleted tasks: \n";
+	
+	private static String MESSAGE_DELETE = "List of deleted tasks:";
+	private static String MESSAGE_DELETED = "Note that you can undo to retrieve the deleted tasks.";
 	private static String MESSAGE_INDEX_OUT_OF_BOUNDS = "Sorry, the task IDs you provided are invalid. Please try again.";
 
 	private DeleteParser parser;
@@ -30,52 +25,57 @@ public class DeleteHandler extends CommandHandler {
 	@Override
 	public String execute() {
 		String returnMessage = parser.parse();
+		ArrayList<Task> tasks = storage.getTasks();
 		if (returnMessage.equals(CommandParser.MESSAGE_PARSE_SUCCESS)) {
-			try {
-				ArrayList<Integer> listOfIndexes = parser.getListOfIndexes();
-				String resultTop = "";
-				String resultBottom = "";
-				returnMessage += "\n";
-				returnMessage += MESSAGE_DELETE;
-				resultTop += DisplayHandler.displayLineSeparator();
-				resultTop += String.format(
-						DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-								.fg(RED).a("ID").reset(), "  |",
-						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|",
-						ansi().fg(CYAN).a(" VENUE").reset(), "|",
-						ansi().fg(YELLOW).a(" TIME").reset(), "|",
-						ansi().fg(GREEN).a(" DATE").reset());
-				resultTop += DisplayHandler.displayLineSeparator();
-				returnMessage += resultTop;
-
-				for (int index : listOfIndexes) {
-					ArrayList<Task> list = storage.getTasks();
-					Task task = list.get(index);
-					returnMessage += DisplayHandler.displayTaskInTable(index,
-							task);
-					storage.removeTask(index);
-					try {
-						googleCalendar.syncDeleteTask(task);
-					} catch (IOException e) {
-						storage.addDeletedTask(task);
-					}
-
-				}
-				storage.saveCurrentState();
-				resultBottom += String.format(
-						DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
-								.fg(RED).a("ID").reset(), "  |",
-						ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|",
-						ansi().fg(CYAN).a(" VENUE").reset(), "|",
-						ansi().fg(YELLOW).a(" TIME").reset(), "|",
-						ansi().fg(GREEN).a(" DATE").reset());
-				resultBottom += DisplayHandler.displayLineSeparator();
-				returnMessage += resultBottom;
-			} catch (IndexOutOfBoundsException e) {
-				returnMessage = MESSAGE_INDEX_OUT_OF_BOUNDS;
-			}
+			returnMessage = deleteSelectedTasks(tasks);
+		} else if (returnMessage.equals(DeleteParser.ARGUMENT_ALL)) {
+			returnMessage = deleteAllTasks(tasks);
 		}
+		return returnMessage;
+	}
 
+	private String deleteSelectedTasks(ArrayList<Task> tasks) {
+		String returnMessage;
+		try {
+			ArrayList<Integer> listOfIndexes = parser.getListOfIndexes();
+			System.out.println(MESSAGE_DELETE);
+			DisplayHandler.displayTop();
+			for (int index : listOfIndexes) {
+				Task task = tasks.get(index);
+				DisplayHandler.displayContents(index, task);
+				storage.removeTask(index);
+				try {
+					googleCalendar.syncDeleteTask(task);
+				} catch (IOException e) {
+					storage.addDeletedTask(task);
+				}
+			}
+			DisplayHandler.displayBottom();
+			storage.saveCurrentState();
+			returnMessage = MESSAGE_DELETED;
+		} catch (IndexOutOfBoundsException e) {
+			returnMessage = MESSAGE_INDEX_OUT_OF_BOUNDS;
+		}
+		return returnMessage;
+	}
+	
+	private String deleteAllTasks(ArrayList<Task> tasks) {
+		String returnMessage;
+		int index = 0;
+		DisplayHandler.displayTop();
+		for (Task task : tasks) {
+			DisplayHandler.displayContents(index, task);
+			try {
+				googleCalendar.syncDeleteTask(task);
+			} catch (IOException e) {
+				storage.addDeletedTask(task);
+			}
+			index++;
+		}
+		storage.clearAllTasks();
+		storage.saveCurrentState();
+		DisplayHandler.displayBottom();
+		returnMessage = MESSAGE_DELETED;
 		return returnMessage;
 	}
 
