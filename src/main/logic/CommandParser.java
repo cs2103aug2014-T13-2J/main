@@ -374,10 +374,18 @@ public abstract class CommandParser {
 		}
 	}
 
-	public static String getTimeAndTrimUserInput(LinkedList<String> wordList) {
+	public static String getTimeAndTrimUserInput(LinkedList<String> wordsList) {
 		String result = "";
-		String word = wordList.poll();
-
+		String word;
+		
+		if (!wordsList.isEmpty()) {
+			word = wordsList.poll().toLowerCase();
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
+		}
+		if (word.length() < 2) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
+		}
 		String pmPortion = word.substring(word.length() - 2, word.length())
 				.toLowerCase();
 		String numPortion = word.substring(0, word.length() - 2).toLowerCase();
