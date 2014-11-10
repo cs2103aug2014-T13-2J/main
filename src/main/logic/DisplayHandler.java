@@ -18,6 +18,9 @@ import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
+/*
+ * This class contains the display table which displays the task list to the user. 
+ */
 public class DisplayHandler extends CommandHandler {
 
 	public static final String DISPLAY_NUM_OF_TASKS = "Total number of tasks: %d\n";
@@ -100,7 +103,11 @@ public class DisplayHandler extends CommandHandler {
 		lineString += "\n";
 		return lineString;
 	}
-
+//@author A0100239W
+	/*
+	 * This method takes care of line overflow in the display table, as well as column alignment. 
+	 * It also assigns the correct colours to the corresponding tasks. 
+	 */
 	public static String displayTaskInTable(int number, Task task) {
 		result = "";
 		boolean completed = task.hasCompleted();
@@ -2188,6 +2195,9 @@ public class DisplayHandler extends CommandHandler {
 		return "(" + task.hasCompleted() + ")" + STRING_SPACE;
 	}
 	//@author A0100239W
+	/*
+	 * This method displays the top header for search and delete class.
+	 */
 	public static void displayTop() {
 		String resultTop = "";
 		resultTop += DisplayHandler.displayLineSeparatorHeader();
@@ -2201,7 +2211,10 @@ public class DisplayHandler extends CommandHandler {
 		resultTop += DisplayHandler.displayLineSeparatorHeader();
 		System.out.print(resultTop);
 	}
-
+	//@author A0100239W
+	/*
+	 * This method displays the bottom header for search and delete class.
+	 */
 	public static void displayBottom() {
 		String resultBottom = "";
 		resultBottom += String.format(
