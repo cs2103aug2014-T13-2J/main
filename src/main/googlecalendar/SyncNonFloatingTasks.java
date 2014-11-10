@@ -15,6 +15,7 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 
+//@author A0072744A
 public class SyncNonFloatingTasks {
 
 	private static LoginToGoogle loginToGoogle = LoginToGoogle.getInstance();

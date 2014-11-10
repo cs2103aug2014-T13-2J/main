@@ -20,6 +20,7 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
 
+//@author A0072744A
 public class LoginToGoogle {
 
 	private static String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";

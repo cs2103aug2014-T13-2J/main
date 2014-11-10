@@ -7,6 +7,7 @@ import main.googlecalendar.GoogleCalendar;
 import main.storage.Storage;
 import main.storage.Task;
 
+//@author A0072744A
 public class DeleteHandler extends CommandHandler {
 
 	private static String MESSAGE_DELETE = "List of deleted tasks:";

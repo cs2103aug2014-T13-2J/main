@@ -5,6 +5,7 @@ import java.util.regex.PatternSyntaxException;
 import main.TaskerLog;
 import main.googlecalendar.GoogleCalendar;
 
+//@author A0072744A
 public class Logic {
 
 	private final static String MESSAGE_INVALID_COMMAND = "Sorry, you entered an invalid command.";
