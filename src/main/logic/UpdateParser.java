@@ -8,23 +8,16 @@ public class UpdateParser extends CommandParser {
 	private Integer taskNumber;
 	private String field;
 
-	protected final static String FIELD_DESCRIPTION = "description";
-	protected final static String FIELD_VENUE = "venue";
-	protected final static String FIELD_START = "start";
+	protected final static String FIELD_DESCRIPTION = "d";
+	protected final static String FIELD_DESCRIPTION_FULL = "description";
+	protected final static String FIELD_VENUE = "v";
+	protected final static String FIELD_VENUE_FULL = "venue";
+	protected final static String FIELD_START = "s";
 	protected final static String FIELD_START_DATE = "start date";
 	protected final static String FIELD_START_TIME = "start time";
-	protected final static String FIELD_END = "end";
+	protected final static String FIELD_END = "e";
 	protected final static String FIELD_END_DATE = "end date";
 	protected final static String FIELD_END_TIME = "end time";
-	protected final static String FIELD_RECURRENCE = "recurrence";
-	protected final static String FIELD_REMINDER = "reminder";
-	protected final static String FIELD_COMPLETE = "complete"; // this is what
-																// the user will
-																// input
-	protected final static String FIELD_INCOMPLETE = "incomplete"; // this is
-																	// what the
-																	// user will
-																	// input
 	private final static String MESSAGE_INVALID_FIELD = "Sorry we did not understand which field you were trying to update.";
 	private final static String MESSAGE_INVALID_TASK_NUMBER = "Task number is not a valid number.";
 	private final static String STRING_SPACE = " ";
@@ -53,7 +46,8 @@ public class UpdateParser extends CommandParser {
 	}
 
 	public void setField(String field) {
-		if (field.equals(FIELD_DESCRIPTION) || field.equals(FIELD_VENUE)
+		if (field.startsWith(FIELD_DESCRIPTION)
+				|| field.startsWith(FIELD_VENUE)
 				|| field.equals(FIELD_START_DATE)
 				|| field.equals(FIELD_START_TIME)
 				|| field.equals(FIELD_END_DATE) || field.equals(FIELD_END_TIME)) {
@@ -73,12 +67,12 @@ public class UpdateParser extends CommandParser {
 		String taskNumber = wordsList.poll();
 		setTaskNumber(taskNumber);
 		String field;
-		if(!wordsList.isEmpty()) {
+		if (!wordsList.isEmpty()) {
 			field = wordsList.poll().toLowerCase();
 		} else {
 			throw new IllegalArgumentException(MESSAGE_INVALID_FIELD);
 		}
-		
+
 		if (isValidField(field)) {
 			String details = getDetails(wordsList);
 			setFieldAndDetails(field, details, wordsList);
@@ -87,12 +81,8 @@ public class UpdateParser extends CommandParser {
 	}
 
 	private boolean isValidField(String field) {
-		if (field.equals(FIELD_DESCRIPTION) || field.equals(FIELD_VENUE)
-				|| field.equals(FIELD_START) || field.equals(FIELD_END)
-				|| field.equals(FIELD_RECURRENCE)
-				|| field.equals(FIELD_REMINDER)
-				|| field.equals(FIELD_COMPLETE)
-				|| field.equals(FIELD_INCOMPLETE)) {
+		if (field.startsWith(FIELD_DESCRIPTION) || field.startsWith(FIELD_VENUE)
+				|| field.startsWith(FIELD_START) || field.startsWith(FIELD_END)) {
 			return true;
 		} else {
 			throw new IllegalArgumentException(MESSAGE_INVALID_FIELD);
@@ -101,13 +91,13 @@ public class UpdateParser extends CommandParser {
 
 	private void setFieldAndDetails(String field, String details,
 			LinkedList<String> wordsList) {
-		if (field.equals(UpdateParser.FIELD_DESCRIPTION)) {
+		if (field.startsWith(FIELD_DESCRIPTION)) {
 			this.setDescription(details);
-			this.setField(FIELD_DESCRIPTION);
-		} else if (field.equals(UpdateParser.FIELD_VENUE)) {
+			this.setField(FIELD_DESCRIPTION_FULL);
+		} else if (field.startsWith(FIELD_VENUE)) {
 			this.setVenue(details);
-			this.setField(FIELD_VENUE);
-		} else if (field.equals(UpdateParser.FIELD_START)) {
+			this.setField(FIELD_VENUE_FULL);
+		} else if (field.startsWith(FIELD_START)) {
 			if (representsTime(wordsList)) {
 				String startTime = getTimeAndTrimUserInput(wordsList);
 				setStartTime(startTime);
@@ -117,7 +107,7 @@ public class UpdateParser extends CommandParser {
 				setStartDate(startDate);
 				this.setField(FIELD_START_DATE);
 			}
-		} else if (field.equals(UpdateParser.FIELD_END)) {
+		} else if (field.startsWith(FIELD_END)) {
 			if (representsTime(wordsList)) {
 				String endTime = getTimeAndTrimUserInput(wordsList);
 				setEndTime(endTime);
@@ -127,18 +117,6 @@ public class UpdateParser extends CommandParser {
 				setEndDate(endDate);
 				this.setField(FIELD_END_DATE);
 			}
-		} else if (field.equals(UpdateParser.FIELD_RECURRENCE)) {
-			setRecurrence(details);
-			this.setField(FIELD_RECURRENCE);
-		} else if (field.equals(UpdateParser.FIELD_REMINDER)) {
-			setReminder(details);
-			this.setField(FIELD_REMINDER);
-		} else if (field.equals(UpdateParser.FIELD_COMPLETE)){
-			this.setCompleted("true");
-			this.setField(FIELD_COMPLETE);
-		} else { //FIELD_INCOMPLEte
-			this.setCompleted("false");
-			this.setField(FIELD_INCOMPLETE);
 		}
 	}
 

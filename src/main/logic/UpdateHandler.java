@@ -38,11 +38,11 @@ public class UpdateHandler extends CommandHandler {
 			String field = parser.getField();
 			Task task = getTask(parser.getTaskNumber());
 
-			if (field.equals(UpdateParser.FIELD_DESCRIPTION)) {
+			if (field.equals(UpdateParser.FIELD_DESCRIPTION_FULL)) {
 				String newDescription = parser.getDescription();
 				task.setDescription(newDescription);
 				googleCalendar.syncUpdateTaskDescription(task, newDescription);
-			} else if (field.equals(UpdateParser.FIELD_VENUE)) {
+			} else if (field.equals(UpdateParser.FIELD_VENUE_FULL)) {
 				if (isFloatingTask(task)) {
 					throw new IllegalArgumentException(
 							MESSAGE_CANNOT_UPDATE_VENUE_FOR_FLOATING_TASK);
@@ -75,10 +75,6 @@ public class UpdateHandler extends CommandHandler {
 							MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK);
 				}
 				updateEndTime(task, parser);
-			} else if (field.equals(UpdateParser.FIELD_COMPLETE)) {
-				task.setCompleted(true);
-			} else {
-				task.setCompleted(false);
 			}
 			storage.saveCurrentState();
 			String successMessage = getSuccessMessage(parser);
@@ -181,17 +177,8 @@ public class UpdateHandler extends CommandHandler {
 
 	private static String getSuccessMessage(UpdateParser parser) {
 		String result;
-		String field = parser.getField();
-		if (field.equals(UpdateParser.FIELD_COMPLETE)) {
-			result = "Task " + parser.getTaskNumber().toString()
-					+ " marked completed!";
-		} else if (field.equals(UpdateParser.FIELD_INCOMPLETE)) {
-			result = "Task " + parser.getTaskNumber().toString()
-					+ " marked incomplete!";
-		} else {
-			result = "Task " + parser.getTaskNumber().toString() + "'s "
+		result = "Task " + parser.getTaskNumber().toString() + "'s "
 					+ parser.getField() + " updated!";
-		}
 		return result;
 	}
 
