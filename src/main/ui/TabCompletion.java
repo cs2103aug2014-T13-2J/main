@@ -24,7 +24,8 @@ public class TabCompletion {
 	private static final String DISPLAY_DELETE = "\033[1mdelete:\033[0m\n\n";
 	private static final String MESSAGE_DELETE = "This is the command to delete task(s) from Tasker.\n"
 			+ "To delete a single task, type \033[1mdelete\033[0m [task index]\n"
-			+ "To delete multiple tasks, type \033[1mdelete\033[0m [task index] [task index] etc\n\n";
+			+ "To delete multiple tasks, type \033[1mdelete\033[0m [task index] [task index] etc\n\n"
+			+ "To delete all the tasks, type \033[1mdelete all\033[0m";
 	private static final String DISPLAY_DISPLAY = "\033[1mdisplay:\033[0m\n\n";
 	private static final String MESSAGE_DISPLAY = "This is the command to display the lists of tasks you have in Tasker.\n"
 			+ "Simply type \033[1mdisplay\033[0m to see the task list.\n\n";
@@ -49,6 +50,8 @@ public class TabCompletion {
 			+ "To synchronise, type \033[1msync\033[0m\n\n";
 	private static final String DISPLAY_EXIT = "\033[1mexit:\033[0m\n\n";
 	private static final String MESSAGE_EXIT = "This is the command to exit Tasker. Simply type \033[1mexit\033[0m\n\n";
+	private static final String DISPLAY_UNDO = "\033[1mundo:\033[0m\n\n";
+	private static final String MESSAGE_UNDO = "This is the command to undo your previous action. The command keyword is \033[1mundo\033[0m.\n\n";
 
 	/**
 	 * This method contains the tab completion feature using Jline library.
@@ -90,6 +93,8 @@ public class TabCompletion {
 		result += MESSAGE_UPDATE;
 		result += DISPLAY_SYNC;
 		result += MESSAGE_SYNC;
+		result += DISPLAY_UNDO;
+		result += MESSAGE_UNDO;
 		result += DISPLAY_EXIT;
 		result += MESSAGE_EXIT;
 		System.out.println(result);
