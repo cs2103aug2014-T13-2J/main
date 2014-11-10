@@ -18,7 +18,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 import com.rits.cloning.Cloner;
-
+//author A0108429A
 public class Storage {
 	private static final int EVENT_ID_INDEX = 0;
 	private static final int DESCRIPTION_INDEX = 1;
@@ -118,7 +118,11 @@ public class Storage {
 	private void setDeletedTasks(ArrayList<Task> deletedTasks) {
 		this.deletedTasks = deletedTasks;
 	}
-
+	/*This method stores snapshots of the tasks after each operation so that
+	 * the revertTaskHistories function can go back to a previous snapshot.
+	 * The local files are written each time it's called in case the program
+	 * crashes, data is not lost.
+	 */
 	public void updateTaskHistories() {
 		Cloner cloner = new Cloner();
 		ArrayList<Task> currentTasks = this.getTasks();
@@ -133,7 +137,10 @@ public class Storage {
 		Storage.writeToFile(DATABASE_FILENAME, tasks);
 		Storage.writeToFile(DELETED_TASKS_FILENAME, deletedTasks);
 	}
-
+	/*This method goes back to a previous snapshot of the tasks.
+	 * The local files are written each time it's called in case the program
+	 * crashes, data is not lost.
+	 */
 	public void revertTaskHistories() {
 		// assumes that size of taskHistory and size of deletedTaskHistory
 		// is always the same
@@ -153,7 +160,9 @@ public class Storage {
 			Storage.writeToFile(DELETED_TASKS_FILENAME, deletedTasks);
 		}
 	}
-
+	/*This method opens the local CSV file and reads its data and converts
+	 * the data into tasks and assigns it to the appriopriate Storage class ArrayList
+	 */
 	public static String readFromFile(String fileName, ArrayList<Task> tasks) {
 		try {
 			String[] nextLine;
@@ -218,7 +227,9 @@ public class Storage {
 			return eventId;
 		}
 	}
-
+	/*This method converts a string date format into a LocalDate object.
+	 * It is used by readFromFile function.
+	 */
 	public static LocalDate convertToDate(String date) {
 		// Date format example: 2014-12-25
 		if (date.equals("null"))
@@ -236,7 +247,9 @@ public class Storage {
 		LocalDate result = new LocalDate(yearInt, monthInt, dayInt);
 		return result;
 	}
-
+	/*This method converts a string time format into a LocalTime object.
+	 * It is used by readFromFile function.
+	 */
 	public static LocalTime convertToTime(String time) {
 		// Time format example: 20:59:00.000
 		if (time.equals("null"))
@@ -259,7 +272,9 @@ public class Storage {
 		LocalTime result = new LocalTime(hourInt, monthInt);
 		return result;
 	}
-
+	/*This method converts a string date format into a DateTime object.
+	 * It is used by readFromFile function.
+	 */
 	public static DateTime convertToDateTime(String dateTime) {
 		// DateTime format example: 2014-10-20T09:00:00.000+08:00
 		if (dateTime.equals("null"))
@@ -294,11 +309,9 @@ public class Storage {
 			return false;
 		}
 	}
-
+	
+	/*This method saves an ArrayList of tasks into a CSV file*/
 	public static String writeToFile(String fileName, ArrayList<Task> tasks) {
-		// this function assumes that the ArrayList containing tasks is fully
-		// updated
-
 		File file = new File(fileName);
 
 		try {
@@ -319,7 +332,9 @@ public class Storage {
 
 		return MESSAGE_WRITE_FROM_FILE_SUCCESS;
 	}
-
+	/*This method calls updateTaskHistories to save a snapshot of the
+	 * current tasks lists
+	 */
 	public void saveCurrentState() {
 		Storage.getInstance().updateTaskHistories();
 	}

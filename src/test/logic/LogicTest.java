@@ -38,7 +38,7 @@ public class LogicTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-
+	//author A0108429A
 	@Test
 	public void testLogicClass() {
 		Storage storage = Storage.getInstance();

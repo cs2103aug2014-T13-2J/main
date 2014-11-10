@@ -31,7 +31,7 @@ public class AddParserTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-
+	//author A0108429
 	@Test
 	public void testParse() {
 		String s1 = "meeting with Prof at 11pm at CLB on 3/10/2014";

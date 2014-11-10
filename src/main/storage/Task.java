@@ -6,7 +6,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
-
+//author A0108429A
 public class Task {
 
 	private static final String DELIMITER = "#!";
@@ -179,7 +179,12 @@ public class Task {
 	public void setHasStartDate(boolean hasStartDate) {
 		this.hasStartDate = hasStartDate;
 	}
-
+	
+	/*This method updates the startDate of a task. If the original startDate equals 
+	 * the original endDate, then both startDate and endDate will be updated to the
+	 * same date. If the new startDate is later than the current endDate, then an 
+	 * exception will be thrown
+	 */
 	public void setStartDate(LocalDate startDate) {
 		if (startDate == null) {
 			this.startDate = startDate;
@@ -205,7 +210,10 @@ public class Task {
 	public void setHasStartTime(boolean hasStartTime) {
 		this.hasStartTime = hasStartTime;
 	}
-
+	
+	/*This method updates the startTime of a task. If the original startTime equals the original
+	endTime, then both startTime and endTime will be updated to the same date. If the new startTime
+	is later than the current endTime, then an exception will be thrown*/
 	public void setStartTime(LocalTime startTime) {
 		if (startTime == null) {
 			this.startTime = startTime;
@@ -231,7 +239,9 @@ public class Task {
 	public void setHasEndDate(boolean hasEndDate) {
 		this.hasEndDate = hasEndDate;
 	}
-
+	/*This method updates the endDate of a task. If the new endDate 
+	 * is earlier than the current startDate, then an exception will be thrown
+	 */
 	public void setEndDate(LocalDate endDate) {
 		if (endDate == null) {
 			this.endDate = endDate;
@@ -251,7 +261,9 @@ public class Task {
 	public void setHasEndTime(boolean hasEndTime) {
 		this.hasEndTime = hasEndTime;
 	}
-
+	/*This method updates the endTime of a task. If the new endTime 
+	 * is earlier than the current startTime, then an exception will be thrown
+	 */
 	public void setEndTime(LocalTime endTime) {
 		if (endTime == null) {
 			this.endTime = endTime;
@@ -303,7 +315,8 @@ public class Task {
 	public void setHasBeenUpdated(boolean hasBeenUpdated) {
 		this.hasBeenUpdated = hasBeenUpdated;
 	}
-
+	
+	/*This method converts a task into a CSV format for file writing*/
 	public String convertToCSVFormat() {
 		String result = "";
 		result = result + this.getId() + DELIMITER;
@@ -350,7 +363,10 @@ public class Task {
 		}
 		return result;
 	}
-
+	/*This function checks to see if a task's end date and time is earlier than
+	 * its start date and date and time. It will return false for floating tasks
+	 * which do not have start and end dates
+	 */
 	public static boolean endIsEarlierThanStart(LocalDate startDate,
 			LocalTime startTime, LocalDate endDate, LocalTime endTime)
 			throws IllegalArgumentException {
@@ -395,8 +411,9 @@ public class Task {
 		}
 
 	}
-
-	// this function assumes that startDate and endDate will never be null
+	/*This function checks to see if a task's start date is equal to its end date.
+	 * This function assumes that startDate and endDate will never be null
+	 */
 	public boolean startDateEqualsEndDate() throws IllegalArgumentException {
 		LocalDate startDate = this.getStartDate();
 		LocalDate endDate = this.getEndDate();
@@ -416,8 +433,9 @@ public class Task {
 		
 		}
 	}
-
-	// this function assumes that startTime and endTime will never be null
+	/*This function checks to see if a task's start time is equal to its end time.
+	 * This function assumes that startTime and endTime will never be null
+	 */
 	public boolean startTimeEqualsEndTime() throws IllegalArgumentException {
 		LocalDate startDate = this.getStartDate();
 		LocalDate endDate = this.getEndDate();

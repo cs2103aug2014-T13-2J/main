@@ -2,14 +2,18 @@ package main.logic;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-
+//author A0108429A
 public class AddParser extends CommandParser {
 
 	public AddParser(String arguments) {
 		super(arguments);
 		userInput = arguments;
 	}
-
+	/*This method takes the user input and gets the description, venue, start
+	 * date, start time, end date, end time fields and stores it in CommandParser attributes
+	 * (non-Javadoc)
+	 * @see main.logic.CommandParser#parse()
+	 */
 	public String parse() {
 		String description = null, venue = null;
 		String startDate = null, startDateYear = null, startDateMonth = null, startDateDay = null;
@@ -125,7 +129,7 @@ public class AddParser extends CommandParser {
 
 		return MESSAGE_PARSE_SUCCESS;
 	}
-
+	/*This method removes the first word from a LinkedList*/
 	private static void removeCurrentWord(LinkedList<String> wordsList) {
 		if (wordsList.isEmpty()) {
 			throw new IllegalArgumentException(MESSAGE_INVALID_FORMAT);
