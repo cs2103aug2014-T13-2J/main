@@ -8,10 +8,9 @@ import main.storage.Storage;
 import main.storage.Task;
 
 public class DeleteHandler extends CommandHandler {
-	
+
 	private static String MESSAGE_DELETE = "List of deleted tasks:";
 	private static String MESSAGE_DELETED = "Note that you can undo to retrieve the deleted tasks.";
-	private static String MESSAGE_INDEX_OUT_OF_BOUNDS = "Sorry, the task IDs you provided are invalid. Please try again.";
 
 	private DeleteParser parser;
 	private static Storage storage = Storage.getInstance();
@@ -36,29 +35,25 @@ public class DeleteHandler extends CommandHandler {
 
 	private String deleteSelectedTasks(ArrayList<Task> tasks) {
 		String returnMessage;
-		try {
-			ArrayList<Integer> listOfIndexes = parser.getListOfIndexes();
-			System.out.println(MESSAGE_DELETE);
-			DisplayHandler.displayTop();
-			for (int index : listOfIndexes) {
-				Task task = tasks.get(index);
-				DisplayHandler.displayContents(index, task);
-				storage.removeTask(index);
-				try {
-					googleCalendar.syncDeleteTask(task);
-				} catch (IOException e) {
-					storage.addDeletedTask(task);
-				}
+		ArrayList<Integer> listOfIndexes = parser.getListOfIndexes();
+		System.out.println(MESSAGE_DELETE);
+		DisplayHandler.displayTop();
+		for (int index : listOfIndexes) {
+			Task task = tasks.get(index);
+			DisplayHandler.displayContents(index, task);
+			storage.removeTask(index);
+			try {
+				googleCalendar.syncDeleteTask(task);
+			} catch (IOException e) {
+				storage.addDeletedTask(task);
 			}
-			DisplayHandler.displayBottom();
-			storage.saveCurrentState();
-			returnMessage = MESSAGE_DELETED;
-		} catch (IndexOutOfBoundsException e) {
-			returnMessage = MESSAGE_INDEX_OUT_OF_BOUNDS;
 		}
+		DisplayHandler.displayBottom();
+		storage.saveCurrentState();
+		returnMessage = MESSAGE_DELETED;
 		return returnMessage;
 	}
-	
+
 	private String deleteAllTasks(ArrayList<Task> tasks) {
 		String returnMessage;
 		int index = 0;
