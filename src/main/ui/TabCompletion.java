@@ -6,7 +6,12 @@ import jline.ArgumentCompletor;
 import jline.ConsoleReader;
 import jline.SimpleCompletor;
 import main.logic.Logic;
+
 //@author A0100239W
+/**
+ * This class takes care of the tab completion aspect of Tasker and passes valid
+ * commands to the Logic class.
+ */
 public class TabCompletion {
 	private static String line;
 	private static final String MESSAGE_PROMPT = "Enter Command: ";
@@ -45,11 +50,15 @@ public class TabCompletion {
 	private static final String DISPLAY_EXIT = "\033[1mexit:\033[0m\n\n";
 	private static final String MESSAGE_EXIT = "This is the command to exit Tasker. Simply type \033[1mexit\033[0m\n\n";
 
+	/**
+	 * This method contains the tab completion feature using Jline library.
+	 */
 	public void run() throws IOException {
 		ConsoleReader reader = new ConsoleReader();
 		String[] availableCommandStrings = new String[] { "add", "search",
 				"update", "exit", "display", "help", "sync", "undo", "delete" };
-		SimpleCompletor simpleCompletor = new SimpleCompletor(availableCommandStrings);
+		SimpleCompletor simpleCompletor = new SimpleCompletor(
+				availableCommandStrings);
 
 		ArgumentCompletor argumentCompletor = new ArgumentCompletor(
 				simpleCompletor);
@@ -64,6 +73,9 @@ public class TabCompletion {
 		}
 	}
 
+	/**
+	 * This method prints out the help manual for users. 
+	 */
 	private void printHelp() {
 		String result = "\n";
 		result += DISPLAY_ADD;

@@ -7,7 +7,13 @@ import main.googlecalendar.GoogleCalendar;
 import main.storage.Storage;
 
 import org.fusesource.jansi.AnsiConsole;
+
 //@author A0100239W
+/**
+ * This class initializes Tasker to sync with Google Calendar and read in user
+ * input.
+ * 
+ */
 @SuppressWarnings("unused")
 public class UI {
 
@@ -17,6 +23,9 @@ public class UI {
 	private static GoogleCalendar googleCalendar;
 	private static TabCompletion tab = new TabCompletion();
 
+	/**
+	 * This method initializes Tasker's synchronization with Google Calendar
+	 */
 	public static void initializeEnvironment() {
 		AnsiConsole.systemInstall();
 		System.out.println(MESSAGE_WELCOME);
@@ -25,6 +34,12 @@ public class UI {
 		TaskerLog.logSystemInfo("Tasker initialized.");
 	}
 
+	/**
+	 * This method calls the tab completion class. The commented portion of the
+	 * code is for running Tasker without tab completion.
+	 * 
+	 * @throws IOException
+	 */
 	public static void readAndExecuteCommands() throws IOException {
 		// Comment the line below to disable tab completion.
 		tab.run();
@@ -38,6 +53,10 @@ public class UI {
 		 */
 	}
 
+	/**
+	 * This method reads from storage for previously entered tasks or deleted
+	 * tasks.
+	 */
 	private static void readFromStorage() {
 		Storage.readFromFile(Storage.DATABASE_FILENAME, Storage.getInstance()
 				.getTasks());

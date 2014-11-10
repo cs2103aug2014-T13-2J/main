@@ -8,6 +8,10 @@ import main.storage.Task;
 import main.logic.DisplayHandler;
 
 //@author A0100239W
+/**
+ * This class parses through the user input and prints out either the valid
+ * searched items or the appropriate messages if search keyword is not valid.
+ */
 public class SearchParser extends CommandParser {
 	public static final String MESSAGE_ERROR = "Would you like to search \"floating\", \"past\", \"today\" or \"future\"?.";
 	public static final String MESSAGE_NULL = "Task list is empty. There is nothing to search from.";
@@ -36,8 +40,16 @@ public class SearchParser extends CommandParser {
 
 	}
 
+	/*
+	 * This method overwrites the parse() method of the CommandParser class. It
+	 * checks what message to return based on the input, and prints out the
+	 * valid return message.
+	 * 
+	 * @see main.logic.CommandParser#parse()
+	 */
 	@Override
 	public String parse() {
+		int oneCharacter = 1;
 
 		if (list.isEmpty()) {
 			return MESSAGE_NULL;
@@ -55,8 +67,7 @@ public class SearchParser extends CommandParser {
 
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 0) {
-						DisplayHandler.displayContents(i,
-								list.get(i));
+						DisplayHandler.displayContents(i, list.get(i));
 					}
 				}
 
@@ -78,8 +89,7 @@ public class SearchParser extends CommandParser {
 
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -1) {
-						DisplayHandler.displayContents(i,
-								list.get(i));
+						DisplayHandler.displayContents(i, list.get(i));
 					}
 				}
 
@@ -100,8 +110,7 @@ public class SearchParser extends CommandParser {
 
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -2) {
-						DisplayHandler.displayContents(i,
-								list.get(i));
+						DisplayHandler.displayContents(i, list.get(i));
 					}
 				}
 
@@ -121,8 +130,7 @@ public class SearchParser extends CommandParser {
 
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 1) {
-						DisplayHandler.displayContents(i,
-								list.get(i));
+						DisplayHandler.displayContents(i, list.get(i));
 					}
 				}
 
@@ -138,12 +146,12 @@ public class SearchParser extends CommandParser {
 		else if (!isWithin(userInput)) {
 			return MESSAGE_UNAVAILABLE;
 		}
-		
-		else if(userInput.length() == 1){
+
+		else if (userInput.length() == oneCharacter) {
 			return MESSAGE_UNAVAILABLE;
 		}
 
-		else if (isWithin(userInput)){
+		else if (isWithin(userInput)) {
 			lowerCaseKey = userInput.toLowerCase();
 
 			System.out.println();
@@ -153,12 +161,10 @@ public class SearchParser extends CommandParser {
 
 			for (int i = 0; i < list.size(); i++) {
 				if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
-					DisplayHandler.displayContents(i,
-							list.get(i));
+					DisplayHandler.displayContents(i, list.get(i));
 				}
 			}
-			
-		
+
 			DisplayHandler.displayBottom();
 
 			return returnMessage;
@@ -166,6 +172,12 @@ public class SearchParser extends CommandParser {
 		return returnMessage;
 	}
 
+	/**
+	 * This method checks whether the keyword is within the task list.
+	 * 
+	 * @param input
+	 * @return
+	 */
 	private boolean isWithin(String input) {
 
 		lowerCaseKey = userInput.toLowerCase();
@@ -206,6 +218,12 @@ public class SearchParser extends CommandParser {
 		return false;
 	}
 
+	/**
+	 * This method checks whether there are any tasks to do from the current
+	 * time until the end of the current day.
+	 * 
+	 * @return
+	 */
 	private boolean isToday() {
 		for (int i = 0; i < list.size(); i++) {
 			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.PRESENT) {
@@ -215,6 +233,11 @@ public class SearchParser extends CommandParser {
 		return false;
 	}
 
+	/**
+	 * This method checks whether there were any tasks that were already due.
+	 * 
+	 * @return
+	 */
 	private boolean isPast() {
 		for (int i = 0; i < list.size(); i++) {
 			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.PAST) {
@@ -224,6 +247,11 @@ public class SearchParser extends CommandParser {
 		return false;
 	}
 
+	/**
+	 * This method checks whether there are tasks due from the next day onwards.
+	 * 
+	 * @return
+	 */
 	private boolean isFuture() {
 		for (int i = 0; i < list.size(); i++) {
 			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.FUTURE) {
@@ -233,6 +261,11 @@ public class SearchParser extends CommandParser {
 		return false;
 	}
 
+	/**
+	 * This method checks whether there are any floating tasks.
+	 * 
+	 * @return
+	 */
 	private boolean isFloating() {
 		for (int i = 0; i < list.size(); i++) {
 			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.TASK_DOES_NOT_HAVE_DATE_TIME) {
