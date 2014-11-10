@@ -8,6 +8,9 @@ import main.storage.Storage;
 import main.storage.Task;
 
 //@author A0072744A
+/**
+ * This class handles the deleting of tasks.
+ */
 public class DeleteHandler extends CommandHandler {
 
 	private static String MESSAGE_DELETE = "List of deleted tasks:";
@@ -17,11 +20,23 @@ public class DeleteHandler extends CommandHandler {
 	private static Storage storage = Storage.getInstance();
 	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
 
+	/**
+	 * This method creates a new DeleteParser constructor to parse the user
+	 * parameters.
+	 * 
+	 * @param details
+	 */
 	public DeleteHandler(String details) {
 		super(details);
 		parser = new DeleteParser(details);
 	}
 
+	/*
+	 * This method overrides the execute() method of CommandHandler class. It
+	 * retrieves the stored tasks and delete according to the user parameters.
+	 * 
+	 * @see main.logic.CommandHandler#execute()
+	 */
 	@Override
 	public String execute() {
 		String returnMessage = parser.parse();
@@ -34,6 +49,13 @@ public class DeleteHandler extends CommandHandler {
 		return returnMessage;
 	}
 
+	/**
+	 * This method deletes user-selected tasks before executing the
+	 * synchronisation.
+	 * 
+	 * @param tasks
+	 * @return the relevant delete result for the user
+	 */
 	private String deleteSelectedTasks(ArrayList<Task> tasks) {
 		String returnMessage;
 		ArrayList<Integer> listOfIndexes = parser.getListOfIndexes();
@@ -55,6 +77,12 @@ public class DeleteHandler extends CommandHandler {
 		return returnMessage;
 	}
 
+	/**
+	 * This method deletes all tasks before executing the synchronisation.
+	 * 
+	 * @param tasks
+	 * @return the relevant delete result for the user
+	 */
 	private String deleteAllTasks(ArrayList<Task> tasks) {
 		String returnMessage;
 		int index = 0;

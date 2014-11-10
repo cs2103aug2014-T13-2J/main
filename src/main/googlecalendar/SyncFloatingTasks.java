@@ -7,6 +7,9 @@ import main.storage.Task;
 import com.google.api.services.tasks.Tasks;
 
 //@author A0072744A
+/**
+ * This class handles the synchronisation of floating tasks to Google Tasks.
+ */
 public class SyncFloatingTasks {
 
 	private static String ID_GOOGLE_TASKS = "@default";
@@ -15,6 +18,12 @@ public class SyncFloatingTasks {
 	private static Tasks googleTasksClient = loginToGoogle
 			.getGoogleTasksClient();
 
+	/**
+	 * This method synchronises the adding of a floating task to Google Tasks.
+	 * 
+	 * @param task
+	 * @return the task ID provided by Google Tasks
+	 */
 	protected static String syncAddTask(Task task) {
 		String id = null;
 		com.google.api.services.tasks.model.Task googleTask = new com.google.api.services.tasks.model.Task();
@@ -29,11 +38,23 @@ public class SyncFloatingTasks {
 		return id;
 	}
 
+	/**
+	 * This method synchronises the deleting of a floating task to Google Tasks.
+	 * 
+	 * @param task
+	 * @throws IOException
+	 */
 	protected static void syncDeleteTask(Task task) throws IOException {
 		String id = task.getId();
 		googleTasksClient.tasks().delete(ID_GOOGLE_TASKS, id).execute();
 	}
 
+	/**
+	 * This method synchronises the updating of a floating task to Google Tasks.
+	 * 
+	 * @param googleTask
+	 * @throws IOException
+	 */
 	protected static void syncPatchTask(
 			com.google.api.services.tasks.model.Task googleTask)
 			throws IOException {
@@ -44,6 +65,14 @@ public class SyncFloatingTasks {
 		}
 	}
 
+	/**
+	 * This method synchronises the updating of the description of a floating
+	 * task to Google Tasks.
+	 * 
+	 * @param task
+	 * @param newDescription
+	 * @throws IOException
+	 */
 	public static void syncUpdateTaskDescription(Task task,
 			String newDescription) throws IOException {
 		com.google.api.services.tasks.model.Task googleTask = convertFloatingTaskToGoogleTask(task);
@@ -51,6 +80,12 @@ public class SyncFloatingTasks {
 		syncPatchTask(googleTask);
 	}
 
+	/**
+	 * This method converts a floating task to a Google Task.
+	 * 
+	 * @param task
+	 * @return the converted Google Task object
+	 */
 	protected static com.google.api.services.tasks.model.Task convertFloatingTaskToGoogleTask(
 			Task task) {
 		com.google.api.services.tasks.model.Task googleTask = new com.google.api.services.tasks.model.Task();

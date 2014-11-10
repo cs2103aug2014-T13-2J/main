@@ -16,6 +16,10 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 
 //@author A0072744A
+/**
+ * This class handles the synchronisation of non-floating tasks to Google
+ * Calendar.
+ */
 public class SyncNonFloatingTasks {
 
 	private static LoginToGoogle loginToGoogle = LoginToGoogle.getInstance();
@@ -23,6 +27,13 @@ public class SyncNonFloatingTasks {
 			.getGoogleCalendarClient();
 	private static String googleId = loginToGoogle.getGoogleId();
 
+	/**
+	 * This method synchronises the adding of a non-floating task to Google
+	 * Calendar.
+	 * 
+	 * @param task
+	 * @return the task ID provided by Google Calendar
+	 */
 	protected static String syncAddTask(Task task) {
 		String id = null;
 		Event event = convertNonFloatingTaskToEvent(task);
@@ -31,19 +42,31 @@ public class SyncNonFloatingTasks {
 					.execute();
 			id = event.getId();
 		} catch (IOException e) {
-			
+
 		}
 		return id;
 	}
 
-	protected static void syncDeleteTask(Task task)
-			throws IOException {
+	/**
+	 * This method synchronises the deleting of a non-floating task to Google
+	 * Calendar.
+	 * 
+	 * @param task
+	 * @throws IOException
+	 */
+	protected static void syncDeleteTask(Task task) throws IOException {
 		String id = task.getId();
 		googleCalendarClient.events().delete(googleId, id).execute();
 	}
 
-	protected static void syncPatchTask(Event event)
-			throws IOException {
+	/**
+	 * This method synchronises the updating of a non-floating task to Google
+	 * Calendar.
+	 * 
+	 * @param event
+	 * @throws IOException
+	 */
+	protected static void syncPatchTask(Event event) throws IOException {
 		String eventId = event.getId();
 		if (eventId != null) {
 			googleCalendarClient.events().patch(googleId, eventId, event)
@@ -51,6 +74,14 @@ public class SyncNonFloatingTasks {
 		}
 	}
 
+	/**
+	 * This method synchronises the updating of the description of a
+	 * non-floating task to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newDescription
+	 * @throws IOException
+	 */
 	protected static void syncUpdateTaskDescription(Task task,
 			String newDescription) throws IOException {
 		Event event = convertNonFloatingTaskToEvent(task);
@@ -58,6 +89,13 @@ public class SyncNonFloatingTasks {
 		syncPatchTask(event);
 	}
 
+	/**
+	 * This method synchronises the updating of the venue of a non-floating task
+	 * to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newVenue
+	 */
 	public static void syncUpdateTaskVenue(Task task, String newVenue) {
 		Event event = convertNonFloatingTaskToEvent(task);
 		event.setLocation(newVenue);
@@ -68,6 +106,13 @@ public class SyncNonFloatingTasks {
 		}
 	}
 
+	/**
+	 * This method synchronises the updating of the start date of a non-floating
+	 * task to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newStartDate
+	 */
 	public static void syncUpdateTaskStartDate(Task task, LocalDate newStartDate) {
 		Event event = convertNonFloatingTaskToEvent(task);
 		EventDateTime eventDateTime = null;
@@ -90,6 +135,14 @@ public class SyncNonFloatingTasks {
 		}
 	}
 
+	/**
+	 * This method synchronises the updating of the start time of a non-floating
+	 * task to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newStartTime
+	 * @throws IOException
+	 */
 	public static void syncUpdateTaskStartTime(Task task, LocalTime newStartTime)
 			throws IOException {
 		Event event = convertNonFloatingTaskToEvent(task);
@@ -105,6 +158,13 @@ public class SyncNonFloatingTasks {
 		}
 	}
 
+	/**
+	 * This method synchronises the updating of the end date of a non-floating
+	 * task to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newEndDate
+	 */
 	public static void syncUpdateTaskEndDate(Task task, LocalDate newEndDate) {
 		Event event = convertNonFloatingTaskToEvent(task);
 		EventDateTime eventDateTime = null;
@@ -122,6 +182,14 @@ public class SyncNonFloatingTasks {
 		}
 	}
 
+	/**
+	 * This method synchronises the updating of the end time of a non-floating
+	 * task to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newEndTime
+	 * @throws IOException
+	 */
 	public static void syncUpdateTaskEndTime(Task task, LocalTime newEndTime)
 			throws IOException {
 		Event event = convertNonFloatingTaskToEvent(task);
@@ -137,6 +205,12 @@ public class SyncNonFloatingTasks {
 		}
 	}
 
+	/**
+	 * This method converts a non-floating task to a Google Calendar Event.
+	 * 
+	 * @param task
+	 * @return the converted Google Calendar Event object
+	 */
 	protected static Event convertNonFloatingTaskToEvent(Task task) {
 		Event event = new Event();
 		event.setId(task.getId());
@@ -168,6 +242,12 @@ public class SyncNonFloatingTasks {
 		return event;
 	}
 
+	/**
+	 * This method converts a LocalDate to a EventDateTime.
+	 * 
+	 * @param localDate
+	 * @return the converted EventDateTime object
+	 */
 	private static EventDateTime convertToEventDateTime(LocalDate localDate) {
 		String temp = localDate.toString(); // of the format YYYY-MM-DD
 		DateTime date = new DateTime(temp);
@@ -176,6 +256,13 @@ public class SyncNonFloatingTasks {
 		return eventDateTime;
 	}
 
+	/**
+	 * This method converts a LocalDate and LocalTime to a EventDateTime.
+	 * 
+	 * @param taskDate
+	 * @param taskTime
+	 * @return the converted EventDateTime object
+	 */
 	private static EventDateTime convertToEventDateTime(LocalDate taskDate,
 			LocalTime taskTime) {
 		org.joda.time.DateTime jodaDateTime = taskDate.toDateTime(taskTime);
@@ -186,6 +273,12 @@ public class SyncNonFloatingTasks {
 		return eventDateTime;
 	}
 
+	/**
+	 * This method converts a EventDateTime to LocalDateTime.
+	 * 
+	 * @param eventDateTime
+	 * @return the converted LocalDateTime object
+	 */
 	private static LocalDateTime convertToLocalDateTime(
 			EventDateTime eventDateTime) {
 		DateTime dateTime = eventDateTime.getDateTime();

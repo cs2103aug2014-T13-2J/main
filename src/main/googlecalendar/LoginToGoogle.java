@@ -21,12 +21,16 @@ import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
 
 //@author A0072744A
+/**
+ * This class handles the logging in to Google Calendar and Google Tasks.
+ */
 public class LoginToGoogle {
 
 	private static String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
 	private static String CLIENT_ID = "101595183122-6l80mvk11dn0o476g77773fi73mev60c.apps.googleusercontent.com";
 	private static String CLIENT_SECRET = "0qES2e4j6ob4WlgekNRCESzR";
 	private static String NAME_APPLICATION = "Tasker/0.5";
+	private static String GOOGLE_CALENDAR_TYPE = "primary";
 
 	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google.";
 	private static String MESSAGE_LOGIN_FAIL = "Sorry, an error has occurred while logging in to Google. Please restart Tasker.";
@@ -36,9 +40,10 @@ public class LoginToGoogle {
 	private static String MESSAGE_INVALID_ARGUMENT = "Sorry, the argument must either be 'Y' or 'N'.";
 	private static String MESSAGE_INVALID_EMAIL = "Sorry, the argument must be a valid email address.";
 
-	/** Directory to store user credentials. */
 	private static final File CREDENTIAL_STORE_DIR = new File(
-			System.getProperty("user.dir"), ".store/Tasker");
+			System.getProperty("user.dir"), ".store/Tasker"); // Directory to
+																// store user
+																// credentials.
 	private static FileDataStoreFactory dataStoreFactory;
 	private static HttpTransport httpTransport;
 	private static final JsonFactory JSON_FACTORY = JacksonFactory
@@ -50,11 +55,20 @@ public class LoginToGoogle {
 	private static String googleId = null;
 	private static Scanner scanner;
 
+	/**
+	 * This constructor calls the login() method.
+	 */
 	private LoginToGoogle() {
 		scanner = new Scanner(System.in);
 		System.out.println(login());
 	}
 
+	/**
+	 * This method creates the singleton for LoginToGoogle class and ensures
+	 * that the LoginToGoogle constructor is not called more than once.
+	 * 
+	 * @return
+	 */
 	public static LoginToGoogle getInstance() {
 		if (theOne == null) {
 			theOne = new LoginToGoogle();
@@ -74,6 +88,11 @@ public class LoginToGoogle {
 		return googleId;
 	}
 
+	/**
+	 * This method initiates the logging in to Google Calendar and Google Tasks.
+	 * 
+	 * @return the relevant login result for user
+	 */
 	private String login() {
 		try {
 			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
@@ -90,8 +109,8 @@ public class LoginToGoogle {
 		}
 
 		try {
-			googleId = googleCalendarClient.calendars().get("primary")
-					.execute().getId();
+			googleId = googleCalendarClient.calendars()
+					.get(GOOGLE_CALENDAR_TYPE).execute().getId();
 		} catch (IOException e) {
 			if (googleId == null) {
 				return getGoogleIdFromUser();
@@ -100,7 +119,13 @@ public class LoginToGoogle {
 		return MESSAGE_LOGIN_SUCCESS;
 	}
 
-	/** Authorizes the installed application to access user's protected data. */
+	/**
+	 * This method authorises Tasker to access the user's protected data in
+	 * Google Calendar and Google Tasks.
+	 * 
+	 * @return the credentials
+	 * @throws Exception
+	 */
 	private static Credential authorise() throws Exception {
 		// load client secrets
 		GoogleClientSecrets.Details installedDetails = new GoogleClientSecrets.Details();
@@ -109,7 +134,7 @@ public class LoginToGoogle {
 		GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
 		clientSecrets.setInstalled(installedDetails);
 
-		// set up authorization code flow
+		// set up authorisation code flow
 		ArrayList<String> scopes = new ArrayList<>();
 		scopes.add(CalendarScopes.CALENDAR);
 		scopes.add(TasksScopes.TASKS);
@@ -122,6 +147,11 @@ public class LoginToGoogle {
 				new LocalServerReceiver()).authorize("user");
 	}
 
+	/**
+	 * This method asks and retrieves the Google ID from the user.
+	 * 
+	 * @return the relevant success message of retrieving the Google ID
+	 */
 	private String getGoogleIdFromUser() {
 		String message = "";
 		System.out.println(MESSAGE_OFFLINE_FIRST_TIME);
@@ -139,6 +169,12 @@ public class LoginToGoogle {
 		return message;
 	}
 
+	/**
+	 * This method confirms with the user that the Google ID provided is
+	 * correct.
+	 * 
+	 * @return true if user enters Y
+	 */
 	private boolean confirmGoogleIdFromUser() {
 		System.out.printf(MESSAGE_OFFLINE_CONFIRM_ID, googleId);
 		String userReply = scanner.nextLine();
@@ -152,6 +188,13 @@ public class LoginToGoogle {
 		}
 	}
 
+	/**
+	 * This method determines whether the Google ID provided by the user is of
+	 * the correct email format.
+	 * 
+	 * @param calendarId
+	 * @return true if the Google ID is of the correct email format
+	 */
 	private boolean isValidEmail(String calendarId) {
 		boolean isValid = calendarId.matches(EMAIL_REGEX);
 		return isValid;

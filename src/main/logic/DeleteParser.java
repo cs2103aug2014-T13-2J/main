@@ -7,6 +7,10 @@ import java.util.Objects;
 import main.storage.Storage;
 
 //@author A0072744A
+/**
+ * This class parses the user parameters for DeleteHandler to verify the
+ * validity.
+ */
 public class DeleteParser extends CommandParser {
 
 	private static String MESSAGE_INVALID_ARGUMENT_TYPE = "Sorry, you have entered invalid task IDs. Please try again.";
@@ -17,12 +21,23 @@ public class DeleteParser extends CommandParser {
 	private String arguments;
 	private ArrayList<Integer> listOfIndexes;
 
+	/**
+	 * This constructor initialises the ArrayList to store the user parameters.
+	 * 
+	 * @param arguments
+	 */
 	public DeleteParser(String arguments) {
 		super(arguments);
 		this.arguments = arguments;
 		listOfIndexes = new ArrayList<>();
 	}
 
+	/*
+	 * This method overrides the parse() method of CommandParser class. It
+	 * breaks up the user parameters to determine the deleting action.
+	 * 
+	 * @see main.logic.CommandParser#parse()
+	 */
 	@Override
 	public String parse() {
 		if (arguments.equalsIgnoreCase(ARGUMENT_ALL)) {
