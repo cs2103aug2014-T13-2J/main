@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-
+//author A0108429A
 public abstract class CommandParser {
 
 	/***************************** Data Members ************************/
@@ -258,8 +258,9 @@ public abstract class CommandParser {
 	/****************************************************************/
 	public abstract String parse();
 
-	// This function assumes that any of the reserved words will not be part of
-	// the description
+	/*This function gets the description from a LinkedList containing the user input
+	 * and removes these words from the LinkedList
+	 */
 	public static String getDescriptionAndTrimUserInput(
 			LinkedList<String> wordsList) throws IllegalArgumentException {
 		String currentWord, description = "";
@@ -330,8 +331,9 @@ public abstract class CommandParser {
 		}
 	}
 
-	// This function ensures that word is of the format H.M or H, appended by am
-	// or pm. H and M can be any integer.
+	/* This function checks if the first word of the LinkedList is of the format H.M or H, appended by am
+	 * or pm. H and M can be any integer.
+	 */
 	public static boolean representsTime(LinkedList<String> wordsList)
 			throws IllegalArgumentException {
 		String word;
@@ -373,7 +375,9 @@ public abstract class CommandParser {
 			return false;
 		}
 	}
-
+	/* This function gets the time from a LinkedList containing the user input and
+	 * removes the word from the LinkedList
+	 */
 	public static String getTimeAndTrimUserInput(LinkedList<String> wordsList) {
 		String result = "";
 		String word;
@@ -440,7 +444,9 @@ public abstract class CommandParser {
 		}
 
 	}
-
+	/* This method gets the venue from a LinkedList containing the user input and
+	 * removes these words from the LinkedList
+	 */
 	public static String getVenueAndTrimUserInput(LinkedList<String> wordsList)
 			throws IllegalArgumentException {
 		LinkedList<String> stack = new LinkedList<String>();
@@ -506,7 +512,9 @@ public abstract class CommandParser {
 
 		return venue;
 	}
-
+	/* This method gets the date from a LinkedList containing the user input and
+	 * removes these words from the LinkedList.
+	 */
 	public static String getDateAndTrimUserInput(LinkedList<String> wordsList)
 			throws IllegalArgumentException {
 		String date = "";
@@ -612,7 +620,11 @@ public abstract class CommandParser {
 			return date;
 		}
 	}
-
+	/* This method is called when the user provides a date that specifies
+	 * the date and month, but not the year. It will return the current year
+	 * if the user's date has not passed, but if it has already passed, then it
+	 * will return the next year.
+	 */
 	private static String getYearForAppend(String month) {
 		// get current year and append to D/M
 		DateTime current = new DateTime();
@@ -660,8 +672,9 @@ public abstract class CommandParser {
 		}
 	}
 
-	// This function assumes startTime is of the format H.M, where H and M can
-	// be any integer not starting with 0
+	 /*This function assumes startTime is of the format H.M, where H and M 
+	  * can be any integer not starting with 0. It will return H as a string.
+	  */
 	public static String getHour(String timeFormat) {
 		if (timeFormat == null) {
 			return null;
@@ -670,8 +683,9 @@ public abstract class CommandParser {
 		return temp[INDEX_HOUR];
 	}
 
-	// This function assumes startTime is of the format H.M, where H and M can
-	// be any integer not starting with 0
+	 /*This function assumes startTime is of the format H.M, where H and M 
+	  * can be any integer not starting with 0. It will return M as a string.
+	  */
 	public static String getMinute(String timeFormat) {
 		if (timeFormat == null) {
 			return null;
@@ -680,8 +694,9 @@ public abstract class CommandParser {
 		return temp[INDEX_MINUTE];
 	}
 
-	// this function assumes dateFormat is of the format D/M/Y, where H and M
-	// can be any integer not starting with 0
+	/* this function assumes dateFormat is of the format D/M/Y, where H and M
+	 *  can be any integer not starting with 0. It will return Y as a string.
+	 */
 	public static String getYear(String dateFormat) {
 		if (dateFormat == null) {
 			return null;
@@ -690,8 +705,9 @@ public abstract class CommandParser {
 		return temp[INDEX_YEAR];
 	}
 
-	// this function assumes dateFormat is of the format D/M/Y, where H and M
-	// can be any integer not starting with 0
+	/* this function assumes dateFormat is of the format D/M/Y, where H and M
+	 *  can be any integer not starting with 0. It will return M as a string.
+	 */
 	public static String getMonth(String dateFormat) {
 		if (dateFormat == null) {
 			return null;
@@ -700,8 +716,9 @@ public abstract class CommandParser {
 		return temp[INDEX_MONTH];
 	}
 
-	// this function assumes dateFormat is of the format D/M/Y, where H and M
-	// can be any integer not starting with 0
+	/* this function assumes dateFormat is of the format D/M/Y, where H and M
+	 *  can be any integer not starting with 0. It will return D as a string.
+	 */
 	public static String getDay(String dateFormat) {
 		if (dateFormat == null) {
 			return null;
@@ -709,19 +726,19 @@ public abstract class CommandParser {
 		String[] temp = dateFormat.split("/");
 		return temp[INDEX_DAY];
 	}
-
+	/*This method will return the current year*/
 	protected static String generateYear() {
 		DateTime current = new DateTime();
 		Integer year = current.getYear();
 		return year.toString();
 	}
-
+	/*This method will return the current month*/
 	protected static String generateMonth() {
 		DateTime current = new DateTime();
 		Integer month = current.getMonthOfYear();
 		return month.toString();
 	}
-
+	/*This method will return the current date (only the day)*/
 	protected static String generateDay() {
 		DateTime current = new DateTime();
 		Integer day = current.getDayOfMonth();
@@ -790,7 +807,10 @@ public abstract class CommandParser {
 		}
 		return true;
 	}
-
+	/*This method will check if the first few words in the LinkedList is of a date
+	 * format, e.g. 25 December, 25 December 2014, 25/12, 25/12/2014, thursday,
+	 * next thursday
+	 */
 	public static boolean representsDate(LinkedList<String> wordsList) {
 		LinkedList<String> stack = new LinkedList<String>();
 		String currentWord;
@@ -855,7 +875,10 @@ public abstract class CommandParser {
 		}
 	}
 
-	// this function is called when the next word is a reserved word
+	/*This method is called when the first word in the LinkedList is a reserved word,
+	 * but it has been determined that it does not represent a task field (e.g. date or time),
+	 * so it can be appended to the description
+	 */
 	protected static String appendToDescription(LinkedList<String> wordsList,
 			String description) {
 		// the first word will be a reserved word so we add it to description

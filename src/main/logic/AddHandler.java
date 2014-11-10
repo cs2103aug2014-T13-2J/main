@@ -9,7 +9,7 @@ import main.storage.TaskBuilder;
 import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
-
+//author A0108429A
 public class AddHandler extends CommandHandler {
 
 	private AddParser parser;
@@ -39,7 +39,10 @@ public class AddHandler extends CommandHandler {
 			return e.getMessage();
 		}
 	}
-
+	/*This method takes the information parsed by the parse function
+	 * and constructs a task containing the information in the appropriate
+	 * fields
+	 */
 	public Task convertParsedDetailsToTask() {
 		TaskBuilder builder = new TaskBuilder();
 

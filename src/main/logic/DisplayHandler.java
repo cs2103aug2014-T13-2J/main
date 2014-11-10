@@ -2071,7 +2071,7 @@ public class DisplayHandler extends CommandHandler {
 
 		return result;
 	}
-
+	//author A0108429A
 	public static String displayTaskForAdd(Task task) {
 		result = "";
 		result = result + displayTask(task) + MESSAGE_ADDED;
@@ -2221,7 +2221,7 @@ public class DisplayHandler extends CommandHandler {
 		print += displayTaskInTable(index, task);
 		System.out.print(print);
 	}
-
+	//author A0108429A
 	// this function returns -1 if the start date time of the task is before
 	// the current date time, 0 if the the start date time of the task is after
 	// the current date time but on the same day, 1 if the start date time of
