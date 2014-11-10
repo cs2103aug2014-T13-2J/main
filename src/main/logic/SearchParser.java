@@ -66,7 +66,7 @@ public class SearchParser extends CommandParser {
 				DisplayHandler.displayTop();
 
 				for (int i = 0; i < list.size(); i++) {
-					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 0) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.PRESENT) {
 						DisplayHandler.displayContents(i, list.get(i));
 					}
 				}
@@ -88,7 +88,7 @@ public class SearchParser extends CommandParser {
 				DisplayHandler.displayTop();
 
 				for (int i = 0; i < list.size(); i++) {
-					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -1) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.PAST) {
 						DisplayHandler.displayContents(i, list.get(i));
 					}
 				}
@@ -109,7 +109,7 @@ public class SearchParser extends CommandParser {
 				DisplayHandler.displayTop();
 
 				for (int i = 0; i < list.size(); i++) {
-					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -2) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.TASK_DOES_NOT_HAVE_DATE_TIME ) {
 						DisplayHandler.displayContents(i, list.get(i));
 					}
 				}
@@ -129,7 +129,7 @@ public class SearchParser extends CommandParser {
 				DisplayHandler.displayTop();
 
 				for (int i = 0; i < list.size(); i++) {
-					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 1) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.FUTURE) {
 						DisplayHandler.displayContents(i, list.get(i));
 					}
 				}
