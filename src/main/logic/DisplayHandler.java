@@ -2187,7 +2187,7 @@ public class DisplayHandler extends CommandHandler {
 	private static String addCompleted(Task task) {
 		return "(" + task.hasCompleted() + ")" + STRING_SPACE;
 	}
-
+	//@author A0100239W
 	public static void displayTop() {
 		String resultTop = "";
 		resultTop += DisplayHandler.displayLineSeparatorHeader();
