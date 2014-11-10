@@ -47,13 +47,7 @@ public class Logic {
 		} else if (commandTypeString.equalsIgnoreCase("undo")) {
 			TaskerLog.logSystemInfo("undo command detected");
 			return CommandType.UNDO;
-		} /* else if (commandTypeString.equalsIgnoreCase("repeat")) {
-			TaskerLog.logSystemInfo("repeat command detected");
-			return CommandType.REPEAT;
-		} else if (commandTypeString.equalsIgnoreCase("remind")) {
-			TaskerLog.logSystemInfo("remind command detected");
-			return CommandType.REMIND; 
-		} */ else if (commandTypeString.equalsIgnoreCase("sync")) {
+		} else if (commandTypeString.equalsIgnoreCase("sync")) {
 			TaskerLog.logSystemInfo("login command detected");
 			return CommandType.SYNC;
 		} else if (commandTypeString.equalsIgnoreCase("exit")) {
@@ -80,10 +74,6 @@ public class Logic {
 			return searchTask(details);
 		case UNDO:
 			return undo(details);
-		case REPEAT:
-			return repeatTask(details);
-		case REMIND:
-			return remindTask(details);
 		case SYNC:
 			return googleCalendar.syncToGoogle();
 		case EXIT:
@@ -115,18 +105,6 @@ public class Logic {
 
 	private static String updateTask(String details) {
 		CommandHandler executor = new UpdateHandler(details);
-		String message = executor.execute();
-		return message;
-	}
-
-	private static String remindTask(String details) {
-		CommandHandler executor = new RemindHandler(details);
-		String message = executor.execute();
-		return message;
-	}
-
-	private static String repeatTask(String details) {
-		CommandHandler executor = new RepeatHandler(details);
 		String message = executor.execute();
 		return message;
 	}
