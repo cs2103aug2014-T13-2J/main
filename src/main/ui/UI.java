@@ -8,6 +8,7 @@ import main.storage.Storage;
 
 import org.fusesource.jansi.AnsiConsole;
 
+@SuppressWarnings("unused")
 public class UI {
 
 	public static final String MESSAGE_WELCOME = "Welcome to Tasker!";

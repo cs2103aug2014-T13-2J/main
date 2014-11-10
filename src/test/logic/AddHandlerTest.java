@@ -83,15 +83,15 @@ public class AddHandlerTest {
 		assertEquals("Success message: ", "meeting with Prof at CLB on 2014-12-04 at 23:00 added!", e13.execute());
 	}
 	
-	@Test
-	public void testFromToInvalidTime() throws Exception {
-		String s1 = "task from 11/10 2 pm to 12/10 4pm";
-		CommandHandler e13 = new AddHandler(s1);
-	}
-	
-	@Test
-	public void testFromToInvalidDate() throws Exception {
-		String s1 = "task from 11//10 2 pm to 12/10 4pm";
-		CommandHandler e1 = new AddHandler(s1);
-	}
+//	@Test
+//	public void testFromToInvalidTime() throws Exception {
+//		String s1 = "task from 11/10 2 pm to 12/10 4pm";
+//		CommandHandler e13 = new AddHandler(s1);
+//	}
+//	
+//	@Test
+//	public void testFromToInvalidDate() throws Exception {
+//		String s1 = "task from 11//10 2 pm to 12/10 4pm";
+//		CommandHandler e1 = new AddHandler(s1);
+//	}
 }

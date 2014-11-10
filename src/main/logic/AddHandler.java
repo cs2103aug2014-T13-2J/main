@@ -12,8 +12,6 @@ import org.joda.time.LocalTime;
 
 public class AddHandler extends CommandHandler {
 
-	private final static String TASK_ADDED_MESSAGE = "Task added!";
-
 	private AddParser parser;
 	private static Storage storage = Storage.getInstance();
 	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();

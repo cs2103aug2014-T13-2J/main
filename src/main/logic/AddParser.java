@@ -134,8 +134,4 @@ public class AddParser extends CommandParser {
 		}
 	}
 
-	private static String viewNextWord(LinkedList<String> wordsList) {
-		return wordsList.peek();
-	}
-
 }

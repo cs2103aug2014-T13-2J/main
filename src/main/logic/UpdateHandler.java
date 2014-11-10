@@ -18,9 +18,6 @@ public class UpdateHandler extends CommandHandler {
 	private final static String MESSAGE_CANNOT_UPDATE_VENUE_FOR_FLOATING_TASK = "Sorry you can't update the venue field for a floating task.";
 	private final static String MESSAGE_CANNOT_UPDATE_DATE_FOR_FLOATING_TASK = "Sorry you can't update the date field for a floating task.";
 	private final static String MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK = "Sorry you can't update the time field for a floating task.";
-	private final static String MESSAGE_CANNOT_UPDATE_RECURRENCE_FOR_FLOATING_TASK = "Sorry you can't update the recurrence field for a floating task.";
-	private final static String MESSAGE_CANNOT_UPDATE_REMINDER_FOR_FLOATING_TASK = "Sorry you can't update the reminder field for a floating task.";
-	private final static String MESSAGE_CANNOT_UPDATE_COMPLETED_FOR_FLOATING_TASK = "Sorry you can't update the completed field for a floating task.";
 
 	private UpdateParser parser;
 	private static Storage storage = Storage.getInstance();
@@ -78,18 +75,6 @@ public class UpdateHandler extends CommandHandler {
 							MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK);
 				}
 				updateEndTime(task, parser);
-			} else if (field.equals(UpdateParser.FIELD_RECURRENCE)) {
-				if (isFloatingTask(task)) {
-					throw new IllegalArgumentException(
-							MESSAGE_CANNOT_UPDATE_RECURRENCE_FOR_FLOATING_TASK);
-				}
-				updateRecurrence(task, parser);
-			} else if (field.equals(UpdateParser.FIELD_REMINDER)) {
-				if (isFloatingTask(task)) {
-					throw new IllegalArgumentException(
-							MESSAGE_CANNOT_UPDATE_REMINDER_FOR_FLOATING_TASK);
-				}
-				updateReminder(task, parser);
 			} else if (field.equals(UpdateParser.FIELD_COMPLETE)) {
 				task.setCompleted(true);
 			} else {
@@ -192,14 +177,6 @@ public class UpdateHandler extends CommandHandler {
 		} catch (IOException e) {
 			
 		}
-	}
-
-	private static void updateRecurrence(Task task, UpdateParser parser) {
-		task.setRecurrence(parser.getRecurrence());
-	}
-
-	private static void updateReminder(Task task, UpdateParser parser) {
-		// don't know do what
 	}
 
 	private static String getSuccessMessage(UpdateParser parser) {

@@ -9,6 +9,7 @@ import main.storage.Task;
 
 import com.google.api.services.calendar.model.Event;
 
+@SuppressWarnings("unused")
 public class GoogleCalendar {
 
 	private static String MESSAGE_SYNC_SUCCESS = "You have successfully synchronised all changes to Google.";

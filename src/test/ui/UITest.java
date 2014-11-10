@@ -6,18 +6,15 @@ import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.MAGENTA;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import main.logic.DisplayHandler;
 import main.logic.Logic;
 import main.storage.Storage;
 import main.storage.Task;
-import main.ui.UI;
 
 import org.junit.Test;
 

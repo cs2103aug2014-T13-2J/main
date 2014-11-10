@@ -1,13 +1,9 @@
 package test.display;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-
+import static org.junit.Assert.assertEquals;
 import main.logic.AddHandler;
 import main.logic.CommandHandler;
 import main.logic.DisplayHandler;
-import main.storage.Storage;
 import main.storage.Task;
 import main.storage.TaskBuilder;
 
