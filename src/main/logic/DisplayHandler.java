@@ -51,14 +51,14 @@ public class DisplayHandler extends CommandHandler {
 			System.out.println();
 			int numberOfTasks = tasks.size();
 			result = String.format(DISPLAY_NUM_OF_TASKS, numberOfTasks);
-			result += displayLineSeparator();
+			result += displayLineSeparatorHeader();
 			result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 					ansi().fg(RED).a("ID").reset(), "  |", ansi().fg(MAGENTA)
 							.a(" DESCRIPTION").reset(), "|",
 					ansi().fg(CYAN).a(" VENUE").reset(), "|", ansi().fg(YELLOW)
 							.a(" TIME").reset(), "|",
 					ansi().fg(GREEN).a(" DATE").reset());
-			result += displayLineSeparator();
+			result += displayLineSeparatorHeader();
 			for (int j = 0; j < tasks.size(); j++) {
 				result += displayTaskInTable(j, tasks.get(j));
 			}
@@ -69,13 +69,29 @@ public class DisplayHandler extends CommandHandler {
 					ansi().fg(CYAN).a(" VENUE").reset(), "|", ansi().fg(YELLOW)
 							.a(" TIME").reset(), "|",
 					ansi().fg(GREEN).a(" DATE").reset());
-			result += displayLineSeparator();
+			result += displayLineSeparatorHeader();
 
 		}
 		return result;
 	}
 
 	public static String displayLineSeparator() {
+		String lineString = "";
+		int terminalWidth = 79;
+		lineString += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+				ansi().fg(RED).a("  ").reset(), "  |", ansi().fg(MAGENTA)
+				.a("").reset(), "|",
+		ansi().fg(CYAN).a("").reset(), "|", ansi().fg(YELLOW)
+				.a("").reset(), "|",
+		ansi().fg(GREEN).a("").reset());
+		for (int i = 0; i < terminalWidth; i++) {
+			lineString += "-";
+		}
+		lineString += "\n";
+		return lineString;
+	}
+	
+	public static String displayLineSeparatorHeader() {
 		String lineString = "";
 		int terminalWidth = 79;
 		for (int i = 0; i < terminalWidth; i++) {
@@ -2174,7 +2190,7 @@ public class DisplayHandler extends CommandHandler {
 
 	public static void displayTop() {
 		String resultTop = "";
-		resultTop += DisplayHandler.displayLineSeparator();
+		resultTop += DisplayHandler.displayLineSeparatorHeader();
 		resultTop += String.format(
 				DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
 						.a("ID").reset(), "  |",
@@ -2182,7 +2198,7 @@ public class DisplayHandler extends CommandHandler {
 				ansi().fg(CYAN).a(" VENUE").reset(), "|",
 				ansi().fg(YELLOW).a(" TIME").reset(), "|",
 				ansi().fg(GREEN).a(" DATE").reset());
-		resultTop += DisplayHandler.displayLineSeparator();
+		resultTop += DisplayHandler.displayLineSeparatorHeader();
 		System.out.print(resultTop);
 	}
 
@@ -2195,7 +2211,7 @@ public class DisplayHandler extends CommandHandler {
 				ansi().fg(CYAN).a(" VENUE").reset(), "|",
 				ansi().fg(YELLOW).a(" TIME").reset(), "|",
 				ansi().fg(GREEN).a(" DATE").reset());
-		resultBottom += DisplayHandler.displayLineSeparator();
+		resultBottom += DisplayHandler.displayLineSeparatorHeader();
 		System.out.print(resultBottom);
 	}
 
@@ -2203,7 +2219,7 @@ public class DisplayHandler extends CommandHandler {
 		String print = "";
 		int index = number;
 		print += displayTaskInTable(index, task);
-		System.out.println(print);
+		System.out.print(print);
 	}
 
 	// this function returns -1 if the start date time of the task is before

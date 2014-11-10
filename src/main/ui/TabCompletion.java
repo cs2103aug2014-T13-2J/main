@@ -48,7 +48,7 @@ public class TabCompletion {
 	public void run() throws IOException {
 		ConsoleReader reader = new ConsoleReader();
 		String[] availableCommandStrings = new String[] { "add", "search",
-				"update", "exit", "display", "help", "sync", "delete" };
+				"update", "exit", "display", "help", "sync", "undo", "delete" };
 		SimpleCompletor simpleCompletor = new SimpleCompletor(availableCommandStrings);
 
 		ArgumentCompletor argumentCompletor = new ArgumentCompletor(
