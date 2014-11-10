@@ -1,11 +1,11 @@
 package test.logic;
 
 import static org.junit.Assert.*;
-
 import main.logic.AddHandler;
 import main.logic.CommandHandler;
 import main.logic.SearchHandler;
 import main.storage.Storage;
+
 import org.junit.Test;
 
 public class SearchTest {
@@ -79,7 +79,7 @@ public class SearchTest {
 		String searchStringSix = "project";
 		SearchHandler searchSix = new SearchHandler(searchStringSix);
 		String resultSix = searchSix.execute();
-		String expectedSix = "Search term cannot be found in the task list. Enter 'display' command to consider refining search terms.";
+		String expectedSix = "Tasker can't find what you asked for. Perhaps you could try another keyword?";
 		assertEquals(resultSix, expectedSix);
 
 		// This test case is in the 'null' partition.
@@ -91,7 +91,8 @@ public class SearchTest {
 		String searchStringSeven = "";
 		SearchHandler searchSeven = new SearchHandler(searchStringSeven);
 		String resultSeven = searchSeven.execute();
-		String expectedSeven = "No search term specified.";
+		String expectedSeven = "Would you like to search \"floating\", \"past\", \"today\" or \"future\"?.";
+
 		assertEquals(resultSeven, expectedSeven);
 
 	}

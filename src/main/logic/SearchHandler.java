@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import main.storage.Storage;
 import main.storage.Task;
 
+//@author A0100239W
 public class SearchHandler extends CommandHandler {
 
 	private SearchParser parser;

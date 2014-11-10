@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import main.storage.Task;
 import main.logic.DisplayHandler;
 
+//@author A0100239W
 public class SearchParser extends CommandParser {
 	public static final String MESSAGE_ERROR = "Would you like to search \"floating\", \"past\", \"today\" or \"future\"?.";
 	public static final String MESSAGE_NULL = "Task list is empty. There is nothing to search from.";
