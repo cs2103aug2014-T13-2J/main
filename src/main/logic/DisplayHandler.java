@@ -84,6 +84,7 @@ public class DisplayHandler extends CommandHandler {
 		result = "";
 		boolean completed = task.hasCompleted();
 		int status = determinePastPresentFuture(task);
+		int maximumWidth = 9;
 		String taskNumber = getTaskNumber(number);
 		String taskDescription = task.getDescription();
 		String taskDescriptionExtra = "";
@@ -162,7 +163,7 @@ public class DisplayHandler extends CommandHandler {
 		}
 
 		String to = "to";
-		if (number < 9) {
+		if (number < maximumWidth) {
 			if (completed) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(YELLOW).a(taskNumber).reset(), " |",
@@ -444,7 +445,7 @@ public class DisplayHandler extends CommandHandler {
 					taskVenueExtra = taskVenueExtra.substring(17);
 					taskDescriptionExtra = taskDescriptionExtra.substring(25);
 
-					if (number < 9) {
+					if (number < maximumWidth) {
 						if (completed) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -535,7 +536,7 @@ public class DisplayHandler extends CommandHandler {
 						}
 					}
 				}
-				if (number < 9) {
+				if (number < maximumWidth) {
 					if (completed) {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -641,7 +642,7 @@ public class DisplayHandler extends CommandHandler {
 					String displayDescription = taskDescriptionExtra.substring(
 							0, 25);
 
-					if (number < 9) {
+					if (number < maximumWidth) {
 						if (completed) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -739,7 +740,7 @@ public class DisplayHandler extends CommandHandler {
 					taskDescriptionExtra = taskDescriptionExtra.substring(25);
 				}
 				if (venueLines - descriptionLines - 1 == 0) {
-					if (number < 9) {
+					if (number < maximumWidth) {
 						if (completed) {
 							result += String
 									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -838,7 +839,7 @@ public class DisplayHandler extends CommandHandler {
 					result += displayLineSeparator();
 
 				} else {
-					if (number < 9) {
+					if (number < maximumWidth) {
 						if (completed) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -965,7 +966,7 @@ public class DisplayHandler extends CommandHandler {
 					for (int i = 0; i < venueLines - descriptionLines - 1; i++) {
 						if (taskVenueExtra.length() > 17) {
 
-							if (number < 9) {
+							if (number < maximumWidth) {
 								if (completed) {
 									result += String.format(
 											DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1111,7 +1112,7 @@ public class DisplayHandler extends CommandHandler {
 
 					}
 
-					if (number < 9) {
+					if (number < maximumWidth) {
 						if (completed) {
 							result += String
 									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1211,7 +1212,7 @@ public class DisplayHandler extends CommandHandler {
 					String displayDescription = taskDescriptionExtra.substring(
 							0, 25);
 
-					if (number < 9) {
+					if (number < maximumWidth) {
 						if (completed) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1308,7 +1309,7 @@ public class DisplayHandler extends CommandHandler {
 
 				if (descriptionLines - venueLines - 1 == 0) {
 					if (taskDescriptionExtra.length() > 25) {
-						if (number < 9) {
+						if (number < maximumWidth) {
 							if (completed) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1569,7 +1570,7 @@ public class DisplayHandler extends CommandHandler {
 						result += displayLineSeparator();
 					} else {
 
-						if (number < 9) {
+						if (number < maximumWidth) {
 							if (completed) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1691,7 +1692,7 @@ public class DisplayHandler extends CommandHandler {
 
 				else {
 
-					if (number < 9) {
+					if (number < maximumWidth) {
 						if (completed) {
 							result += String
 									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1814,7 +1815,7 @@ public class DisplayHandler extends CommandHandler {
 
 					for (int i = 0; i < descriptionLines - venueLines - 1; i++) {
 						if (taskDescriptionExtra.length() > 25) {
-							if (number < 9) {
+							if (number < maximumWidth) {
 								if (completed) {
 									result += String.format(
 											DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -1949,7 +1950,7 @@ public class DisplayHandler extends CommandHandler {
 									.substring(25);
 						}
 					}
-					if (number < 9) {
+					if (number < maximumWidth) {
 						if (completed) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
@@ -2195,7 +2196,8 @@ public class DisplayHandler extends CommandHandler {
 
 	public static void displayContents(int number, Task task) {
 		String print = "";
-		print += displayTaskInTable(number, task);
+		int index = number;
+		print += displayTaskInTable(index, task);
 		System.out.println(print);
 	}
 

@@ -10,7 +10,7 @@ import main.logic.DisplayHandler;
 public class SearchParser extends CommandParser {
 	public static final String MESSAGE_ERROR = "Would you like to search \"past\", \"today\" or \"future\"?.";
 	public static final String MESSAGE_NULL = "Task list is empty. There is nothing to search from.";
-	public static final String MESSAGE_UNAVAILABLE = "Tasker can't find what you asked for. Perhaps try another keyword?";
+	public static final String MESSAGE_UNAVAILABLE = "Tasker can't find what you asked for. Perhaps you could try another keyword?";
 	public static final String MESSAGE_SEARCH = "List of tasks containing";
 	public static final String MESSAGE_NOT_TODAY = "There are no tasks due today.";
 	public static final String MESSAGE_TODAY = "These are the tasks due today.";
@@ -54,8 +54,8 @@ public class SearchParser extends CommandParser {
 
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 0) {
-						System.out.print(DisplayHandler.displayTaskInTable(i,
-								list.get(i)));
+						DisplayHandler.displayContents(i,
+								list.get(i));
 					}
 				}
 
@@ -77,8 +77,8 @@ public class SearchParser extends CommandParser {
 
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -1) {
-						System.out.print(DisplayHandler.displayTaskInTable(i,
-								list.get(i)));
+						DisplayHandler.displayContents(i,
+								list.get(i));
 					}
 				}
 
@@ -99,8 +99,8 @@ public class SearchParser extends CommandParser {
 
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -2) {
-						System.out.print(DisplayHandler.displayTaskInTable(i,
-								list.get(i)));
+						DisplayHandler.displayContents(i,
+								list.get(i));
 					}
 				}
 
@@ -120,8 +120,8 @@ public class SearchParser extends CommandParser {
 
 				for (int i = 0; i < list.size(); i++) {
 					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 1) {
-						System.out.print(DisplayHandler.displayTaskInTable(i,
-								list.get(i)));
+						DisplayHandler.displayContents(i,
+								list.get(i));
 					}
 				}
 
@@ -142,7 +142,7 @@ public class SearchParser extends CommandParser {
 			return MESSAGE_UNAVAILABLE;
 		}
 
-		else {
+		else if (isWithin(userInput)){
 			lowerCaseKey = userInput.toLowerCase();
 
 			System.out.println();
@@ -152,16 +152,17 @@ public class SearchParser extends CommandParser {
 
 			for (int i = 0; i < list.size(); i++) {
 				if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
-					System.out.print(DisplayHandler.displayTaskInTable(i,
-							list.get(i)));
+					DisplayHandler.displayContents(i,
+							list.get(i));
 				}
 			}
-
+			
+		
 			DisplayHandler.displayBottom();
 
 			return returnMessage;
 		}
-
+		return returnMessage;
 	}
 
 	private boolean isWithin(String input) {
