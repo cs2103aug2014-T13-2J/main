@@ -176,6 +176,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(YELLOW).a(taskVenue).reset(), "|",
 						ansi().fg(YELLOW).a(startTaskTime).reset(), "|", ansi()
 								.fg(YELLOW).a(startTaskDate).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(YELLOW).a(nullSpace).reset(), " |",
@@ -183,6 +184,7 @@ public class DisplayHandler extends CommandHandler {
 						"|", ansi().fg(YELLOW).a(taskVenueExtraOne).reset(),
 						"|", ansi().fg(YELLOW).a(to).reset(), "|",
 						ansi().fg(YELLOW).a(to).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(YELLOW).a(nullSpace).reset(), " |",
@@ -190,6 +192,7 @@ public class DisplayHandler extends CommandHandler {
 						"|", ansi().fg(YELLOW).a(taskVenueExtraTwo).reset(),
 						"|", ansi().fg(YELLOW).a(endTaskTime).reset(), "|",
 						ansi().fg(YELLOW).a(endTaskDate).reset());
+				result += "\n";
 
 			} else if (status == PRESENT) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
@@ -198,6 +201,7 @@ public class DisplayHandler extends CommandHandler {
 								.fg(RED).a(taskVenue).reset(), "|",
 						ansi().fg(RED).a(startTaskTime).reset(), "|", ansi()
 								.fg(RED).a(startTaskDate).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(RED).a(nullSpace).reset(), " |",
@@ -205,6 +209,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(RED).a(taskVenueExtraOne).reset(), "|",
 						ansi().fg(RED).a(to).reset(), "|", ansi().fg(RED).a(to)
 								.reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(RED).a(nullSpace).reset(), " |",
@@ -212,6 +217,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(RED).a(taskVenueExtraTwo).reset(), "|",
 						ansi().fg(RED).a(endTaskTime).reset(), "|",
 						ansi().fg(RED).a(endTaskDate).reset());
+				result += "\n";
 
 			} else if (status == PAST) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
@@ -220,6 +226,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(CYAN).a(taskVenue).reset(), "|",
 						ansi().fg(CYAN).a(startTaskTime).reset(), "|", ansi()
 								.fg(CYAN).a(startTaskDate).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(CYAN).a(nullSpace).reset(), " |", ansi().fg(CYAN)
@@ -227,6 +234,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(CYAN).a(taskVenueExtraOne).reset(), "|",
 						ansi().fg(CYAN).a(to).reset(), "|",
 						ansi().fg(CYAN).a(to).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(CYAN).a(nullSpace).reset(), " |", ansi().fg(CYAN)
@@ -234,6 +242,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(CYAN).a(taskVenueExtraTwo).reset(), "|",
 						ansi().fg(CYAN).a(endTaskTime).reset(), "|",
 						ansi().fg(CYAN).a(endTaskDate).reset());
+				result += "\n";
 
 			}
 
@@ -244,6 +253,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(GREEN).a(taskVenue).reset(), "|",
 						ansi().fg(GREEN).a(startTaskTime).reset(), "|", ansi()
 								.fg(GREEN).a(startTaskDate).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(GREEN).a(nullSpace).reset(), " |", ansi().fg(GREEN)
@@ -251,6 +261,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(GREEN).a(taskVenueExtraOne).reset(), "|",
 						ansi().fg(GREEN).a(to).reset(), "|", ansi().fg(GREEN)
 								.a(to).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(GREEN).a(nullSpace).reset(), " |", ansi().fg(GREEN)
@@ -258,6 +269,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(GREEN).a(taskVenueExtraTwo).reset(), "|",
 						ansi().fg(GREEN).a(endTaskTime).reset(), "|", ansi()
 								.fg(GREEN).a(endTaskDate).reset());
+				result += "\n";
 
 			}
 
@@ -268,6 +280,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(MAGENTA).a(taskVenue).reset(), "|", ansi()
 								.fg(MAGENTA).a(startTaskTime).reset(), "|",
 						ansi().fg(MAGENTA).a(startTaskDate).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(MAGENTA).a(nullSpace).reset(), " |",
@@ -275,6 +288,7 @@ public class DisplayHandler extends CommandHandler {
 						"|", ansi().fg(MAGENTA).a(taskVenueExtraOne).reset(),
 						"|", ansi().fg(MAGENTA).a(to).reset(), "|",
 						ansi().fg(MAGENTA).a(to).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(MAGENTA).a(nullSpace).reset(), " |",
@@ -282,6 +296,7 @@ public class DisplayHandler extends CommandHandler {
 						"|", ansi().fg(MAGENTA).a(taskVenueExtraTwo).reset(),
 						"|", ansi().fg(MAGENTA).a(endTaskTime).reset(), "|",
 						ansi().fg(MAGENTA).a(endTaskDate).reset());
+				result += "\n";
 
 			}
 		} else {
@@ -292,6 +307,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(YELLOW).a(taskVenue).reset(), "|",
 						ansi().fg(YELLOW).a(startTaskTime).reset(), "|", ansi()
 								.fg(YELLOW).a(startTaskDate).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(YELLOW).a(nullSpace).reset(), "|", ansi()
@@ -299,6 +315,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(YELLOW).a(taskVenueExtraOne).reset(), "|",
 						ansi().fg(YELLOW).a(to).reset(), "|", ansi().fg(YELLOW)
 								.a(to).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(YELLOW).a(nullSpace).reset(), "|", ansi()
@@ -306,6 +323,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(YELLOW).a(taskVenueExtraTwo).reset(), "|",
 						ansi().fg(YELLOW).a(endTaskTime).reset(), "|", ansi()
 								.fg(YELLOW).a(endTaskDate).reset());
+				result += "\n";
 
 			} else if (status == PRESENT) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
@@ -314,6 +332,7 @@ public class DisplayHandler extends CommandHandler {
 								.fg(RED).a(taskVenue).reset(), "|",
 						ansi().fg(RED).a(startTaskTime).reset(), "|", ansi()
 								.fg(RED).a(startTaskDate).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(RED).a(nullSpace).reset(), "|",
@@ -321,6 +340,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(RED).a(taskVenueExtraOne).reset(), "|",
 						ansi().fg(RED).a(to).reset(), "|", ansi().fg(RED).a(to)
 								.reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(RED).a(nullSpace).reset(), "|",
@@ -328,6 +348,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(RED).a(taskVenueExtraTwo).reset(), "|",
 						ansi().fg(RED).a(endTaskTime).reset(), "|",
 						ansi().fg(RED).a(endTaskDate).reset());
+				result += "\n";
 
 			} else if (status == PAST) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
@@ -336,6 +357,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(CYAN).a(taskVenue).reset(), "|",
 						ansi().fg(CYAN).a(startTaskTime).reset(), "|", ansi()
 								.fg(CYAN).a(startTaskDate).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(CYAN).a(nullSpace).reset(), "|",
@@ -343,6 +365,7 @@ public class DisplayHandler extends CommandHandler {
 						"|", ansi().fg(CYAN).a(taskVenueExtraOne).reset(), "|",
 						ansi().fg(CYAN).a(to).reset(), "|",
 						ansi().fg(CYAN).a(to).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(CYAN).a(nullSpace).reset(), "|",
@@ -350,6 +373,7 @@ public class DisplayHandler extends CommandHandler {
 						"|", ansi().fg(CYAN).a(taskVenueExtraTwo).reset(), "|",
 						ansi().fg(CYAN).a(endTaskTime).reset(), "|",
 						ansi().fg(CYAN).a(endTaskDate).reset());
+				result += "\n";
 
 			}
 
@@ -360,6 +384,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(GREEN).a(taskVenue).reset(), "|",
 						ansi().fg(GREEN).a(startTaskTime).reset(), "|", ansi()
 								.fg(GREEN).a(startTaskDate).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(GREEN).a(nullSpace).reset(), "|", ansi().fg(GREEN)
@@ -367,6 +392,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(GREEN).a(taskVenueExtraOne).reset(), "|",
 						ansi().fg(GREEN).a(to).reset(), "|", ansi().fg(GREEN)
 								.a(to).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(GREEN).a(nullSpace).reset(), "|", ansi().fg(GREEN)
@@ -374,6 +400,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(GREEN).a(taskVenueExtraTwo).reset(), "|",
 						ansi().fg(GREEN).a(endTaskTime).reset(), "|", ansi()
 								.fg(GREEN).a(endTaskDate).reset());
+				result += "\n";
 
 			}
 
@@ -384,6 +411,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(MAGENTA).a(taskVenue).reset(), "|", ansi()
 								.fg(MAGENTA).a(startTaskTime).reset(), "|",
 						ansi().fg(MAGENTA).a(startTaskDate).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(MAGENTA).a(nullSpace).reset(), "|",
@@ -391,6 +419,7 @@ public class DisplayHandler extends CommandHandler {
 						"|", ansi().fg(MAGENTA).a(taskVenueExtraOne).reset(),
 						"|", ansi().fg(MAGENTA).a(to).reset(), "|",
 						ansi().fg(MAGENTA).a(to).reset());
+				result += "\n";
 
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(MAGENTA).a(nullSpace).reset(), "|",
@@ -398,6 +427,7 @@ public class DisplayHandler extends CommandHandler {
 						"|", ansi().fg(MAGENTA).a(taskVenueExtraTwo).reset(),
 						"|", ansi().fg(MAGENTA).a(endTaskTime).reset(), "|",
 						ansi().fg(MAGENTA).a(endTaskDate).reset());
+				result += "\n";
 
 			}
 		}
