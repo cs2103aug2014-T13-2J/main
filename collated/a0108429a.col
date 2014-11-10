@@ -1,0 +1,4201 @@
+//@author: a0108429a
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\AddHandler.java
+	 */
+
+public class AddHandler extends CommandHandler {
+
+	private AddParser parser;
+	private static Storage storage = Storage.getInstance();
+	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
+
+	public AddHandler(String details) {
+		super(details);
+		parser = new AddParser(details);
+	}
+
+	@Override
+	public String execute() {
+		try {
+			// parser will analyze the user input and store each piece of
+			// information into its respective
+			// attributes
+			parser.parse();
+			Task task = convertParsedDetailsToTask();
+			String taskId = googleCalendar.syncAddTask(task);
+			task.setId(taskId);
+			storage.addTask(task);
+			storage.saveCurrentState();
+			return DisplayHandler.displayTaskForAdd(task);
+		} catch (IllegalArgumentException e) {
+			TaskerLog.logSystemExceptionError(e.getMessage());
+			return e.getMessage();
+		}
+	}
+	/*This method takes the information parsed by the parse function
+	 * and constructs a task containing the information in the appropriate
+	 * fields
+	 */
+	public Task convertParsedDetailsToTask() {
+		TaskBuilder builder = new TaskBuilder();
+
+		String description = parser.getDescription();
+		builder.setDescription(description);
+
+		if (parser.hasVenue()) {
+			String venue = parser.getVenue();
+			builder.setVenue(venue);
+		}
+
+		if (parser.hasStartDate()) {
+			try {
+				Integer startDateYear = Integer.parseInt(parser
+						.getStartDateYear());
+				Integer startDateMonth = Integer.parseInt(parser
+						.getStartDateMonth());
+				Integer startDateDay = Integer.parseInt(parser
+						.getStartDateDay());
+
+				LocalDate date = new LocalDate(startDateYear, startDateMonth,
+						startDateDay);
+
+				builder.setStartDate(date);
+			} catch (IllegalFieldValueException e) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_DATE_VALUE);
+			}
+		}
+
+		if (parser.hasStartTime()) {
+			try {
+				Integer startTimeHour = Integer.parseInt(parser
+						.getStartTimeHour());
+				Integer startTimeMinute = Integer.parseInt(parser
+						.getStartTimeMinute());
+
+				LocalTime time = new LocalTime(startTimeHour, startTimeMinute);
+
+				builder.setStartTime(time);
+			} catch (IllegalFieldValueException e) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
+			}
+		}
+
+		if (parser.hasEndDate()) {
+			try {
+				Integer endDateYear = Integer.parseInt(parser.getEndDateYear());
+				Integer endDateMonth = Integer.parseInt(parser
+						.getEndDateMonth());
+				Integer endDateDay = Integer.parseInt(parser.getEndDateDay());
+
+				LocalDate date = new LocalDate(endDateYear, endDateMonth,
+						endDateDay);
+
+				builder.setEndDate(date);
+			} catch (IllegalFieldValueException e) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_DATE_VALUE);
+			}
+		}
+
+		if (parser.hasEndTime()) {
+			try {
+				Integer endTimeHour = Integer.parseInt(parser.getEndTimeHour());
+				Integer endTimeMinute = Integer.parseInt(parser
+						.getEndTimeMinute());
+
+				LocalTime time = new LocalTime(endTimeHour, endTimeMinute);
+
+				builder.setEndTime(time);
+			} catch (IllegalFieldValueException e) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
+			}
+		}
+		return builder.buildTask();
+
+	}
+
+}
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\AddHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\AddParser.java
+	 */
+
+public class AddParser extends CommandParser {
+
+	public AddParser(String arguments) {
+		super(arguments);
+		userInput = arguments;
+	}
+	/*This method takes the user input and gets the description, venue, start
+	 * date, start time, end date, end time fields and stores it in CommandParser attributes
+	 * (non-Javadoc)
+	 * @see main.logic.CommandParser#parse()
+	 */
+	public String parse() {
+		String description = null, venue = null;
+		String startDate = null, startDateYear = null, startDateMonth = null, startDateDay = null;
+		String startTime = null, startTimeHour = null, startTimeMinute = null;
+		String endDate = null, endDateYear = null, endDateMonth = null, endDateDay = null;
+		String endTime = null, endTimeHour = null, endTimeMinute = null;
+
+		String[] userInput = this.getUserInput().split(" ");
+		LinkedList<String> wordsList = new LinkedList<String>(
+				Arrays.asList(userInput));
+
+		description = getDescriptionAndTrimUserInput(wordsList);
+		while (!wordsList.isEmpty()) {
+			String currentReservedWord = wordsList.peek().toLowerCase();
+			if (currentReservedWord.equals("")) {
+				wordsList.pop();
+				continue;
+			} else if (currentReservedWord.equals("at")) {
+				// remove reserved word
+				removeCurrentWord(wordsList);
+				// determine if next word is time or venue
+				if (representsTime(wordsList)) {
+					startTime = getTimeAndTrimUserInput(wordsList);
+					// set endTime to startTime by default, in the case that
+					// user only
+					// specifies startTime without endTime
+					endTime = startTime;
+				} else {
+					// if it's not time, then the next word must represent venue
+					venue = getVenueAndTrimUserInput(wordsList);
+				}
+			} else if (currentReservedWord.equals("on")) { // get date
+				// remove reserved word
+				removeCurrentWord(wordsList);
+				if (representsDate(wordsList)) {
+					startDate = getDateAndTrimUserInput(wordsList);
+					endDate = startDate;
+				} else {
+					replaceWordOn(wordsList);
+					description = appendToDescription(wordsList, description);
+				}
+
+			} else if (currentReservedWord.equals("from")) {
+				// remove reserved word
+				removeCurrentWord(wordsList);
+				if (representsTime(wordsList)) {
+					startTime = getTimeAndTrimUserInput(wordsList);
+					// remove the word "to"
+					removeCurrentWord(wordsList);
+					endTime = getTimeAndTrimUserInput(wordsList);
+				} else {
+					startDate = getDateAndTrimUserInput(wordsList);
+					if (representsTime(wordsList)) {
+						startTime = getTimeAndTrimUserInput(wordsList);
+						// remove the word "to"
+						removeCurrentWord(wordsList);
+						endDate = getDateAndTrimUserInput(wordsList);
+						endTime = getTimeAndTrimUserInput(wordsList);
+					} else {
+						// remove the word "to"
+						removeCurrentWord(wordsList);
+						endDate = getDateAndTrimUserInput(wordsList);
+					}
+				}
+			} else if (currentReservedWord.equals("next")) {
+				if (representsDate(wordsList)) {
+					startDate = getDateAndTrimUserInput(wordsList);
+					endDate = startDate;
+				} else {
+					description = appendToDescription(wordsList, description);
+				}
+			} else {
+				description = appendToDescription(wordsList, description);
+			}
+		}
+
+		if (startDate == null && startTime != null) {
+			// if time but no date, set today
+			startDateYear = generateYear();
+			startDateMonth = generateMonth();
+			startDateDay = generateDay();
+			endDateYear = startDateYear;
+			endDateMonth = startDateMonth;
+			endDateDay = startDateDay;
+		} else {
+			startDateYear = getYear(startDate);
+			startDateMonth = getMonth(startDate);
+			startDateDay = getDay(startDate);
+			endDateYear = getYear(endDate);
+			endDateMonth = getMonth(endDate);
+			endDateDay = getDay(endDate);
+		}
+
+		startTimeHour = getHour(startTime);
+		startTimeMinute = getMinute(startTime);
+		endTimeHour = getHour(endTime);
+		endTimeMinute = getMinute(endTime);
+
+		this.setDescription(description);
+		this.setVenue(venue);
+		this.setStartDateYear(startDateYear);
+		this.setStartDateMonth(startDateMonth);
+		this.setStartDateDay(startDateDay);
+		this.setStartTimeHour(startTimeHour);
+		this.setStartTimeMinute(startTimeMinute);
+		this.setEndDateYear(endDateYear);
+		this.setEndDateMonth(endDateMonth);
+		this.setEndDateDay(endDateDay);
+		this.setStartTimeHour(startTimeHour);
+		this.setStartTimeMinute(startTimeMinute);
+		this.setEndTimeHour(endTimeHour);
+		this.setEndTimeMinute(endTimeMinute);
+
+		return MESSAGE_PARSE_SUCCESS;
+	}
+	/*This method removes the first word from a LinkedList*/
+	private static void removeCurrentWord(LinkedList<String> wordsList) {
+		if (wordsList.isEmpty()) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_FORMAT);
+		} else {
+			wordsList.poll();
+		}
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\AddParser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\CommandParser.java
+	 */
+
+public abstract class CommandParser {
+
+	/***************************** Data Members ************************/
+	protected final static String MESSAGE_INVALID_DESCRIPTION = "Sorry, we did not capture your description. Please try again.";
+	protected final static String MESSAGE_INVALID_TIME_FORMAT = "Sorry, we did not manage to capture the time. Please ensure you entered it in the correct format.";
+	protected final static String MESSAGE_INVALID_VENUE = "Sorry, we did not manage to capture the venue. Please try again.";
+	protected final static String MESSAGE_INVALID_DATE_FORMAT = "Sorry, we did not manage to capture the date. Please ensure you entered it in the correct format.";
+	protected final static String MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS = "If the task falls on next week, you need to have the word \"next\" before the day.";
+	protected final static String MESSAGE_PARSE_SUCCESS = "Parse successful.";
+	protected final static String MESSAGE_REQUIRE_START_TIME_OR_DATE = "Sorry you need to specify either the time or date";
+	protected final static String MESSAGE_INVALID_RECURRENCE_FORMAT = "Sorry, we did not manage to capture the recurrence. Please try again.";
+	protected final static String MESSAGE_INVALID_COMPLETED_FORMAT = "Sorry, we did not manage to capture the completion of the task. Please try again.";
+	protected final static String MESSAGE_INVALID_FORMAT = "Sorry we were unable to parse the information.";
+	protected final static String MESSAGE_DESCRIPTION_INVALID_QUOTATIONS = "You need to close your quotations properly for the description.";
+	protected final static String MESSAGE_VENUE_INVALID_QUOTATIONS = "You need to close your quotations properly for the venue.";
+	public static final String STRING_SPACE = " ";
+	protected final static Integer INDEX_HOUR = 0;
+	protected final static Integer INDEX_MINUTE = 1;
+	protected final static Integer INDEX_DAY = 0;
+	protected final static Integer INDEX_MONTH = 1;
+	protected final static Integer INDEX_YEAR = 2;
+	protected final static Integer DAYS_IN_WEEK = 7;
+
+	protected String userInput;
+	private String description = null;
+	private boolean hasVenue = false;
+	private String venue = null;
+	private boolean hasStartDate = false;
+	private String startDateYear = null;
+	private String startDateMonth = null;
+	private String startDateDay = null;
+	private boolean hasEndDate = false;
+	private String endDateYear = null;
+	private String endDateMonth = null;
+	private String endDateDay = null;
+	private boolean hasStartTime = false;
+	private String startTimeHour = null;
+	private String startTimeMinute = null;
+	private boolean hasEndTime = false;
+	private String endTimeHour = null;
+	private String endTimeMinute = null;
+	private String reminder = null;
+	private String recurrence = null;
+	private String completed = null;
+
+	/***************************** Constructors ************************/
+	public CommandParser(String arguments) {
+		this.userInput = arguments;
+	}
+
+	/***************************** Accessors ************************/
+	public String getUserInput() {
+		return userInput;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public String getVenue() {
+		return venue;
+	}
+
+	public String getStartDateYear() {
+		return startDateYear;
+	}
+
+	public String getStartDateMonth() {
+		return startDateMonth;
+	}
+
+	public String getStartDateDay() {
+		return startDateDay;
+	}
+
+	public String getEndDateYear() {
+		return endDateYear;
+	}
+
+	public String getEndDateMonth() {
+		return endDateMonth;
+	}
+
+	public String getEndDateDay() {
+		return endDateDay;
+	}
+
+	public String getStartTimeHour() {
+		return startTimeHour;
+	}
+
+	public String getStartTimeMinute() {
+		return startTimeMinute;
+	}
+
+	public String getEndTimeHour() {
+		return endTimeHour;
+	}
+
+	public String getEndTimeMinute() {
+		return endTimeMinute;
+	}
+
+	public String getRecurrence() {
+		return recurrence;
+	}
+
+	public String getCompleted() {
+		return completed;
+	}
+
+	public boolean hasVenue() {
+		return hasVenue;
+	}
+
+	public boolean hasStartDate() {
+		return hasStartDate;
+	}
+
+	public boolean hasEndDate() {
+		return hasEndDate;
+	}
+
+	public boolean hasStartTime() {
+		return hasStartTime;
+	}
+
+	public boolean hasEndTime() {
+		return hasEndTime;
+	}
+
+	/***************************** Mutators ************************/
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setVenue(String venue) {
+		this.venue = venue;
+		this.setHasVenue(true);
+	}
+
+	public void setStartDateYear(String startDateYear) {
+		this.startDateYear = startDateYear;
+		if (startDateYear == null) {
+			this.setHasStartDate(false);
+		} else {
+			this.setHasStartDate(true);
+		}
+	}
+
+	public void setStartDateMonth(String startDateMonth) {
+		this.startDateMonth = startDateMonth;
+	}
+
+	public void setStartDateDay(String startDateDay) {
+		this.startDateDay = startDateDay;
+	}
+
+	public void setEndDateYear(String endDateYear) {
+		this.endDateYear = endDateYear;
+		if (endDateYear == null) {
+			this.setHasEndDate(false);
+		} else {
+			this.setHasEndDate(true);
+		}
+	}
+
+	public void setEndDateMonth(String endDateMonth) {
+		this.endDateMonth = endDateMonth;
+	}
+
+	public void setEndDateDay(String endDateDay) {
+		this.endDateDay = endDateDay;
+	}
+
+	public void setStartTimeHour(String startTimeHour) {
+		this.startTimeHour = startTimeHour;
+		if (startTimeHour == null) {
+			this.setHasStartTime(false);
+		} else {
+			this.setHasStartTime(true);
+		}
+
+	}
+
+	public void setStartTimeMinute(String startTimeMinute) {
+		this.startTimeMinute = startTimeMinute;
+	}
+
+	public void setEndTimeHour(String endTimeHour) {
+		this.endTimeHour = endTimeHour;
+		if (endTimeHour == null) {
+			this.setHasEndTime(false);
+		} else {
+			this.setHasEndTime(true);
+		}
+	}
+
+	public void setEndTimeMinute(String endTimeMinute) {
+		this.endTimeMinute = endTimeMinute;
+	}
+
+	public String getReminder() {
+		return reminder;
+	}
+
+	public void setReminder(String reminder) {
+		this.reminder = reminder;
+	}
+
+	public void setRecurrence(String recurrence) {
+		recurrence = recurrence.toLowerCase();
+		if (recurrence.equals("weekly") || recurrence.equals("monthly")
+				|| recurrence.equals("yearly")) {
+			this.recurrence = recurrence;
+		} else {
+			throw new IllegalArgumentException(
+					MESSAGE_INVALID_RECURRENCE_FORMAT);
+		}
+	}
+
+	public void setCompleted(String completed) {
+		completed = completed.toLowerCase();
+		if (completed.equals("true") || completed.equals("false")) {
+			this.completed = completed;
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_COMPLETED_FORMAT);
+		}
+	}
+
+	private void setHasVenue(boolean hasVenue) {
+		this.hasVenue = hasVenue;
+	}
+
+	private void setHasStartDate(boolean hasStartDate) {
+		this.hasStartDate = hasStartDate;
+	}
+
+	private void setHasEndDate(boolean hasEndDate) {
+		this.hasEndDate = hasEndDate;
+	}
+
+	private void setHasStartTime(boolean hasStartTime) {
+		this.hasStartTime = hasStartTime;
+	}
+
+	private void setHasEndTime(boolean hasEndTime) {
+		this.hasEndTime = hasEndTime;
+	}
+
+	/****************************************************************/
+	public abstract String parse();
+
+	/*This function gets the description from a LinkedList containing the user input
+	 * and removes these words from the LinkedList
+	 */
+	public static String getDescriptionAndTrimUserInput(
+			LinkedList<String> wordsList) throws IllegalArgumentException {
+		String currentWord, description = "";
+		boolean hasEndQuotations = false;
+
+		currentWord = wordsList.peek();
+		if (currentWord.startsWith("\"")) {
+			wordsList.poll();
+			currentWord = removeStartQuotations(currentWord);
+			if (currentWord.endsWith("\"")) {
+				currentWord = removeEndQuotations(currentWord);
+				hasEndQuotations = true;
+			}
+			description = description + currentWord + STRING_SPACE;
+			while (!wordsList.isEmpty() && hasEndQuotations == false) {
+				currentWord = wordsList.poll();
+				if (currentWord.endsWith("\"")) {
+					hasEndQuotations = true;
+					currentWord = removeEndQuotations(currentWord);
+					description = description + currentWord + STRING_SPACE;
+					break;
+				} else {
+					description = description + currentWord + STRING_SPACE;
+				}
+			}
+
+			if (hasEndQuotations == false) {
+				throw new IllegalArgumentException(
+						MESSAGE_DESCRIPTION_INVALID_QUOTATIONS);
+			}
+		} else {
+			while (!wordsList.isEmpty()) {
+				currentWord = wordsList.peek();
+				if (isReservedWord(currentWord)) {
+					break;
+				} else {
+					wordsList.poll();
+					description += currentWord + STRING_SPACE;
+				}
+			}
+		}
+		description = description.trim();
+		// this condition is put here because "".split(" ") returns a string
+		// array of non zero length, so before trim(), description will be equal
+		// to
+		// something like " "
+		if (description.equals("")) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_DESCRIPTION);
+		}
+		return description;
+	}
+
+	private static String removeStartQuotations(String word) {
+		return word.substring(1, word.length());
+	}
+
+	private static String removeEndQuotations(String word) {
+		return word.substring(0, word.length() - 1);
+	}
+
+	protected static boolean isReservedWord(String word) {
+		word = word.toLowerCase();
+		if (word.equals("at") || word.equals("on") || word.equals("from")
+				|| word.equals("next")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/* This function checks if the first word of the LinkedList is of the format H.M or H, appended by am
+	 * or pm. H and M can be any integer.
+	 */
+	public static boolean representsTime(LinkedList<String> wordsList)
+			throws IllegalArgumentException {
+		String word;
+
+		if (!wordsList.isEmpty()) {
+			word = wordsList.peek().toLowerCase();
+		} else {
+			return false;
+		}
+		if (word.length() < 2) {
+			return false;
+		}
+		String numPortion = word.substring(0, word.length() - 2).toLowerCase();
+		String amPortion = word.substring(word.length() - 2, word.length())
+				.toLowerCase();
+
+		if (!amPortion.equals("am") && !amPortion.equals("pm")) {
+			return false;
+		}
+
+		if (numPortion.contains(".")) {
+			// Need the double backslash if we want to use . as the delimiter
+			String[] numPortionParts = numPortion.split("\\.");
+			if (numPortionParts.length != 2) {
+				return false;
+			}
+			String numHour = numPortionParts[INDEX_HOUR];
+			String numMinute = numPortionParts[INDEX_MINUTE];
+
+			if (isInteger(numHour) && isInteger(numMinute)) {
+				return true;
+			} else {
+				return false;
+			}
+
+		} else if (isInteger(numPortion)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	/* This function gets the time from a LinkedList containing the user input and
+	 * removes the word from the LinkedList
+	 */
+	public static String getTimeAndTrimUserInput(LinkedList<String> wordsList) {
+		String result = "";
+		String word;
+		
+		if (!wordsList.isEmpty()) {
+			word = wordsList.poll().toLowerCase();
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
+		}
+		if (word.length() < 2) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
+		}
+		String pmPortion = word.substring(word.length() - 2, word.length())
+				.toLowerCase();
+		String numPortion = word.substring(0, word.length() - 2).toLowerCase();
+
+		if (!pmPortion.equals("am") && !pmPortion.equals("pm")) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
+		}
+
+		boolean isPm;
+		if (pmPortion.equals("pm")) {
+			isPm = true;
+		} else {
+			isPm = false;
+		}
+
+		// to cater to cases that format is not one of the following: 9am,
+		// 9.30pm, 12.30am
+		if (numPortion.contains(".")) {
+			// Need the double backslash if we want to use . as the delimiter
+			String[] numPortionParts = numPortion.split("\\.");
+			String hour = numPortionParts[INDEX_HOUR];
+			String minute = numPortionParts[INDEX_MINUTE];
+			if (!isInteger(hour) && !isInteger(minute)) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_TIME_FORMAT);
+			}
+
+			Integer numHour = Integer.parseInt(hour);
+			Integer numMinute = Integer.parseInt(minute);
+
+			if (isPm == true && numHour != 12) {
+				numHour += 12;
+			} else if (isPm == false && numHour == 12) { // to cater to the 12am
+															// case: we want the
+															// output to be 0.0
+				numHour -= 12;
+			}
+
+			result = numHour + "." + numMinute;
+			return result;
+		} else {
+			Integer numHour = Integer.parseInt(numPortion);
+			// insert assert statement that numPortionParts.length == 1
+			if (isPm == true && numHour != 12) {
+				numHour += 12;
+			} else if (isPm == false && numHour == 12) { // to cater to the 12am
+															// case: we want the
+															// output to be 0.0
+				numHour -= 12;
+			}
+			result = numHour + "." + "0";
+			return result;
+		}
+
+	}
+	/* This method gets the venue from a LinkedList containing the user input and
+	 * removes these words from the LinkedList
+	 */
+	public static String getVenueAndTrimUserInput(LinkedList<String> wordsList)
+			throws IllegalArgumentException {
+		LinkedList<String> stack = new LinkedList<String>();
+		String currentWord, venue = "";
+		boolean hasEndQuotations = false;
+		if (!wordsList.isEmpty()) {
+			currentWord = wordsList.peek();
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_VENUE);
+		}
+		if (currentWord.startsWith("\"")) {
+			wordsList.poll();
+			currentWord = removeStartQuotations(currentWord);
+			if (currentWord.endsWith("\"")) {
+				currentWord = removeEndQuotations(currentWord);
+				hasEndQuotations = true;
+			}
+			venue = venue + currentWord + STRING_SPACE;
+			while (!wordsList.isEmpty()) {
+				currentWord = wordsList.poll();
+				if (currentWord.endsWith("\"")) {
+					hasEndQuotations = true;
+					currentWord = removeEndQuotations(currentWord);
+					venue = venue + currentWord + STRING_SPACE;
+					break;
+				} else {
+					venue = venue + currentWord + STRING_SPACE;
+				}
+			}
+
+			if (hasEndQuotations == false) {
+				throw new IllegalArgumentException(
+						MESSAGE_VENUE_INVALID_QUOTATIONS);
+			}
+		} else {
+			while (!wordsList.isEmpty()) {
+				currentWord = wordsList.poll();
+				if (isReservedWord(currentWord)) {
+					stack.push(currentWord);
+					if (representsTime(wordsList) || representsDate(wordsList)) {
+						while (!stack.isEmpty()) {
+							wordsList.offerFirst(stack.pop());
+						}
+						break;
+					} else {
+						while (!stack.isEmpty()) {
+							venue += stack.removeLast() + STRING_SPACE;
+						}
+					}
+				} else {
+					venue += currentWord + STRING_SPACE;
+				}
+			}
+		}
+		venue = venue.trim();
+		// this condition is put here because "".split(" ") returns a string
+		// array
+		// of non zero length, so before trim(), venue will be equal to
+		// something like " "
+		if (venue.equals("")) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_VENUE);
+		}
+
+		return venue;
+	}
+	/* This method gets the date from a LinkedList containing the user input and
+	 * removes these words from the LinkedList.
+	 */
+	public static String getDateAndTrimUserInput(LinkedList<String> wordsList)
+			throws IllegalArgumentException {
+		String date = "";
+		String currentWord;
+		if (!wordsList.isEmpty()) {
+			currentWord = wordsList.poll();
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_DATE_FORMAT);
+		}
+
+		String[] arr = currentWord.split("/");
+		// if the format is D/M/Y, where D, M, Y can be any integer, but cannot
+		// start with 0
+		if (arr.length == 3) {
+			if (!isInteger(arr[INDEX_DAY]) || !isInteger(arr[INDEX_MONTH])
+					|| !isInteger(arr[INDEX_YEAR])) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_DATE_FORMAT);
+			}
+			return currentWord;
+		} else if (arr.length == 2) { // if the format is D/M, where D, M can be
+										// any integer, but cannot start with 0
+			if (!isInteger(arr[INDEX_DAY]) || !isInteger(arr[INDEX_MONTH])) {
+				throw new IllegalArgumentException(MESSAGE_INVALID_DATE_FORMAT);
+			}
+			String year = getYearForAppend(arr[INDEX_MONTH]);
+			date = currentWord + "/" + year;
+			return date;
+		} else if (isDayOfWeek(currentWord)) {
+			String inputDayString = currentWord;
+			int inputDayInt = convertDayToInt(inputDayString);
+
+			LocalDate todayLocalDate = new LocalDate();
+			int todayInt = todayLocalDate.getDayOfWeek();
+
+			int differenceInDays = inputDayInt - todayInt;
+			if (differenceInDays < 0) {
+				throw new IllegalArgumentException(
+						MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS);
+			}
+			todayLocalDate = todayLocalDate.plusDays(differenceInDays);
+			Integer yearInt = todayLocalDate.getYear();
+			Integer monthInt = todayLocalDate.getMonthOfYear();
+			Integer dayInt = todayLocalDate.getDayOfMonth();
+			date = dayInt.toString() + "/" + monthInt.toString() + "/"
+					+ yearInt.toString();
+			return date;
+		} else if (currentWord.equals("next")) {
+			String inputDayString = wordsList.poll();
+			int inputDayInt = convertDayToInt(inputDayString);
+
+			LocalDate todayLocalDate = new LocalDate();
+			int todayInt = todayLocalDate.getDayOfWeek();
+
+			int differenceInDays = inputDayInt - todayInt + DAYS_IN_WEEK;
+			if (differenceInDays < 0) {
+				throw new IllegalArgumentException(
+						MESSAGE_NEGATIVE_DIFFERENCE_IN_DAYS);
+			}
+			todayLocalDate = todayLocalDate.plusDays(differenceInDays);
+			Integer yearInt = todayLocalDate.getYear();
+			Integer monthInt = todayLocalDate.getMonthOfYear();
+			Integer dayInt = todayLocalDate.getDayOfMonth();
+			date = dayInt.toString() + "/" + monthInt.toString() + "/"
+					+ yearInt.toString();
+			return date;
+		} else { // if the format is D M Y
+			// get day
+			if (isInteger(currentWord)) {
+				date += currentWord;
+			} else {
+				throw new IllegalArgumentException(MESSAGE_INVALID_DATE_FORMAT);
+			}
+			// get month
+			String month = null;
+			if (!wordsList.isEmpty()) {
+				currentWord = wordsList.poll();
+				if (isMonth(currentWord)) {
+					month = convertMonthToNumberStringFormat(currentWord);
+					date += "/" + month;
+				} else {
+					throw new IllegalArgumentException(
+							MESSAGE_INVALID_DATE_FORMAT);
+				}
+			} else {
+				throw new IllegalArgumentException(MESSAGE_INVALID_DATE_FORMAT);
+			}
+
+			// get year
+			if (!wordsList.isEmpty()) {
+				currentWord = wordsList.peek();
+				if (isYear(currentWord)) {
+					date += "/" + currentWord;
+					wordsList.poll();
+				} else {
+					String year = getYearForAppend(month);
+					date = date + "/" + year;
+				}
+			} else {
+				String year = getYearForAppend(month);
+				date = date + "/" + year;
+				return date;
+			}
+			return date;
+		}
+	}
+	/* This method is called when the user provides a date that specifies
+	 * the date and month, but not the year. It will return the current year
+	 * if the user's date has not passed, but if it has already passed, then it
+	 * will return the next year.
+	 */
+	private static String getYearForAppend(String month) {
+		// get current year and append to D/M
+		DateTime current = new DateTime();
+		Integer year = current.getYear();
+		Integer currentMonth = current.getMonthOfYear();
+		Integer monthOfDate = Integer.valueOf(month);
+
+		if (monthOfDate < currentMonth) {
+			year += 1;
+		}
+
+		return year.toString();
+	}
+
+	private static boolean isDayOfWeek(String day) {
+		day = day.toLowerCase();
+		if (day.equals("monday") || day.equals("tuesday")
+				|| day.equals("wednesday") || day.equals("thursday")
+				|| day.equals("friday") || day.equals("saturday")
+				|| day.equals("sunday")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// This function assumes that day will be valid, i.e. one of the days of the
+	// week
+	private static Integer convertDayToInt(String day) {
+		day = day.toLowerCase();
+		if (day.equals("monday")) {
+			return 1;
+		} else if (day.equals("tuesday")) {
+			return 2;
+		} else if (day.equals("wednesday")) {
+			return 3;
+		} else if (day.equals("thursday")) {
+			return 4;
+		} else if (day.equals("friday")) {
+			return 5;
+		} else if (day.equals("saturday")) {
+			return 6;
+		} else { // for sunday
+			return 7;
+		}
+	}
+
+	 /*This function assumes startTime is of the format H.M, where H and M 
+	  * can be any integer not starting with 0. It will return H as a string.
+	  */
+	public static String getHour(String timeFormat) {
+		if (timeFormat == null) {
+			return null;
+		}
+		String[] temp = timeFormat.split("\\.");
+		return temp[INDEX_HOUR];
+	}
+
+	 /*This function assumes startTime is of the format H.M, where H and M 
+	  * can be any integer not starting with 0. It will return M as a string.
+	  */
+	public static String getMinute(String timeFormat) {
+		if (timeFormat == null) {
+			return null;
+		}
+		String[] temp = timeFormat.split("\\.");
+		return temp[INDEX_MINUTE];
+	}
+
+	/* this function assumes dateFormat is of the format D/M/Y, where H and M
+	 *  can be any integer not starting with 0. It will return Y as a string.
+	 */
+	public static String getYear(String dateFormat) {
+		if (dateFormat == null) {
+			return null;
+		}
+		String[] temp = dateFormat.split("/");
+		return temp[INDEX_YEAR];
+	}
+
+	/* this function assumes dateFormat is of the format D/M/Y, where H and M
+	 *  can be any integer not starting with 0. It will return M as a string.
+	 */
+	public static String getMonth(String dateFormat) {
+		if (dateFormat == null) {
+			return null;
+		}
+		String[] temp = dateFormat.split("/");
+		return temp[INDEX_MONTH];
+	}
+
+	/* this function assumes dateFormat is of the format D/M/Y, where H and M
+	 *  can be any integer not starting with 0. It will return D as a string.
+	 */
+	public static String getDay(String dateFormat) {
+		if (dateFormat == null) {
+			return null;
+		}
+		String[] temp = dateFormat.split("/");
+		return temp[INDEX_DAY];
+	}
+	/*This method will return the current year*/
+	protected static String generateYear() {
+		DateTime current = new DateTime();
+		Integer year = current.getYear();
+		return year.toString();
+	}
+	/*This method will return the current month*/
+	protected static String generateMonth() {
+		DateTime current = new DateTime();
+		Integer month = current.getMonthOfYear();
+		return month.toString();
+	}
+	/*This method will return the current date (only the day)*/
+	protected static String generateDay() {
+		DateTime current = new DateTime();
+		Integer day = current.getDayOfMonth();
+		return day.toString();
+	}
+
+	protected static boolean isMonth(String word) {
+		word = word.toLowerCase();
+		if (word.equals("january") || word.equals("february")
+				|| word.equals("march") || word.equals("may")
+				|| word.equals("june") || word.equals("july")
+				|| word.equals("august") || word.equals("september")
+				|| word.equals("october") || word.equals("november")
+				|| word.equals("december")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static String convertMonthToNumberStringFormat(String word) {
+		word = word.toLowerCase();
+		if (word.equals("january")) {
+			return "1";
+		} else if (word.equals("february")) {
+			return "2";
+		} else if (word.equals("march")) {
+			return "3";
+		} else if (word.equals("april")) {
+			return "4";
+		} else if (word.equals("may")) {
+			return "5";
+		} else if (word.equals("june")) {
+			return "6";
+		} else if (word.equals("july")) {
+			return "7";
+		} else if (word.equals("august")) {
+			return "8";
+		} else if (word.equals("september")) {
+			return "9";
+		} else if (word.equals("october")) {
+			return "10";
+		} else if (word.equals("november")) {
+			return "11";
+		} else {
+			return "12";
+		}
+	}
+
+	protected static boolean isYear(String word) {
+		if (word.length() == 4 && isInteger(word)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	protected static boolean isInteger(String number) {
+		try {
+			Integer.parseInt(number);
+			if (number.startsWith("0")) {
+				return false;
+			}
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
+	}
+	/*This method will check if the first few words in the LinkedList is of a date
+	 * format, e.g. 25 December, 25 December 2014, 25/12, 25/12/2014, thursday,
+	 * next thursday
+	 */
+	public static boolean representsDate(LinkedList<String> wordsList) {
+		LinkedList<String> stack = new LinkedList<String>();
+		String currentWord;
+		if (wordsList.isEmpty()) {
+			return false;
+		} else {
+			currentWord = wordsList.peek().toLowerCase();
+		}
+
+		if (currentWord.equals("next")) {
+			stack.push(currentWord);
+			wordsList.poll();
+			currentWord = wordsList.peek().toLowerCase();
+			if (isDayOfWeek(currentWord)) {
+				wordsList.offerFirst(stack.pop());
+				return true;
+			} else {
+				wordsList.offerFirst(stack.pop());
+				return false;
+			}
+		} else if (isDayOfWeek(currentWord)) {
+			return true;
+		} else if (isInteger(currentWord)) {
+			stack.push(wordsList.poll());
+			if (!wordsList.isEmpty()) {
+				currentWord = wordsList.peek().toLowerCase();
+			} else {
+				wordsList.offerFirst(stack.pop());
+				return false;
+			}
+			// put the word back
+			wordsList.offerFirst(stack.pop());
+			if (isMonth(currentWord)) {
+				return true;
+			} else {
+				return false;
+			}
+		} else if (currentWord.contains("/")) {
+			String[] dateFormat = currentWord.split("/");
+			if (dateFormat.length == 2) {
+				String day = dateFormat[INDEX_DAY];
+				String month = dateFormat[INDEX_MONTH];
+				if (isInteger(day) && isInteger(month)) {
+					return true;
+				} else {
+					return false;
+				}
+			} else if (dateFormat.length == 3) {
+				String day = dateFormat[INDEX_DAY];
+				String month = dateFormat[INDEX_MONTH];
+				String year = dateFormat[INDEX_YEAR];
+				if (isInteger(day) && isInteger(month) && isInteger(year)) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	/*This method is called when the first word in the LinkedList is a reserved word,
+	 * but it has been determined that it does not represent a task field (e.g. date or time),
+	 * so it can be appended to the description
+	 */
+	protected static String appendToDescription(LinkedList<String> wordsList,
+			String description) {
+		// the first word will be a reserved word so we add it to description
+		// first
+		String currentWord = wordsList.poll();
+		description = description + STRING_SPACE + currentWord;
+
+		while (!wordsList.isEmpty()) {
+			currentWord = wordsList.poll();
+			if (!isReservedWord(currentWord)) {
+				description = description + STRING_SPACE + currentWord;
+			} else {
+				wordsList.offerFirst(currentWord);
+				break;
+			}
+		}
+
+		return description;
+	}
+
+	protected static void replaceWordOn(LinkedList<String> wordsList) {
+		wordsList.offerFirst("on");
+	}
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\CommandParser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+	 */
+
+	public static String displayTaskForAdd(Task task) {
+		result = "";
+		result = result + displayTask(task) + MESSAGE_ADDED;
+		return result;
+	}
+
+	public static String displayTask(Task task) {
+		result = "";
+		result += getDescription(task);
+		result += getVenue(task);
+		// if a task has a start date, it will definitely have an end date, it
+		// just depends whether they are equal
+		if (task.hasStartDate() && !task.startDateEqualsEndDate()) { // append
+																		// "from.. ..to"
+			result += addFrom();
+			result += addStartDate(task);
+			if (task.hasStartTime()) {
+				result += addStartTime(task);
+			}
+			result += addTo();
+			result += addEndDate(task);
+			if (task.hasEndTime()) {
+				result += addEndTime(task);
+			}
+		} else if (task.hasStartDate()) {
+			result += addOn();
+			result += addStartDate(task);
+
+			if (task.hasStartTime() && task.hasEndTime()
+					&& !task.startTimeEqualsEndTime()) {
+				result += addFrom();
+				result += addStartTime(task);
+				result += addTo();
+				result += addEndTime(task);
+			} else if (task.hasStartTime()) {
+				result += addAt();
+				result += addStartTime(task);
+			}
+
+		} else if (task.hasStartTime()) {
+			result += addAt();
+			result += addStartTime(task);
+		}
+
+		if (task.hasRecurrence()) {
+			result += addRecurrence(task);
+		}
+
+		if (task.hasCompleted()) {
+			result += addCompleted(task);
+		}
+		result = result.trim();
+		return result;
+	}
+
+	private static String getTaskNumber(int number) {
+		return number + 1 + "." + STRING_SPACE;
+	}
+
+	private static String getDescription(Task task) {
+		return (task.getDescription() + STRING_SPACE);
+	}
+
+	private static String getVenue(Task task) {
+		String venue = task.getVenue();
+		if (venue != null) {
+			return "at " + task.getVenue() + STRING_SPACE;
+		} else {
+			return "";
+		}
+	}
+
+	private static String addFrom() {
+		return "from" + STRING_SPACE;
+	}
+
+	private static String addTo() {
+		return "to" + STRING_SPACE;
+	}
+
+	private static String addStartDate(Task task) {
+		return task.getStartDate() + STRING_SPACE;
+	}
+
+	private static String addStartTime(Task task) {
+		return task.getStartTime().toString()
+				.substring(TIME_STRING_START_INDEX, TIME_STRING_END_INDEX)
+				+ STRING_SPACE;
+	}
+
+	private static String addEndDate(Task task) {
+		return task.getEndDate() + STRING_SPACE;
+	}
+
+	private static String addEndTime(Task task) {
+		return task.getEndTime().toString()
+				.substring(TIME_STRING_START_INDEX, TIME_STRING_END_INDEX)
+				+ STRING_SPACE;
+	}
+
+	private static String addOn() {
+		return "on" + STRING_SPACE;
+	}
+
+	private static String addAt() {
+		return "at" + STRING_SPACE;
+	}
+
+	private static String addRecurrence(Task task) {
+		return "(" + task.getRecurrence() + ")" + STRING_SPACE;
+	}
+
+	private static String addCompleted(Task task) {
+		return "(" + task.hasCompleted() + ")" + STRING_SPACE;
+	}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+	 */
+
+	// this function returns -1 if the start date time of the task is before
+	// the current date time, 0 if the the start date time of the task is after
+	// the current date time but on the same day, 1 if the start date time of
+	// the task
+	// is after the current date time and not on the same day
+	public static Integer determinePastPresentFuture(Task task) {
+		DateTime currentDateTime = new DateTime();
+		LocalDate taskDate = task.getStartDate();
+		LocalTime taskTime = task.getStartTime();
+		if (taskDate == null && taskTime == null) {
+			return TASK_DOES_NOT_HAVE_DATE_TIME;
+		} else {
+			DateTime taskDateTime = taskDate.toDateTime(taskTime);
+
+			int compareDate = DateTimeComparator.getInstance().compare(
+					taskDateTime, currentDateTime);
+
+			switch (compareDate) {
+			case -1:
+				return PAST;
+			case 0:
+			case 1: {
+				int taskDay = taskDateTime.getDayOfYear();
+				int currentDay = currentDateTime.getDayOfYear();
+				if (taskDay == currentDay) {
+					return PRESENT;
+				} else {
+					return FUTURE;
+				}
+			}
+			default:
+				// we should never reach this case
+				throw new IllegalArgumentException();
+			}
+		}
+	}
+}
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\UpdateHandler.java
+	 */
+
+public class UpdateHandler extends CommandHandler {
+
+	private final static String MESSAGE_TASK_NOT_FOUND = "Sorry we couldn't find that task. Please try again.";
+	private final static String MESSAGE_CANNOT_UPDATE_VENUE_FOR_FLOATING_TASK = "Sorry you can't update the venue field for a floating task.";
+	private final static String MESSAGE_CANNOT_UPDATE_DATE_FOR_FLOATING_TASK = "Sorry you can't update the date field for a floating task.";
+	private final static String MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK = "Sorry you can't update the time field for a floating task.";
+
+	private UpdateParser parser;
+	private static Storage storage = Storage.getInstance();
+	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
+
+	public UpdateHandler(String details) {
+		super(details);
+		parser = new UpdateParser(details);
+	}
+
+	@Override
+	public String execute() {
+		try {
+			// parser will analyze the user input and store each piece of
+			// information into its respective
+			// attributes
+			parser.parse();
+			String field = parser.getField();
+			Task task = getTask(parser.getTaskNumber());
+
+			if (field.equals(UpdateParser.FIELD_DESCRIPTION_FULL)) {
+				String newDescription = parser.getDescription();
+				task.setDescription(newDescription);
+				googleCalendar.syncUpdateTaskDescription(task, newDescription);
+			} else if (field.equals(UpdateParser.FIELD_VENUE_FULL)) {
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_VENUE_FOR_FLOATING_TASK);
+				}
+				String newVenue = parser.getVenue();
+				task.setVenue(newVenue);
+				SyncNonFloatingTasks.syncUpdateTaskVenue(task, newVenue);
+
+			} else if (field.equals(UpdateParser.FIELD_START_DATE)) {
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_DATE_FOR_FLOATING_TASK);
+				}
+				updateStartDate(task, parser);
+			} else if (field.equals(UpdateParser.FIELD_START_TIME)) {
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK);
+				}
+				updateStartTime(task, parser);
+			} else if (field.equals(UpdateParser.FIELD_END_DATE)) {
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_DATE_FOR_FLOATING_TASK);
+				}
+				updateEndDate(task, parser);
+			} else if (field.equals(UpdateParser.FIELD_END_TIME)) {
+				if (isFloatingTask(task)) {
+					throw new IllegalArgumentException(
+							MESSAGE_CANNOT_UPDATE_TIME_FOR_FLOATING_TASK);
+				}
+				updateEndTime(task, parser);
+			}
+			storage.saveCurrentState();
+			String successMessage = getSuccessMessage(parser);
+			return successMessage;
+		} catch (IndexOutOfBoundsException e) {
+			return MESSAGE_TASK_NOT_FOUND;
+		} catch (IllegalArgumentException e) {
+			return e.getMessage();
+		} catch (IOException e) {
+			return e.getMessage();
+		}
+	}
+
+	public static Task getTask(Integer number) {
+		ArrayList<Task> tasks = storage.getTasks();
+		return tasks.get(number - 1);
+	}
+
+	private static void updateStartDate(Task task, UpdateParser parser) {
+		try {
+			Integer startDateYear = Integer.parseInt(parser.getStartDateYear());
+			Integer startDateMonth = Integer.parseInt(parser
+					.getStartDateMonth());
+			Integer startDateDay = Integer.parseInt(parser.getStartDateDay());
+
+			LocalDate newStartDate = new LocalDate(startDateYear,
+					startDateMonth, startDateDay);
+			task.setStartDate(newStartDate);
+			SyncNonFloatingTasks.syncUpdateTaskStartDate(task, newStartDate);
+
+			if (task.startDateEqualsEndDate()) {
+				task.setEndDate(newStartDate);
+			}
+
+		} catch (IllegalFieldValueException e) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_DATE_VALUE);
+		}
+	}
+
+	private static void updateEndDate(Task task, UpdateParser parser) {
+		try {
+			Integer endDateYear = Integer.parseInt(parser.getEndDateYear());
+			Integer endDateMonth = Integer.parseInt(parser.getEndDateMonth());
+			Integer endDateDay = Integer.parseInt(parser.getEndDateDay());
+
+			LocalDate newEndDate = new LocalDate(endDateYear, endDateMonth,
+					endDateDay);
+			task.setEndDate(newEndDate);
+			SyncNonFloatingTasks.syncUpdateTaskEndDate(task, newEndDate);
+
+		} catch (IllegalFieldValueException e) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_DATE_VALUE);
+		}
+	}
+
+	private static void updateStartTime(Task task, UpdateParser parser)
+			throws IOException {
+		try {
+			Integer startTimeHour = Integer.parseInt(parser.getStartTimeHour());
+			Integer startTimeMinute = Integer.parseInt(parser
+					.getStartTimeMinute());
+
+			LocalTime newStartTime = new LocalTime(startTimeHour,
+					startTimeMinute);
+
+			task.setStartTime(newStartTime);
+			try {
+				SyncNonFloatingTasks.syncUpdateTaskStartTime(task, newStartTime);
+			} catch (IOException e) {
+				// do nothing
+			}
+			try {
+				if (task.startTimeEqualsEndTime()) {
+					task.setEndTime(newStartTime);
+					SyncNonFloatingTasks.syncUpdateTaskEndTime(task, newStartTime);
+				}
+			} catch (IOException e) {
+				
+			}
+		} catch (IllegalFieldValueException e) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
+		}
+	}
+
+	private static void updateEndTime(Task task, UpdateParser parser) {
+		try {
+			int endTimeHour = Integer.parseInt(parser.getEndTimeHour());
+			int endTimeMinute = Integer.parseInt(parser.getEndTimeMinute());
+
+			LocalTime newEndTime = new LocalTime(endTimeHour, endTimeMinute);
+
+			task.setEndTime(newEndTime);
+			SyncNonFloatingTasks.syncUpdateTaskEndTime(task, newEndTime);
+		} catch (IllegalFieldValueException e) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_TIME_VALUE);
+		} catch (IOException e) {
+			
+		}
+	}
+
+	private static String getSuccessMessage(UpdateParser parser) {
+		String result;
+		result = "Task " + parser.getTaskNumber().toString() + "'s "
+					+ parser.getField() + " updated!";
+		return result;
+	}
+
+	private static boolean isFloatingTask(Task task) {
+		if ((task.hasStartDate() && task.hasEndDate())
+				|| (task.hasStartTime() && task.hasEndTime())) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\UpdateHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\UpdateParser.java
+	 */
+
+public class UpdateParser extends CommandParser {
+
+	private Integer taskNumber;
+	private String field;
+
+	protected final static String FIELD_DESCRIPTION = "d";
+	protected final static String FIELD_DESCRIPTION_FULL = "description";
+	protected final static String FIELD_VENUE = "v";
+	protected final static String FIELD_VENUE_FULL = "venue";
+	protected final static String FIELD_START = "s";
+	protected final static String FIELD_START_DATE = "start date";
+	protected final static String FIELD_START_TIME = "start time";
+	protected final static String FIELD_END = "e";
+	protected final static String FIELD_END_DATE = "end date";
+	protected final static String FIELD_END_TIME = "end time";
+	private final static String MESSAGE_INVALID_FIELD = "Sorry we did not understand which field you were trying to update.";
+	private final static String MESSAGE_INVALID_TASK_NUMBER = "Task number is not a valid number.";
+	private final static String STRING_SPACE = " ";
+
+	/***************************** Constructors ************************/
+	public UpdateParser(String arguments) {
+		super(arguments);
+	}
+
+	/***************************** Accessors ************************/
+
+	public Integer getTaskNumber() {
+		return taskNumber;
+	}
+
+	public String getField() {
+		return field;
+	}
+
+	/***************************** Mutators ************************/
+
+	public void setTaskNumber(String number) throws IllegalArgumentException {
+		Integer result;
+		result = convertStringToInteger(number);
+		this.taskNumber = result;
+	}
+
+	public void setField(String field) {
+		if (field.startsWith(FIELD_DESCRIPTION)
+				|| field.startsWith(FIELD_VENUE)
+				|| field.equals(FIELD_START_DATE)
+				|| field.equals(FIELD_START_TIME)
+				|| field.equals(FIELD_END_DATE) || field.equals(FIELD_END_TIME)) {
+			this.field = field;
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_FIELD);
+		}
+	}
+
+	/****************************************************************/
+	@Override
+	public String parse() {
+		String[] userInput = this.getUserInput().split(" ");
+		LinkedList<String> wordsList = new LinkedList<String>(
+				Arrays.asList(userInput));
+
+		String taskNumber = wordsList.poll();
+		setTaskNumber(taskNumber);
+		String field;
+		if (!wordsList.isEmpty()) {
+			field = wordsList.poll().toLowerCase();
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_FIELD);
+		}
+
+		if (isValidField(field)) {
+			String details = getDetails(wordsList);
+			setFieldAndDetails(field, details, wordsList);
+		}
+		return MESSAGE_PARSE_SUCCESS;
+	}
+
+	private boolean isValidField(String field) {
+		if (field.startsWith(FIELD_DESCRIPTION) || field.startsWith(FIELD_VENUE)
+				|| field.startsWith(FIELD_START) || field.startsWith(FIELD_END)) {
+			return true;
+		} else {
+			throw new IllegalArgumentException(MESSAGE_INVALID_FIELD);
+		}
+	}
+
+	private void setFieldAndDetails(String field, String details,
+			LinkedList<String> wordsList) {
+		if (field.startsWith(FIELD_DESCRIPTION)) {
+			this.setDescription(details);
+			this.setField(FIELD_DESCRIPTION_FULL);
+		} else if (field.startsWith(FIELD_VENUE)) {
+			this.setVenue(details);
+			this.setField(FIELD_VENUE_FULL);
+		} else if (field.startsWith(FIELD_START)) {
+			if (representsTime(wordsList)) {
+				String startTime = getTimeAndTrimUserInput(wordsList);
+				setStartTime(startTime);
+				this.setField(FIELD_START_TIME);
+			} else {
+				String startDate = getDateAndTrimUserInput(wordsList);
+				setStartDate(startDate);
+				this.setField(FIELD_START_DATE);
+			}
+		} else if (field.startsWith(FIELD_END)) {
+			if (representsTime(wordsList)) {
+				String endTime = getTimeAndTrimUserInput(wordsList);
+				setEndTime(endTime);
+				this.setField(FIELD_END_TIME);
+			} else {
+				String endDate = getDateAndTrimUserInput(wordsList);
+				setEndDate(endDate);
+				this.setField(FIELD_END_DATE);
+			}
+		}
+	}
+
+	private static String getDetails(LinkedList<String> wordsList) {
+		String details = "";
+		for (String word : wordsList) {
+			details = details + word + STRING_SPACE;
+		}
+		details = details.trim();
+		return details;
+	}
+
+	private static Integer convertStringToInteger(String number) {
+		try {
+			Integer result = Integer.parseInt(number);
+			return result;
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException(MESSAGE_INVALID_TASK_NUMBER);
+		}
+	}
+
+	private void setStartDate(String startDate) {
+		String startDateYear = getYear(startDate);
+		String startDateMonth = getMonth(startDate);
+		String startDateDay = getDay(startDate);
+
+		this.setStartDateYear(startDateYear);
+		this.setStartDateMonth(startDateMonth);
+		this.setStartDateDay(startDateDay);
+	}
+
+	private void setEndDate(String endDate) {
+		String endDateYear = getYear(endDate);
+		String endDateMonth = getMonth(endDate);
+		String endDateDay = getDay(endDate);
+
+		this.setEndDateYear(endDateYear);
+		this.setEndDateMonth(endDateMonth);
+		this.setEndDateDay(endDateDay);
+	}
+
+	private void setStartTime(String startTime) {
+		String startTimeHour = getHour(startTime);
+		String startTimeMinute = getMinute(startTime);
+		this.setStartTimeHour(startTimeHour);
+		this.setStartTimeMinute(startTimeMinute);
+	}
+
+	private void setEndTime(String endTime) {
+		String endTimeHour = getHour(endTime);
+		String endTimeMinute = getMinute(endTime);
+		this.setEndTimeHour(endTimeHour);
+		this.setEndTimeMinute(endTimeMinute);
+	}
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\UpdateParser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\storage\Storage.java
+	 */
+
+public class Storage {
+	private static final int EVENT_ID_INDEX = 0;
+	private static final int DESCRIPTION_INDEX = 1;
+	private static final int VENUE_INDEX = 2;
+	private static final int START_DATE_INDEX = 3;
+	private static final int START_TIME_INDEX = 4;
+	private static final int END_DATE_INDEX = 5;
+	private static final int END_TIME_INDEX = 6;
+	private static final int REMINDER_INDEX = 7;
+	private static final int RECURRENCE_INDEX = 8;
+	private static final int COMPLETED_INDEX = 9;
+	private static final int HAS_BEEN_UPDATED_INDEX = 10;
+	private static final String MESSAGE_READ_FROM_FILE_SUCCESS = "Data read from storage.";
+	private static final String MESSAGE_WRITE_FROM_FILE_SUCCESS = "Tasks added.";
+	private static final String MESSAGE_NO_MORE_COMMANDS_TO_UNDO = "There are no more commands to undo.";
+	private static final String MESSAGE_FILE_NOT_FOUND = "File does not exist";
+	private static final String MESSAGE_IO_EXCEPTION = "IO exception in readFromFile function.";
+	private static final String MESSAGE_ARRAY_INDEX_OUT_OF_BOUNDS_EXCEPTION = "ArrayIndexOutOfBounds exception in readFromFile function.";
+	public static final String DATABASE_FILENAME = "database.csv";
+	public static final String DELETED_TASKS_FILENAME = "deletedTasks.csv";
+	private static final int DATE_INDEX = 0;
+	private static final int TIME_INDEX = 1;
+	private static final int YEAR_INDEX = 0;
+	private static final int MONTH_INDEX = 1;
+	private static final int DAY_INDEX = 2;
+	private static final int HOUR_INDEX = 0;
+	private static final int MINUTE_INDEX = 1;
+
+	/***************************** Data Members ************************/
+	private static Storage theOne = null;
+	private ArrayList<Task> tasks;
+	private ArrayList<Task> deletedTasks;
+	private LinkedList<ArrayList<Task>> taskHistory;
+	private LinkedList<ArrayList<Task>> deletedTaskHistory;
+
+	/***************************** Constructors ************************/
+	private Storage() {
+		tasks = new ArrayList<Task>();
+		deletedTasks = new ArrayList<Task>();
+		taskHistory = new LinkedList<ArrayList<Task>>();
+		deletedTaskHistory = new LinkedList<ArrayList<Task>>();
+	}
+
+	public static Storage getInstance() {
+		if (theOne == null) {
+			theOne = new Storage();
+		}
+		return theOne;
+	}
+
+	/***************************** Accessors ************************/
+	public ArrayList<Task> getTasks() {
+		return this.tasks;
+	}
+
+	public ArrayList<Task> getDeletedTasks() {
+		return this.deletedTasks;
+	}
+
+	public LinkedList<ArrayList<Task>> getTaskHistory() {
+		return this.taskHistory;
+	}
+
+	public LinkedList<ArrayList<Task>> getDeletedTaskHistory() {
+		return this.deletedTaskHistory;
+	}
+
+	/****************************************************************/
+	public void addTask(Task task) {
+		tasks.add(task);
+	}
+
+	public void addDeletedTask(Task task) {
+		deletedTasks.add(task);
+	}
+
+	public void removeTask(int index) {
+		tasks.remove(index);
+	}
+
+	public void removeDeletedTask(int index) {
+		deletedTasks.remove(index);
+	}
+
+	public void clearAllTasks() {
+		tasks.clear();
+	}
+
+	public void clearAllDeletedTasks() {
+		deletedTasks.clear();
+	}
+
+	private void setTasks(ArrayList<Task> tasks) {
+		this.tasks = tasks;
+	}
+
+	private void setDeletedTasks(ArrayList<Task> deletedTasks) {
+		this.deletedTasks = deletedTasks;
+	}
+	/*This method stores snapshots of the tasks after each operation so that
+	 * the revertTaskHistories function can go back to a previous snapshot.
+	 * The local files are written each time it's called in case the program
+	 * crashes, data is not lost.
+	 */
+	public void updateTaskHistories() {
+		Cloner cloner = new Cloner();
+		ArrayList<Task> currentTasks = this.getTasks();
+		ArrayList<Task> tasksClone = cloner.deepClone(currentTasks);
+		this.getTaskHistory().push(tasksClone);
+
+		ArrayList<Task> currentDeletedTasks = this.getDeletedTasks();
+		ArrayList<Task> deletedTasksClone = cloner
+				.deepClone(currentDeletedTasks);
+		this.getDeletedTaskHistory().push(deletedTasksClone);
+
+		Storage.writeToFile(DATABASE_FILENAME, tasks);
+		Storage.writeToFile(DELETED_TASKS_FILENAME, deletedTasks);
+	}
+	/*This method goes back to a previous snapshot of the tasks.
+	 * The local files are written each time it's called in case the program
+	 * crashes, data is not lost.
+	 */
+	public void revertTaskHistories() {
+		// assumes that size of taskHistory and size of deletedTaskHistory
+		// is always the same
+		if (this.taskHistory.size() == 1) {
+			throw new IllegalArgumentException(MESSAGE_NO_MORE_COMMANDS_TO_UNDO);
+		} else {
+			LinkedList<ArrayList<Task>> taskHistory = this.getTaskHistory();
+			LinkedList<ArrayList<Task>> deletedTaskHistory = this
+					.getDeletedTaskHistory();
+
+			taskHistory.pop();
+			deletedTaskHistory.pop();
+			this.setTasks(taskHistory.peek());
+			this.setDeletedTasks(deletedTaskHistory.peek());
+
+			Storage.writeToFile(DATABASE_FILENAME, tasks);
+			Storage.writeToFile(DELETED_TASKS_FILENAME, deletedTasks);
+		}
+	}
+	/*This method opens the local CSV file and reads its data and converts
+	 * the data into tasks and assigns it to the appriopriate Storage class ArrayList
+	 */
+	public static String readFromFile(String fileName, ArrayList<Task> tasks) {
+		try {
+			String[] nextLine;
+			CSVReader reader = new CSVReader(new FileReader(fileName));
+
+			String eventId;
+			String description;
+			String venue;
+			LocalDate startDate;
+			LocalTime startTime;
+			LocalDate endDate;
+			LocalTime endTime;
+			DateTime reminder;
+			String recurrence;
+			boolean completed;
+			boolean hasBeenUpdated;
+
+			nextLine = reader.readNext();
+			while (nextLine != null) {
+				eventId = convertToEventId(nextLine[EVENT_ID_INDEX]);
+				description = nextLine[DESCRIPTION_INDEX];
+				venue = convertToVenue(nextLine[VENUE_INDEX]);
+				startDate = convertToDate(nextLine[START_DATE_INDEX]);
+				startTime = convertToTime(nextLine[START_TIME_INDEX]);
+				endDate = convertToDate(nextLine[END_DATE_INDEX]);
+				endTime = convertToTime(nextLine[END_TIME_INDEX]);
+				reminder = convertToDateTime(nextLine[REMINDER_INDEX]);
+				recurrence = nextLine[RECURRENCE_INDEX];
+				completed = convertToBoolean(nextLine[COMPLETED_INDEX]);
+				hasBeenUpdated = convertToBoolean(nextLine[HAS_BEEN_UPDATED_INDEX]);
+				tasks.add(new Task(eventId, description, venue, startDate,
+						startTime, endDate, endTime, reminder, recurrence,
+						completed, hasBeenUpdated));
+				nextLine = reader.readNext();
+			}
+
+			reader.close();
+		} catch (FileNotFoundException e) {
+			TaskerLog.logSystemInfo(MESSAGE_FILE_NOT_FOUND);
+		} catch (IOException e) {
+			TaskerLog.logSystemInfo(MESSAGE_IO_EXCEPTION);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			TaskerLog
+					.logSystemInfo(MESSAGE_ARRAY_INDEX_OUT_OF_BOUNDS_EXCEPTION);
+		}
+
+		return MESSAGE_READ_FROM_FILE_SUCCESS;
+	}
+
+	public static String convertToVenue(String venue) {
+		if (venue.equals("null")) {
+			return null;
+		} else {
+			return venue;
+		}
+	}
+
+	public static String convertToEventId(String eventId) {
+		if (eventId.equals("null")) {
+			return null;
+		} else {
+			return eventId;
+		}
+	}
+	/*This method converts a string date format into a LocalDate object.
+	 * It is used by readFromFile function.
+	 */
+	public static LocalDate convertToDate(String date) {
+		// Date format example: 2014-12-25
+		if (date.equals("null"))
+			return null;
+		String[] yearMonthDay = date.split("-");
+
+		int yearInt = Integer.parseInt(yearMonthDay[YEAR_INDEX]);
+		int monthInt = Integer.parseInt(yearMonthDay[MONTH_INDEX]);
+		String dayString = yearMonthDay[DAY_INDEX];
+		if (dayString.startsWith("0")) {
+			dayString = dayString.substring(1, dayString.length());
+		}
+		int dayInt = Integer.parseInt(dayString);
+
+		LocalDate result = new LocalDate(yearInt, monthInt, dayInt);
+		return result;
+	}
+	/*This method converts a string time format into a LocalTime object.
+	 * It is used by readFromFile function.
+	 */
+	public static LocalTime convertToTime(String time) {
+		// Time format example: 20:59:00.000
+		if (time.equals("null"))
+			return null;
+		String[] hourMinute = time.split(":");
+
+		String hourString = hourMinute[HOUR_INDEX];
+		String minuteString = hourMinute[MINUTE_INDEX];
+
+		if (hourString.startsWith("0")) {
+			hourString = hourString.substring(1, hourString.length());
+		}
+		if (minuteString.startsWith("0")) {
+			minuteString = minuteString.substring(1, minuteString.length());
+		}
+
+		int hourInt = Integer.parseInt(hourString);
+		int monthInt = Integer.parseInt(minuteString);
+
+		LocalTime result = new LocalTime(hourInt, monthInt);
+		return result;
+	}
+	/*This method converts a string date format into a DateTime object.
+	 * It is used by readFromFile function.
+	 */
+	public static DateTime convertToDateTime(String dateTime) {
+		// DateTime format example: 2014-10-20T09:00:00.000+08:00
+		if (dateTime.equals("null"))
+			return null;
+		String[] parameters = dateTime.split("T");
+		String date = parameters[DATE_INDEX];
+		String[] yearMonthDay = date.split("-");
+		String time = parameters[TIME_INDEX];
+		String[] hourMinuteSecond = time.split(":");
+
+		int year = Integer.parseInt(yearMonthDay[YEAR_INDEX]);
+		int month = Integer.parseInt(yearMonthDay[MONTH_INDEX]);
+		String dayString = yearMonthDay[DAY_INDEX];
+		if (dayString.substring(1) == "0") {
+			dayString = dayString.substring(1, dayString.length() - 1);
+		}
+		int dayInt = Integer.parseInt(dayString);
+		int hour = Integer.parseInt(hourMinuteSecond[HOUR_INDEX]);
+		int minute = Integer.parseInt(hourMinuteSecond[MINUTE_INDEX]);
+
+		DateTime result = new DateTime(year, month, dayInt, hour, minute);
+		return result;
+	}
+
+	public static boolean convertToBoolean(String completed) {
+		if (completed.equals("false")) {
+			return false;
+		} else if (completed.equals("true")) {
+			return true;
+		} else {
+			System.out.println("Unexpected input in convertToBoolean method");
+			return false;
+		}
+	}
+	
+	/*This method saves an ArrayList of tasks into a CSV file*/
+	public static String writeToFile(String fileName, ArrayList<Task> tasks) {
+		File file = new File(fileName);
+
+		try {
+			if (file.exists()) {
+				file.delete();
+			}
+			file.createNewFile();
+			CSVWriter writer = new CSVWriter(new FileWriter(fileName));
+			String[] currentEntry;
+			for (Task task : tasks) {
+				currentEntry = task.convertToCSVFormat().split("#!");
+				writer.writeNext(currentEntry);
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return MESSAGE_WRITE_FROM_FILE_SUCCESS;
+	}
+	/*This method calls updateTaskHistories to save a snapshot of the
+	 * current tasks lists
+	 */
+	public void saveCurrentState() {
+		Storage.getInstance().updateTaskHistories();
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\storage\Storage.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\storage\Task.java
+	 */
+
+public class Task {
+
+	private static final String DELIMITER = "#!";
+	private static final String MESSAGE_UPDATE_END_DATE_WITHOUT_START_DATE = "Can't update end date if there is no start date";
+	private static final String MESSAGE_END_EARLIER_THAN_START = "Sorry, the end time can't be earlier than the start time.";
+	private static final String MESSAGE_HAS_TIME_WITHOUT_DATE = "Sorry, can't have time without date.";
+
+	/***************************** Data Members ************************/
+	private String id = null;
+	private boolean hasId = false;
+	private String description;
+	private boolean hasVenue = false;
+	private String venue = null;
+	private boolean hasStartDate = false;
+	private LocalDate startDate = null;
+	private boolean hasStartTime = false;
+	private LocalTime startTime = null;
+	private boolean hasEndDate = false;
+	private LocalDate endDate = null;
+	private boolean hasEndTime = false;
+	private LocalTime endTime = null;
+	private boolean hasReminder = false;
+	private DateTime reminder = null;
+	private boolean hasRecurrence = false;
+	private String recurrence = null;
+	private boolean completed = false;
+	private boolean hasBeenUpdated = false;
+
+	/***************************** Constructors ************************/
+	public Task(String id, String description, String venue,
+			LocalDate startDate, LocalTime startTime, LocalDate endDate,
+			LocalTime endTime, DateTime reminder, String recurrence,
+			boolean completed, boolean hasBeenUpdated) throws IllegalArgumentException {
+		this.setId(id);
+		this.setDescription(description);
+		this.setVenue(venue);
+		this.setStartDate(startDate);
+		this.setEndDate(endDate);
+		// we put setStartTime after setEndDate because of endIsEarlierThanStart
+		// function
+		// requires that if startTime is not null, endTime must not be null
+		this.setStartTime(startTime);
+		this.setEndTime(endTime);
+
+		if (startDate == null && endDate == null
+				&& (startTime != null || endTime != null)) {
+			throw new IllegalArgumentException(MESSAGE_HAS_TIME_WITHOUT_DATE);
+		}
+
+		if (endIsEarlierThanStart(startDate, startTime, endDate, endTime)) {
+			throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
+		}
+
+		this.setReminder(reminder);
+		this.setRecurrence(recurrence);
+		this.completed = completed;
+		this.hasBeenUpdated = hasBeenUpdated;
+	}
+
+	/***************************** Accessors ************************/
+	public boolean hasId() {
+		return hasId;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public boolean hasVenue() {
+		return hasVenue;
+	}
+
+	public String getVenue() {
+		return venue;
+	}
+
+	public boolean hasStartDate() {
+		return hasStartDate;
+	}
+
+	public LocalDate getStartDate() {
+		return startDate;
+	}
+
+	public boolean hasStartTime() {
+		return hasStartTime;
+	}
+
+	public LocalTime getStartTime() {
+		return startTime;
+	}
+
+	public boolean hasEndDate() {
+		return hasEndDate;
+	}
+
+	public LocalDate getEndDate() {
+		return endDate;
+	}
+
+	public boolean hasEndTime() {
+		return hasEndTime;
+	}
+
+	public LocalTime getEndTime() {
+		return endTime;
+	}
+
+	public boolean hasReminder() {
+		return hasReminder;
+	}
+
+	public DateTime getReminder() {
+		return reminder;
+	}
+
+	public boolean hasRecurrence() {
+		return hasRecurrence;
+	}
+
+	public String getRecurrence() {
+		return recurrence;
+	}
+
+	public boolean hasCompleted() {
+		return completed;
+	}
+	
+	public boolean hasBeenUpdated() {
+		return hasBeenUpdated;
+	}
+
+	/***************************** Mutators ************************/
+	private void setHasId(boolean hasId) {
+		this.hasId = hasId;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+
+		if (id == null) {
+			this.setHasId(false);
+		} else {
+			this.setHasId(true);
+		}
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setHasVenue(boolean hasVenue) {
+		this.hasVenue = hasVenue;
+	}
+
+	public void setVenue(String venue) {
+		this.venue = venue;
+
+		if (venue == null) {
+			this.setHasVenue(false);
+		} else {
+			this.setHasVenue(true);
+		}
+	}
+
+	public void setHasStartDate(boolean hasStartDate) {
+		this.hasStartDate = hasStartDate;
+	}
+	
+	/*This method updates the startDate of a task. If the original startDate equals 
+	 * the original endDate, then both startDate and endDate will be updated to the
+	 * same date. If the new startDate is later than the current endDate, then an 
+	 * exception will be thrown
+	 */
+	public void setStartDate(LocalDate startDate) {
+		if (startDate == null) {
+			this.startDate = startDate;
+			this.setHasStartDate(false);
+		} else {
+			if (endDate == null || startDateEqualsEndDate()) {
+				this.startDate = startDate;
+				this.setHasStartDate(true);
+				this.setEndDate(startDate);
+				this.setHasEndDate(true);
+			} else if (endDate != null
+					&& endIsEarlierThanStart(startDate, this.getStartTime(),
+							this.getEndDate(), this.getEndTime())) {
+				throw new IllegalArgumentException(
+						MESSAGE_END_EARLIER_THAN_START);
+			} else {
+				this.startDate = startDate;
+				this.setHasStartDate(true);
+			}
+		}
+	}
+
+	public void setHasStartTime(boolean hasStartTime) {
+		this.hasStartTime = hasStartTime;
+	}
+	
+	/*This method updates the startTime of a task. If the original startTime equals the original
+	endTime, then both startTime and endTime will be updated to the same date. If the new startTime
+	is later than the current endTime, then an exception will be thrown*/
+	public void setStartTime(LocalTime startTime) {
+		if (startTime == null) {
+			this.startTime = startTime;
+			this.setHasStartTime(false);
+		} else {
+			if (endTime == null || startTimeEqualsEndTime()) {
+				this.startTime = startTime;
+				this.setHasStartTime(true);
+				this.setEndTime(startTime);
+				this.setHasEndTime(true);
+			} else if (endTime != null
+					&& endIsEarlierThanStart(this.getStartDate(), startTime,
+							this.getEndDate(), this.getEndTime())) {
+				throw new IllegalArgumentException(
+						MESSAGE_END_EARLIER_THAN_START);
+			} else {
+				this.startTime = startTime;
+				this.setHasStartTime(true);
+			}
+		}
+	}
+
+	public void setHasEndDate(boolean hasEndDate) {
+		this.hasEndDate = hasEndDate;
+	}
+	/*This method updates the endDate of a task. If the new endDate 
+	 * is earlier than the current startDate, then an exception will be thrown
+	 */
+	public void setEndDate(LocalDate endDate) {
+		if (endDate == null) {
+			this.endDate = endDate;
+			this.setHasEndDate(false);
+		} else {
+			if (endIsEarlierThanStart(this.getStartDate(), this.getStartTime(),
+					endDate, this.getEndTime())) {
+				throw new IllegalArgumentException(
+						MESSAGE_END_EARLIER_THAN_START);
+			} else {
+				this.endDate = endDate;
+				this.setHasEndDate(true);
+			}
+		}
+	}
+
+	public void setHasEndTime(boolean hasEndTime) {
+		this.hasEndTime = hasEndTime;
+	}
+	/*This method updates the endTime of a task. If the new endTime 
+	 * is earlier than the current startTime, then an exception will be thrown
+	 */
+	public void setEndTime(LocalTime endTime) {
+		if (endTime == null) {
+			this.endTime = endTime;
+			this.setHasEndTime(false);
+		} else {
+			if (endIsEarlierThanStart(this.getStartDate(), this.getStartTime(),
+					this.getEndDate(), endTime)) {
+				throw new IllegalArgumentException(
+						MESSAGE_END_EARLIER_THAN_START);
+			} else {
+				this.endTime = endTime;
+				this.setHasEndTime(true);
+			}
+		}
+	}
+
+	private void setHasReminder(boolean hasReminder) {
+		this.hasReminder = hasReminder;
+	}
+
+	public void setReminder(DateTime reminder) {
+		if (reminder == null) {
+			this.setHasReminder(false);
+			this.reminder = reminder;
+		} else {
+			this.setHasReminder(true);
+			this.reminder = reminder;
+		}
+	}
+
+	private void setHasRecurrence(boolean hasRecurrence) {
+		this.hasRecurrence = hasRecurrence;
+	}
+
+	public void setRecurrence(String recurrence) {
+		if (recurrence == null) {
+			this.setHasRecurrence(false);
+			this.recurrence = recurrence;
+		} else {
+			this.setHasRecurrence(true);
+			this.recurrence = recurrence;
+		}
+	}
+
+	public void setCompleted(boolean completed) {
+		this.completed = completed;
+	}
+	
+	public void setHasBeenUpdated(boolean hasBeenUpdated) {
+		this.hasBeenUpdated = hasBeenUpdated;
+	}
+	
+	/*This method converts a task into a CSV format for file writing*/
+	public String convertToCSVFormat() {
+		String result = "";
+		result = result + this.getId() + DELIMITER;
+		result = result + this.getDescription() + DELIMITER;
+		result = result + this.getVenue() + DELIMITER;
+		result = result + this.getStartDate() + DELIMITER;
+		result = result + this.getStartTime() + DELIMITER;
+		result = result + this.getEndDate() + DELIMITER;
+		result = result + this.getEndTime() + DELIMITER;
+		result = result + this.getReminder() + DELIMITER;
+		result = result + this.getRecurrence() + DELIMITER;
+		result = result + this.hasCompleted() + DELIMITER;
+		result = result + this.hasBeenUpdated();
+
+		return result;
+	}
+
+	public String toString() {
+		String result = "";
+		result = result + "Description: " + this.getDescription();
+		result = result + ", " + "Venue: " + this.getVenue();
+
+		if (this.hasStartDate()) {
+			result = result + ", " + "Start date: " + this.getStartDate();
+		}
+
+		if (this.hasStartTime()) {
+			result = result + ", " + "Start time: " + this.getStartTime();
+		}
+
+		if (this.hasEndDate()) {
+			result = result + ", " + "End date: " + this.getEndDate();
+		}
+
+		if (this.hasEndTime()) {
+			result = result + ", " + "End time: " + this.getEndTime();
+		}
+
+		if (this.hasReminder()) {
+			result = result + ", " + "Reminder on: " + this.getReminder();
+		}
+		if (this.hasRecurrence()) {
+			result = result + ", " + "Recurrence: " + this.getRecurrence();
+		}
+		return result;
+	}
+	/*This function checks to see if a task's end date and time is earlier than
+	 * its start date and date and time. It will return false for floating tasks
+	 * which do not have start and end dates
+	 */
+	public static boolean endIsEarlierThanStart(LocalDate startDate,
+			LocalTime startTime, LocalDate endDate, LocalTime endTime)
+			throws IllegalArgumentException {
+		if (startDate == null && endDate == null) {
+			return false;
+		} else if (startDate == null && endDate != null) {
+			throw new IllegalArgumentException(
+					MESSAGE_UPDATE_END_DATE_WITHOUT_START_DATE);
+		}
+		DateTime d1 = startDate.toDateTimeAtStartOfDay();
+		DateTime d2 = endDate.toDateTimeAtStartOfDay();
+		int compareResult = DateTimeComparator.getDateOnlyInstance().compare(
+				d1, d2);
+		switch (compareResult) {
+		case -1: // startDate is earlier than endDate
+			return false;
+		case 0: { // if dates are equal we compare time unless they are null
+			if (startTime == null && endTime == null) {
+				return false;
+			} else {
+				DateTime t1 = startTime.toDateTimeToday();
+				DateTime t2 = endTime.toDateTimeToday();
+				compareResult = DateTimeComparator.getTimeOnlyInstance()
+						.compare(t1, t2);
+			}
+			break;
+		}
+		case 1: // startDate is later than endDate
+			return true;
+		}
+
+		switch (compareResult) {
+		case -1: // startTime is earlier than endTime
+			return false;
+		case 0: // startTime is equal to endTime
+			return false;
+		case 1: // startTime is later than endTime
+			return true;
+		default:
+			// we should never reach this case
+			throw new IllegalArgumentException();
+		}
+
+	}
+	/*This function checks to see if a task's start date is equal to its end date.
+	 * This function assumes that startDate and endDate will never be null
+	 */
+	public boolean startDateEqualsEndDate() throws IllegalArgumentException {
+		LocalDate startDate = this.getStartDate();
+		LocalDate endDate = this.getEndDate();
+		DateTime d1 = startDate.toDateTimeAtStartOfDay();
+		DateTime d2 = endDate.toDateTimeAtStartOfDay();
+		int compareResult = DateTimeComparator.getDateOnlyInstance().compare(
+				d1, d2);
+		switch (compareResult) {
+		case -1: // startDate is earlier than endDate
+			return false;
+		case 0: // startDate equals endDate
+			return true;
+		default: // we should never reach this case
+			TaskerLog
+					.logSystemInfo("Entered unexpected case in startDateEqualsEndDate function in Task class");
+			throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
+		
+		}
+	}
+	/*This function checks to see if a task's start time is equal to its end time.
+	 * This function assumes that startTime and endTime will never be null
+	 */
+	public boolean startTimeEqualsEndTime() throws IllegalArgumentException {
+		LocalDate startDate = this.getStartDate();
+		LocalDate endDate = this.getEndDate();
+		LocalTime startTime = this.getStartTime();
+		LocalTime endTime = this.getEndTime();
+		DateTime t1 = startDate.toDateTime(startTime);
+		DateTime t2 = endDate.toDateTime(endTime);
+		int compareResult = DateTimeComparator.getInstance().compare(
+				t1, t2);
+		switch (compareResult) {
+		case -1: // startTime is earlier than endTime
+			return false;
+		case 0: // startTime equals endTime
+			return true;
+		default: // we should never reach this case
+			TaskerLog
+					.logSystemInfo("Entered unexpected case in startTimeEqualsEndTime function in Task class");
+			throw new IllegalArgumentException(MESSAGE_END_EARLIER_THAN_START);
+		}
+	}
+
+}
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\storage\Task.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\storage\TaskBuilder.java
+	 */
+
+public class TaskBuilder {
+
+	/***************************** Data Members ************************/
+	private String id = null;
+	private String description;
+	private String venue = null;
+	private LocalDate startDate = null;
+	private LocalTime startTime = null;
+	private LocalDate endDate = null;
+	private LocalTime endTime = null;
+	private DateTime reminder = null;
+	private String recurrence = null;
+	private boolean completed = false;
+	private boolean hasBeenUpdated = false;
+
+	/***************************** Constructors ************************/
+	public TaskBuilder() {
+
+	}
+
+	public TaskBuilder setDescription(String description) {
+		this.description = description;
+		return this;
+	}
+
+	public TaskBuilder setVenue(String venue) {
+		this.venue = venue;
+		return this;
+	}
+
+	public TaskBuilder setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
+		return this;
+	}
+
+	public TaskBuilder setStartTime(LocalTime startTime) {
+		this.startTime = startTime;
+		return this;
+	}
+
+	public TaskBuilder setEndDate(LocalDate endDate) {
+		this.endDate = endDate;
+		return this;
+	}
+
+	public TaskBuilder setEndTime(LocalTime endTime) {
+		this.endTime = endTime;
+		return this;
+	}
+
+	public void setReminder(DateTime reminder) {
+		this.reminder = reminder;
+	}
+
+	public void setRecurrence(String recurrence) {
+		this.recurrence = recurrence;
+
+	}
+
+	public TaskBuilder setCompleted(boolean completed) {
+		this.completed = completed;
+		return this;
+	}
+
+	public Task buildTask() {
+		return new Task(id, description, venue, startDate, startTime, endDate,
+				endTime, reminder, recurrence, completed, hasBeenUpdated);
+	}
+}
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\storage\TaskBuilder.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\test\display\DisplayHandlerTest.java
+	 */
+
+public class DisplayHandlerTest {
+
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+	}
+
+	@Before
+	public void setUp() throws Exception {
+	}
+
+	@After
+	public void tearDown() throws Exception {
+	}
+
+/**	@Test
+	public void testExecute() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testDisplayHandler() {
+		fail("Not yet implemented");
+	}
+**/
+	@Test
+	public void testDisplayTask() {
+		String s1 = "meeting with Prof at 11pm at CLB on 3/10/2014";
+		CommandHandler e1 = new AddHandler(s1);
+		assertEquals("meeting with Prof at CLB on 2014-10-03 at 23:00 added!", e1.execute());
+		
+		String s2 = "meeting with Prof at CLB at 11pm on 3/10";
+		CommandHandler e2 = new AddHandler(s2);
+		assertEquals("meeting with Prof at CLB on 2015-10-03 at 23:00 added!", e2.execute());
+		
+		String s3 = "meeting with Prof at CLB on 4/12 at 11pm";
+		CommandHandler e3 = new AddHandler(s3);
+		assertEquals("meeting with Prof at CLB on 2014-12-04 at 23:00 added!", e3.execute());
+		
+		String s4 = "gathering on 3/10/2014";
+		CommandHandler e4 = new AddHandler(s4);
+		assertEquals("gathering on 2014-10-03 added!", e4.execute());
+		
+		String s5 = "gathering on 3/10";
+		CommandHandler e5 = new AddHandler(s5);
+		assertEquals("gathering on 2015-10-03 added!", e5.execute());
+		
+		String s6 = "gathering on 3 October";	
+		CommandHandler e6 = new AddHandler(s6);
+		assertEquals("gathering on 2015-10-03 added!", e6.execute());
+		
+		String s7 = "gathering on 3 October 2014";
+		CommandHandler e7 = new AddHandler(s7);
+		assertEquals("gathering on 2014-10-03 added!", e7.execute());
+		
+		String s8 = "meeting from 3/10/2014 11pm to 4/10/2014 1am at Utown";
+		CommandHandler e8 = new AddHandler(s8);
+		assertEquals("meeting at Utown from 2014-10-03 23:00 to 2014-10-04 01:00 added!", e8.execute());
+		
+		String s9 = "meeting from 3/10 to 4/10 at Utown";
+		CommandHandler e9 = new AddHandler(s9);
+		assertEquals("meeting at Utown from 2015-10-03 to 2015-10-04 added!", e9.execute());
+		
+		String s10 = "meeting from 3 October 11pm to 4 October 1am at Utown";
+		CommandHandler e10 = new AddHandler(s10);
+		assertEquals("meeting at Utown from 2015-10-03 23:00 to 2015-10-04 01:00 added!", e10.execute());
+		
+		String s11 = "meeting from 3/10 to 18/10";
+		CommandHandler e11 = new AddHandler(s11);
+		assertEquals("meeting from 2015-10-03 to 2015-10-18 added!", e11.execute());
+		
+		String s12 = "meeting with Prof on 4/12 at CLB at 11pm";
+		CommandHandler e12 = new AddHandler(s12);
+		assertEquals("meeting with Prof at CLB on 2014-12-04 at 23:00 added!", e12.execute());
+		
+		String s13 = "meeting with Prof on 4/12 at 11pm at CLB";
+		CommandHandler e13 = new AddHandler(s13);
+		assertEquals("meeting with Prof at CLB on 2014-12-04 at 23:00 added!", e13.execute());
+		
+	}
+	
+	@Test
+	public void testDeterminePastPresentFuture() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setStartTime(new LocalTime(23, 59));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setEndTime(new LocalTime(00, 00));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task t1 = builder.buildTask();
+		
+		assertEquals(DisplayHandler.PAST, DisplayHandler.determinePastPresentFuture(t1));
+		
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 11, 10));
+		builder.setStartTime(new LocalTime(23, 59));
+		builder.setEndDate(new LocalDate(2014, 11, 10));
+		builder.setEndTime(new LocalTime(23, 59));
+		Task t2 = builder.buildTask();
+		
+		assertEquals(DisplayHandler.PRESENT, DisplayHandler.determinePastPresentFuture(t2));
+		
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 11, 14));
+		builder.setStartTime(new LocalTime(23, 59));
+		builder.setEndDate(new LocalDate(2014, 11, 14));
+		builder.setEndTime(new LocalTime(23, 59));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task t3 = builder.buildTask();
+		
+		assertEquals(DisplayHandler.FUTURE, DisplayHandler.determinePastPresentFuture(t3));
+
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\test\display\DisplayHandlerTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\test\logic\AddHandlerTest.java
+	 */
+
+	@Test
+	public void testAddHandlerAndExecute() {
+		String s1 = "meeting with Prof at 11pm at CLB on 3/10/2014";
+		CommandHandler e1 = new AddHandler(s1);
+		assertEquals("Success message: ", "meeting with Prof at CLB on 2014-10-03 at 23:00 added!", e1.execute());
+		
+		String s2 = "meeting with Prof at CLB at 11pm on 3/10";
+		CommandHandler e2 = new AddHandler(s2);
+		assertEquals("Success message: ", "meeting with Prof at CLB on 2015-10-03 at 23:00 added!", e2.execute());
+		
+		String s3 = "meeting with Prof at CLB on 4/12 at 11pm";
+		CommandHandler e3 = new AddHandler(s3);
+		assertEquals("Success message: ", "meeting with Prof at CLB on 2014-12-04 at 23:00 added!", e3.execute());
+		
+		String s4 = "gathering on 3/10/2014";
+		CommandHandler e4 = new AddHandler(s4);
+		assertEquals("Success message: ", "gathering on 2014-10-03 added!", e4.execute());
+		
+		String s5 = "gathering on 3/10";
+		CommandHandler e5 = new AddHandler(s5);
+		assertEquals("Success message: ", "gathering on 2015-10-03 added!", e5.execute());
+
+		String s6 = "gathering on 3 October";	
+		CommandHandler e6 = new AddHandler(s6);
+		assertEquals("Success message: ", "gathering on 2015-10-03 added!", e6.execute());
+		
+		String s7 = "gathering on 3 October 2014";
+		CommandHandler e7 = new AddHandler(s7);
+		assertEquals("Success message: ", "gathering on 2014-10-03 added!", e7.execute());
+		
+		String s8 = "meeting from 3/10/2014 11pm to 4/10/2014 1am at Utown";
+		CommandHandler e8 = new AddHandler(s8);
+		assertEquals("Success message: ", "meeting at Utown from 2014-10-03 23:00 to 2014-10-04 01:00 added!", e8.execute());
+		
+		String s9 = "meeting from 3/10 to 4/10 at Utown";
+		CommandHandler e9 = new AddHandler(s9);
+		assertEquals("Success message: ", "meeting at Utown from 2015-10-03 to 2015-10-04 added!", e9.execute());
+		
+		String s10 = "meeting from 3 October 11pm to 4 October 1am at Utown";
+		CommandHandler e10 = new AddHandler(s10);
+		assertEquals("Success message: ", "meeting at Utown from 2015-10-03 23:00 to 2015-10-04 01:00 added!", e10.execute());
+		
+		String s11 = "meeting from 3/10 to 18/10";
+		CommandHandler e11 = new AddHandler(s11);
+		assertEquals("Success message: ", "meeting from 2015-10-03 to 2015-10-18 added!", e11.execute());
+		
+		String s12 = "meeting with Prof on 4/12 at CLB at 11pm";
+		CommandHandler e12 = new AddHandler(s12);
+		assertEquals("Success message: ", "meeting with Prof at CLB on 2014-12-04 at 23:00 added!", e12.execute());
+		
+		String s13 = "meeting with Prof on 4/12 at 11pm at CLB";
+		CommandHandler e13 = new AddHandler(s13);
+		assertEquals("Success message: ", "meeting with Prof at CLB on 2014-12-04 at 23:00 added!", e13.execute());
+	}
+	
+//	@Test
+//	public void testFromToInvalidTime() throws Exception {
+//		String s1 = "task from 11/10 2 pm to 12/10 4pm";
+//		CommandHandler e13 = new AddHandler(s1);
+//	}
+//	
+//	@Test
+//	public void testFromToInvalidDate() throws Exception {
+//		String s1 = "task from 11//10 2 pm to 12/10 4pm";
+//		CommandHandler e1 = new AddHandler(s1);
+//	}
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\test\logic\AddHandlerTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\test\logic\AddParserTest.java
+	 */
+
+	@Test
+	public void testParse() {
+		String s1 = "meeting with Prof at 11pm at CLB on 3/10/2014";
+		AddParser p1 = new AddParser(s1);
+		p1.parse();
+		assertEquals("Description: ", "meeting with Prof", p1.getDescription());
+		assertEquals("Venue: ", "CLB", p1.getVenue());
+		assertEquals("startTimeHour: ", "23", p1.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p1.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "23", p1.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p1.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p1.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p1.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p1.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p1.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p1.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p1.getEndDateDay());
+		
+		String s2 = "meeting with Prof at CLB at 11pm on 3/10";
+		AddParser p2 = new AddParser(s2);
+		p2.parse();
+		assertEquals("Description: ", "meeting with Prof", p2.getDescription());
+		assertEquals("Venue: ", "CLB", p2.getVenue());
+		assertEquals("startTimeHour: ", "23", p2.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p2.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "23", p2.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p2.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2015", p2.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p2.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p2.getStartDateDay());
+		assertEquals("endDateYear: ", "2015", p2.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p2.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p2.getEndDateDay());
+		
+		String s3 = "meeting with Prof at CLB on 4/12 at 11pm";
+		AddParser p3 = new AddParser(s3);
+		p3.parse();
+		assertEquals("Description: ", "meeting with Prof", p3.getDescription());
+		assertEquals("Venue: ", "CLB", p3.getVenue());
+		assertEquals("startTimeHour: ", "23", p3.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p3.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "23", p3.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p3.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p3.getStartDateYear());
+		assertEquals("startDateMonth: ", "12", p3.getStartDateMonth());
+		assertEquals("startDateDay: ", "4", p3.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p3.getEndDateYear());
+		assertEquals("endDateMonth: ", "12", p3.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p3.getEndDateDay());
+				
+		String s4 = "gathering on 3/10/2014";
+		AddParser p4 = new AddParser(s4);
+		p4.parse();
+		assertEquals("Description: ", "gathering", p4.getDescription());
+		assertEquals("Venue: ", null, p4.getVenue());
+		assertEquals("startTimeHour: ", null, p4.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p4.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p4.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p4.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p4.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p4.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p4.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p4.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p4.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p4.getEndDateDay());
+		
+		String s5 = "gathering on 3/10";
+		AddParser p5 = new AddParser(s5);
+		p5.parse();
+		assertEquals("Description: ", "gathering", p5.getDescription());
+		assertEquals("Venue: ", null, p5.getVenue());
+		assertEquals("startTimeHour: ", null, p5.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p5.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p5.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p5.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2015", p5.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p5.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p5.getStartDateDay());
+		assertEquals("endDateYear: ", "2015", p5.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p5.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p5.getEndDateDay());
+		
+		
+		String s6 = "gathering on 3 October";
+		AddParser p6 = new AddParser(s6);
+		p6.parse();
+		assertEquals("Description: ", "gathering", p6.getDescription());
+		assertEquals("Venue: ", null, p6.getVenue());
+		assertEquals("startTimeHour: ", null, p6.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p6.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p6.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p6.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2015", p6.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p6.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p6.getStartDateDay());
+		assertEquals("endDateYear: ", "2015", p6.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p6.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p6.getEndDateDay());
+		
+		String s7 = "gathering on 3 October 2014";
+		AddParser p7 = new AddParser(s7); 
+		p7.parse();
+		assertEquals("Description: ", "gathering", p7.getDescription());
+		assertEquals("Venue: ", null, p7.getVenue());
+		assertEquals("startTimeHour: ", null, p7.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p7.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p7.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p7.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p7.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p7.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p7.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p7.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p7.getEndDateMonth());
+		assertEquals("endDateDay: ", "3", p7.getEndDateDay()); 
+		
+		String s8 = "meeting from 3/10/2014 11pm to 4/10/2014 1am at Utown";
+		AddParser p8 = new AddParser(s8); 
+		p8.parse();
+		assertEquals("Description: ", "meeting", p8.getDescription());
+		assertEquals("Venue: ", "Utown", p8.getVenue());
+		assertEquals("startTimeHour: ", "23", p8.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p8.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "1", p8.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p8.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p8.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p8.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p8.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p8.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p8.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p8.getEndDateDay());
+		
+		String s9 = "meeting from 3/10 to 4/10 at Utown";
+		AddParser p9 = new AddParser(s9);
+		p9.parse();
+		assertEquals("Description: ", "meeting", p9.getDescription());
+		assertEquals("Venue: ", "Utown", p9.getVenue());
+		assertEquals("startTimeHour: ", null, p9.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p9.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p9.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p9.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2015", p9.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p9.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p9.getStartDateDay());
+		assertEquals("endDateYear: ", "2015", p9.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p9.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p9.getEndDateDay());
+		
+		String s10 = "meeting from 3 October 11pm to 4 October 1am at Utown";
+		AddParser p10 = new AddParser(s10);
+		p10.parse();
+		assertEquals("Description: ", "meeting", p10.getDescription());
+		assertEquals("Venue: ", "Utown", p10.getVenue());
+		assertEquals("startTimeHour: ", "23", p10.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p10.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "1", p10.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p10.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2015", p10.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p10.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p10.getStartDateDay());
+		assertEquals("endDateYear: ", "2015", p10.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p10.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p10.getEndDateDay());
+
+		String s11 = "meeting from 3/10 to 18/10";	
+		AddParser p11 = new AddParser(s11);  
+		p11.parse();
+		assertEquals("Description: ", "meeting", p11.getDescription());
+		assertEquals("Venue: ", null, p11.getVenue());
+		assertEquals("startTimeHour: ", null, p11.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p11.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p11.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p11.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2015", p11.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p11.getStartDateMonth());
+		assertEquals("startDateDay: ", "3", p11.getStartDateDay());
+		assertEquals("endDateYear: ", "2015", p11.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p11.getEndDateMonth());
+		assertEquals("endDateDay: ", "18", p11.getEndDateDay());
+		
+		String s12 = "meeting with Prof on 4/12 at CLB at 11pm";
+		AddParser p12 = new AddParser(s12); 
+		p12.parse();
+		assertEquals("Description: ", "meeting with Prof", p12.getDescription());
+		assertEquals("Venue: ", "CLB", p12.getVenue());
+		assertEquals("startTimeHour: ", "23", p12.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p12.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "23", p12.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p12.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p12.getStartDateYear());
+		assertEquals("startDateMonth: ", "12", p12.getStartDateMonth());
+		assertEquals("startDateDay: ", "4", p12.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p12.getEndDateYear());
+		assertEquals("endDateMonth: ", "12", p12.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p12.getEndDateDay());
+		
+		String s13 = "meeting with Prof on 4/12 at 11pm at CLB";
+		AddParser p13 = new AddParser(s13);
+		p13.parse();
+		assertEquals("Description: ", "meeting with Prof", p13.getDescription());
+		assertEquals("Venue: ", "CLB", p13.getVenue());
+		assertEquals("startTimeHour: ", "23", p13.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p13.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "23", p13.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p13.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p13.getStartDateYear());
+		assertEquals("startDateMonth: ", "12", p13.getStartDateMonth());
+		assertEquals("startDateDay: ", "4", p13.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p13.getEndDateYear());
+		assertEquals("endDateMonth: ", "12", p13.getEndDateMonth());
+		assertEquals("endDateDay: ", "4", p13.getEndDateDay());
+		
+		String s14 = "meeting with Prof on 22/10 from 10am to 12pm";
+		AddParser p14 = new AddParser(s14);
+		p14.parse();
+		assertEquals("Description: ", "meeting with Prof", p14.getDescription());
+		assertEquals("Venue: ", null, p14.getVenue());
+		assertEquals("startTimeHour: ", "10", p14.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p14.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "12", p14.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p14.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2015", p14.getStartDateYear());
+		assertEquals("startDateMonth: ", "10", p14.getStartDateMonth());
+		assertEquals("startDateDay: ", "22", p14.getStartDateDay());
+		assertEquals("endDateYear: ", "2015", p14.getEndDateYear());
+		assertEquals("endDateMonth: ", "10", p14.getEndDateMonth());
+		assertEquals("endDateDay: ", "22", p14.getEndDateDay());
+		
+		String s15 = "meeting with Prof on Sunday";
+		AddParser p15 = new AddParser(s15);
+		p15.parse();
+		assertEquals("Description: ", "meeting with Prof", p15.getDescription());
+		assertEquals("Venue: ", null, p15.getVenue());
+		assertEquals("startTimeHour: ", null, p15.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p15.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p15.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p15.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p15.getStartDateYear());
+		assertEquals("startDateMonth: ", "11", p15.getStartDateMonth());
+		assertEquals("startDateDay: ", "16", p15.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p15.getEndDateYear());
+		assertEquals("endDateMonth: ", "11", p15.getEndDateMonth());
+		assertEquals("endDateDay: ", "16", p15.getEndDateDay());
+		
+		String s16 = "meeting with Prof next Friday from 11am to 2pm";
+		AddParser p16 = new AddParser(s16);
+		p16.parse();
+		assertEquals("Description: ", "meeting with Prof", p16.getDescription());
+		assertEquals("Venue: ", null, p16.getVenue());
+		assertEquals("startTimeHour: ", "11", p16.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p16.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "14", p16.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p16.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p16.getStartDateYear());
+		assertEquals("startDateMonth: ", "11", p16.getStartDateMonth());
+		assertEquals("startDateDay: ", "21", p16.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p16.getEndDateYear());
+		assertEquals("endDateMonth: ", "11", p16.getEndDateMonth());
+		assertEquals("endDateDay: ", "21", p16.getEndDateDay());
+		
+		String s17 = "meeting on level 3 at 2pm on 7 November";
+		AddParser p17 = new AddParser(s17);
+		p17.parse();
+		assertEquals("Description: ", "meeting on level 3", p17.getDescription());
+		assertEquals("Venue: ", null, p17.getVenue());
+		assertEquals("startTimeHour: ", "14", p17.getStartTimeHour());
+		assertEquals("startTimeMinute: ", "0", p17.getStartTimeMinute());
+		assertEquals("endTimeHour: ", "14", p17.getEndTimeHour());
+		assertEquals("endTimeMinute: ", "0", p17.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p17.getStartDateYear());
+		assertEquals("startDateMonth: ", "11", p17.getStartDateMonth());
+		assertEquals("startDateDay: ", "7", p17.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p17.getEndDateYear());
+		assertEquals("endDateMonth: ", "11", p17.getEndDateMonth());
+		assertEquals("endDateDay: ", "7", p17.getEndDateDay());
+		
+		String s18 = "\"meeting at somerset at 313 on level 3\" at \"2pm 2\"pm on next from\"     on 7 November";
+		AddParser p18 = new AddParser(s18);
+		p18.parse();
+		assertEquals("Description: ", "meeting at somerset at 313 on level 3", p18.getDescription());
+		assertEquals("Venue: ", "2pm 2\"pm on next from", p18.getVenue());
+		assertEquals("startTimeHour: ", null, p18.getStartTimeHour());
+		assertEquals("startTimeMinute: ", null, p18.getStartTimeMinute());
+		assertEquals("endTimeHour: ", null, p18.getEndTimeHour());
+		assertEquals("endTimeMinute: ", null, p18.getEndTimeMinute());
+		assertEquals("startDateYear: ", "2014", p18.getStartDateYear());
+		assertEquals("startDateMonth: ", "11", p18.getStartDateMonth());
+		assertEquals("startDateDay: ", "7", p18.getStartDateDay());
+		assertEquals("endDateYear: ", "2014", p18.getEndDateYear());
+		assertEquals("endDateMonth: ", "11", p18.getEndDateMonth());
+		assertEquals("endDateDay: ", "7", p18.getEndDateDay());
+	}
+	
+	@Test
+	public void testGetDescriptionAndTrimUserInput() {
+		String s1 = "meeting at 10pm";
+		LinkedList<String> l1 = new LinkedList<String>(Arrays.asList(s1.split(" ")));
+		assertEquals("Description", "meeting", AddParser.getDescriptionAndTrimUserInput(l1));
+
+		String s2 = "NUS Overseas College Fireside Chat at CLB";
+		LinkedList<String> l2 = new LinkedList<String>(Arrays.asList(s2.split(" ")));
+		assertEquals("Description", "NUS Overseas College Fireside Chat", AddParser.getDescriptionAndTrimUserInput(l2));
+
+		String s3 = "Study session at engineering at 2pm";
+		LinkedList<String> l3 = new LinkedList<String>(Arrays.asList(s3.split(" ")));
+		assertEquals("Description", "Study session", AddParser.getDescriptionAndTrimUserInput(l3));
+
+		String s4 = "Overseas in Germany from Thursday to Friday";		
+		LinkedList<String> l4 = new LinkedList<String>(Arrays.asList(s4.split(" ")));
+		assertEquals("Description", "Overseas in Germany", AddParser.getDescriptionAndTrimUserInput(l4));
+
+		String s5 = "EE2021 Midterms next Monday at 9am";
+		LinkedList<String> l5 = new LinkedList<String>(Arrays.asList(s5.split(" ")));
+		assertEquals("Description", "EE2021 Midterms", AddParser.getDescriptionAndTrimUserInput(l5));
+
+		String s6 = "Beach party on 12/10";
+		LinkedList<String> l6 = new LinkedList<String>(Arrays.asList(s6.split(" ")));
+		assertEquals("Description", "Beach party", AddParser.getDescriptionAndTrimUserInput(l6));
+
+		String s7 = "meeting with Prof";
+		LinkedList<String> l7 = new LinkedList<String>(Arrays.asList(s7.split(" ")));
+		assertEquals("Description", "meeting with Prof", AddParser.getDescriptionAndTrimUserInput(l7));
+		
+		String s8 = "\"meeting on level 3 at 2pm at on from to there next\"";
+		LinkedList<String> l8 = new LinkedList<String>(Arrays.asList(s8.split(" ")));
+		assertEquals("Description", "meeting on level 3 at 2pm at on from to there next", AddParser.getDescriptionAndTrimUserInput(l8));
+	}
+
+	@Test
+	public void testRepresentsTime() {
+		String s1 = "11am";
+		LinkedList<String> l1 = convertStringToLinkedList(s1);
+		assertEquals(true, AddParser.representsTime(l1));
+
+		String s2 = "12pm";
+		LinkedList<String> l2 = convertStringToLinkedList(s2);
+		assertEquals(true, AddParser.representsTime(l2));
+		
+		String s3 = "0pm";
+		LinkedList<String> l3 = convertStringToLinkedList(s3);
+		assertEquals(false, AddParser.representsTime(l3));
+		
+		String s4 = "123.431am";
+		LinkedList<String> l4 = convertStringToLinkedList(s4);
+		assertEquals(true, AddParser.representsTime(l4));
+		
+		String s5 = "123.am";
+		LinkedList<String> l5 = convertStringToLinkedList(s5);
+		assertEquals(false, AddParser.representsTime(l5));
+		
+		String s6 = ".3134am";
+		LinkedList<String> l6 = convertStringToLinkedList(s6);
+		assertEquals(false, AddParser.representsTime(l6));
+		
+		String s7 = "11.30am";
+		LinkedList<String> l7 = convertStringToLinkedList(s7);
+		assertEquals(true, AddParser.representsTime(l7));
+		
+		String s8 = "12.30pm";
+		LinkedList<String> l8 = convertStringToLinkedList(s8);
+		assertEquals(true, AddParser.representsTime(l8));
+	} 
+	
+	@Test
+	public void testRepresentsDate() {
+		String s1 = "25 NOvEMber 2014";
+		LinkedList<String> l1 = convertStringToLinkedList(s1);
+		assertEquals(true, CommandParser.representsDate(l1));
+		
+		String s2 = "25 NoVemBEr";
+		LinkedList<String> l2 = convertStringToLinkedList(s2);
+		assertEquals(true, CommandParser.representsDate(l2));
+		
+		String s3 = "5/11";
+		LinkedList<String> l3 = convertStringToLinkedList(s3);
+		assertEquals(true, CommandParser.representsDate(l3));
+		
+		String s4 = "5/11/2014";
+		LinkedList<String> l4 = convertStringToLinkedList(s4);
+		assertEquals(true, CommandParser.representsDate(l4));
+		
+		String s5 = "nEXt ThuRsDay";
+		LinkedList<String> l5 = convertStringToLinkedList(s5);
+		assertEquals(true, CommandParser.representsDate(l5));
+		
+		String s6 = "friDaY";
+		LinkedList<String> l6 = convertStringToLinkedList(s6);
+		assertEquals(true, CommandParser.representsDate(l6));
+		
+		String s7 = "next week's agenda";
+		LinkedList<String> l7 = convertStringToLinkedList(s7);
+		assertEquals(false, CommandParser.representsDate(l7));
+		
+		String s8 = "5 cows on the moon";
+		LinkedList<String> l8 = convertStringToLinkedList(s8);
+		assertEquals(false, CommandParser.representsDate(l8));
+		
+		String s9 = "213/431a/5334";
+		LinkedList<String> l9 = convertStringToLinkedList(s9);
+		assertEquals(false, CommandParser.representsDate(l9));
+	}
+
+	@Test
+	public void testGetTime() {
+		String s1 = "9am at CLB";
+		LinkedList<String> l1 = new LinkedList<String>(Arrays.asList(s1.split(" ")));
+		String s2 = "12pm at CLB";
+		LinkedList<String> l2 = new LinkedList<String>(Arrays.asList(s2.split(" ")));
+		String s3 = "12.30am at CLB";
+		LinkedList<String> l3 = new LinkedList<String>(Arrays.asList(s3.split(" ")));
+		String s4 = "9.30pm at CLB";
+		LinkedList<String> l4 = new LinkedList<String>(Arrays.asList(s4.split(" ")));
+		
+		assertEquals("Time: ", "9.0", AddParser.getTimeAndTrimUserInput(l1));
+		assertEquals("Time: ", "12.0", AddParser.getTimeAndTrimUserInput(l2));
+		assertEquals("Time: ", "0.30", AddParser.getTimeAndTrimUserInput(l3));
+		assertEquals("Time: ", "21.30", AddParser.getTimeAndTrimUserInput(l4));
+	}
+
+	@Test
+	public void testGetVenueAndTrimUserInput() {
+		String s1 = "Zouk at 11pm";
+		LinkedList<String> l1 = new LinkedList<String>(Arrays.asList(s1.split(" ")));
+		String s2 = "MPSH1 from 5pm to 6pm";
+		LinkedList<String> l2 = new LinkedList<String>(Arrays.asList(s2.split(" ")));
+		String s3 = "CLB next Thursday";
+		LinkedList<String> l3 = new LinkedList<String>(Arrays.asList(s3.split(" ")));
+		String s4 = "SRC on 11/10";
+		LinkedList<String> l4 = new LinkedList<String>(Arrays.asList(s4.split(" ")));
+		String s5 = "Jalan Kayu Street 31 on 5 October";
+		LinkedList<String> l5 = new LinkedList<String>(Arrays.asList(s5.split(" ")));
+
+		assertEquals("Venue: ", "Zouk", AddParser.getVenueAndTrimUserInput(l1));
+		assertEquals("Venue: ", "MPSH1", AddParser.getVenueAndTrimUserInput(l2));
+		assertEquals("Venue: ", "CLB", AddParser.getVenueAndTrimUserInput(l3));
+		assertEquals("Venue: ", "SRC", AddParser.getVenueAndTrimUserInput(l4));
+		assertEquals("Venue: ", "Jalan Kayu Street 31", AddParser.getVenueAndTrimUserInput(l5));
+		
+	}
+
+	@Test
+	public void testGetDateAndTrimUserInput() {
+		String s1 = "2/10/2015 at CLB";
+		LinkedList<String> l1 = new LinkedList<String>(Arrays.asList(s1.split(" ")));
+		String s2 = "2/10/2014";
+		LinkedList<String> l2 = new LinkedList<String>(Arrays.asList(s2.split(" ")));
+		String s3 = "3/9 at CLB";
+		LinkedList<String> l3 = new LinkedList<String>(Arrays.asList(s3.split(" ")));
+		String s4 = "3/9";
+		LinkedList<String> l4 = new LinkedList<String>(Arrays.asList(s4.split(" ")));
+		String s5 = "99/12 at CLB";
+		LinkedList<String> l5 = new LinkedList<String>(Arrays.asList(s5.split(" ")));
+		String s6 = "99/12";
+		LinkedList<String> l6 = new LinkedList<String>(Arrays.asList(s6.split(" ")));
+		String s7 = "35/1 at CLB";
+		LinkedList<String> l7 = new LinkedList<String>(Arrays.asList(s7.split(" ")));
+		String s8 = "35/1";
+		LinkedList<String> l8 = new LinkedList<String>(Arrays.asList(s8.split(" ")));
+		String s9 = "42 October 2050";
+		LinkedList<String> l9 = new LinkedList<String>(Arrays.asList(s9.split(" ")));
+		String s10 = "42 October";
+		LinkedList<String> l10 = new LinkedList<String>(Arrays.asList(s10.split(" ")));
+		String s11 = "27 February 1002 at CLB";
+		LinkedList<String> l11 = new LinkedList<String>(Arrays.asList(s11.split(" ")));
+		String s12 = "27 February 1002";
+		LinkedList<String> l12 = new LinkedList<String>(Arrays.asList(s12.split(" ")));
+		
+		assertEquals("Date: ", "2/10/2015", AddParser.getDateAndTrimUserInput(l1));
+		assertEquals("Date: ", "2/10/2014", AddParser.getDateAndTrimUserInput(l2));
+		assertEquals("Date: ", "3/9/2015", AddParser.getDateAndTrimUserInput(l3));
+		assertEquals("Date: ", "3/9/2015", AddParser.getDateAndTrimUserInput(l4));
+		assertEquals("Date: ", "99/12/2014", AddParser.getDateAndTrimUserInput(l5));
+		assertEquals("Date: ", "99/12/2014", AddParser.getDateAndTrimUserInput(l6));
+		assertEquals("Date: ", "35/1/2015", AddParser.getDateAndTrimUserInput(l7));
+		assertEquals("Date: ", "35/1/2015", AddParser.getDateAndTrimUserInput(l8));
+		assertEquals("Date: ", "42/10/2050", AddParser.getDateAndTrimUserInput(l9)); 
+		assertEquals("Date: ", "42/10/2015", AddParser.getDateAndTrimUserInput(l10));
+		assertEquals("Date: ", "27/2/1002", AddParser.getDateAndTrimUserInput(l11)); 
+		assertEquals("Date: ", "27/2/1002", AddParser.getDateAndTrimUserInput(l12));
+		
+	}
+	
+	@Test
+	public void testConvertMonthToNumberStringFormat() {
+		String s1 = "January";
+		String s2 = "feBruary";
+		String s3 = "mARch";
+		String s4 = "apriL";
+		String s5 = "may";
+		String s6 = "JUNE";
+		String s7 = "July";
+		String s8 = "August";
+		String s9 = "September";
+		String s10 = "October";
+		String s11 = "NoveMBER";
+		String s12 = "deceMBER";
+		
+		assertEquals("Month: ", "1", AddParser.convertMonthToNumberStringFormat(s1));
+		assertEquals("Month: ", "2", AddParser.convertMonthToNumberStringFormat(s2));
+		assertEquals("Month: ", "3", AddParser.convertMonthToNumberStringFormat(s3));
+		assertEquals("Month: ", "4", AddParser.convertMonthToNumberStringFormat(s4));
+		assertEquals("Month: ", "5", AddParser.convertMonthToNumberStringFormat(s5));
+		assertEquals("Month: ", "6", AddParser.convertMonthToNumberStringFormat(s6));
+		assertEquals("Month: ", "7", AddParser.convertMonthToNumberStringFormat(s7));
+		assertEquals("Month: ", "8", AddParser.convertMonthToNumberStringFormat(s8));
+		assertEquals("Month: ", "9", AddParser.convertMonthToNumberStringFormat(s9));
+		assertEquals("Month: ", "10", AddParser.convertMonthToNumberStringFormat(s10));
+		assertEquals("Month: ", "11", AddParser.convertMonthToNumberStringFormat(s11));
+		assertEquals("Month: ", "12", AddParser.convertMonthToNumberStringFormat(s12));
+		
+		
+	}
+
+	public static LinkedList<String> convertStringToLinkedList(String s) {
+		String[] userInput = s.split(" ");
+		LinkedList<String> wordsList = new LinkedList<String>(
+				Arrays.asList(userInput));
+		return wordsList;
+	}
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\test\logic\AddParserTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\test\logic\LogicTest.java
+	 */
+
+	@Test
+	public void testLogicClass() {
+		Storage storage = Storage.getInstance();
+		ArrayList<Task> tasks = storage.getTasks();// display task
+		
+		String s1 = "add meeting with Prof at 11pm at CLB next Thursday";
+		String e1 = "meeting with Prof at CLB on 2014-11-06 at 23:00 added!";
+		assertEquals(e1, Logic.uiToLogic(s1));
+		Task task1 = tasks.get(0);
+		assertEquals("meeting with Prof", task1.getDescription());
+		assertEquals("CLB", task1.getVenue().toString());
+		assertEquals("2014-11-06", task1.getStartDate().toString());
+		assertEquals("2014-11-06", task1.getEndDate().toString());
+		assertEquals("23:00:00.000", task1.getStartTime().toString());
+		assertEquals("23:00:00.000", task1.getEndTime().toString());
+	
+		String s2 = "add meeting with Prof at CLB at 11pm next Thursday";
+		String e2 = "meeting with Prof at CLB on 2014-11-06 at 23:00 added!";
+		assertEquals(e2, Logic.uiToLogic(s2));
+		Task task2 = tasks.get(1);
+		assertEquals("meeting with Prof", task2.getDescription());
+		assertEquals("CLB", task2.getVenue().toString());
+		assertEquals("2014-11-06", task2.getStartDate().toString());
+		assertEquals("2014-11-06", task2.getEndDate().toString());
+		assertEquals("23:00:00.000", task2.getStartTime().toString());
+		assertEquals("23:00:00.000", task2.getEndTime().toString());
+		
+		String s3 = "add meeting with Prof at CLB next Thursday at 11pm";
+		String e3 = "meeting with Prof at CLB on 2014-11-06 at 23:00 added!";
+		assertEquals(e3, Logic.uiToLogic(s3));
+		Task task3 = tasks.get(2);
+		assertEquals("meeting with Prof", task3.getDescription());
+		assertEquals("CLB", task3.getVenue().toString());
+		assertEquals("2014-11-06", task3.getStartDate().toString());
+		assertEquals("2014-11-06", task3.getEndDate().toString());
+		assertEquals("23:00:00.000", task3.getStartTime().toString());
+		assertEquals("23:00:00.000", task3.getEndTime().toString());
+			
+		// cases 4 to 7 allow different kinds of time formatting
+		String s4 = "add gathering on 3/10/2014";
+		String e4 = "gathering on 2014-10-03 added!";
+		assertEquals(e4, Logic.uiToLogic(s4));
+		Task task4 = tasks.get(3);
+		assertEquals("gathering", task4.getDescription());
+		assertEquals(null, task4.getVenue());
+		assertEquals("2014-10-03", task4.getStartDate().toString());
+		assertEquals("2014-10-03", task4.getEndDate().toString());
+		assertEquals(null, task4.getStartTime());
+		assertEquals(null, task4.getEndTime());
+		
+		String s5 = "add gathering on 3/10";
+		String e5 = "gathering on 2014-10-03 added!";
+		assertEquals(e5, Logic.uiToLogic(s5));
+		Task task5 = tasks.get(4);
+		assertEquals("gathering", task5.getDescription());
+		assertEquals(null, task5.getVenue());
+		assertEquals("2014-10-03", task5.getStartDate().toString());
+		assertEquals("2014-10-03", task5.getEndDate().toString());
+		assertEquals(null, task5.getStartTime());
+		assertEquals(null, task5.getEndTime());
+		
+		String s6 = "add gathering on 3 October";
+		String e6 = "gathering on 2014-10-03 added!";
+		assertEquals(e6, Logic.uiToLogic(s6));
+		Task task6 = tasks.get(5);
+		assertEquals("gathering", task6.getDescription());
+		assertEquals(null, task6.getVenue());
+		assertEquals("2014-10-03", task6.getStartDate().toString());
+		assertEquals("2014-10-03", task6.getEndDate().toString());
+		assertEquals(null, task6.getStartTime());
+		assertEquals(null, task6.getEndTime());
+		
+		String s7 = "add gathering on 3 October 2014";
+		String e7 = "gathering on 2014-10-03 added!";
+		assertEquals(e7, Logic.uiToLogic(s7));
+		Task task7 = tasks.get(6);
+		assertEquals("gathering", task7.getDescription());
+		assertEquals(null, task7.getVenue());
+		assertEquals("2014-10-03", task7.getStartDate().toString());
+		assertEquals("2014-10-03", task7.getEndDate().toString());
+		assertEquals(null, task7.getStartTime());
+		assertEquals(null, task7.getEndTime());
+		
+		String s8 = "add meeting from next Thursday 11pm to next Friday 1am at Utown";
+		String e8 = "meeting at Utown from 2014-11-06 23:00 to 2014-11-07 01:00 added!";
+		assertEquals(e8, Logic.uiToLogic(s8));
+		Task task8 = tasks.get(7);
+		assertEquals("meeting", task8.getDescription());
+		assertEquals("Utown", task8.getVenue().toString());
+		assertEquals("2014-11-06", task8.getStartDate().toString());
+		assertEquals("2014-11-07", task8.getEndDate().toString());
+		assertEquals("23:00:00.000", task8.getStartTime().toString());
+		assertEquals("01:00:00.000", task8.getEndTime().toString());
+		
+		String s9 = "add meeting from Thursday to Friday at Utown";
+		String e9 = "meeting at Utown from 2014-10-30 to 2014-10-31 added!";
+		assertEquals(e9, Logic.uiToLogic(s9));
+		Task task9 = tasks.get(8);
+		assertEquals("meeting", task9.getDescription());
+		assertEquals("Utown", task9.getVenue().toString());
+		assertEquals("2014-10-30", task9.getStartDate().toString());
+		assertEquals("2014-10-31", task9.getEndDate().toString());
+		assertEquals(null, task9.getStartTime());
+		assertEquals(null, task9.getEndTime());
+		
+		String s10 = "add meeting from Thursday 11pm to Friday 1am at Utown";
+		String e10 = "meeting at Utown from 2014-10-30 23:00 to 2014-10-31 01:00 added!";
+		assertEquals(e10, Logic.uiToLogic(s10));
+		Task task10 = tasks.get(9);
+		assertEquals("meeting", task10.getDescription());
+		assertEquals("Utown", task10.getVenue().toString());
+		assertEquals("2014-10-30", task10.getStartDate().toString());
+		assertEquals("2014-10-31", task10.getEndDate().toString());
+		assertEquals("23:00:00.000", task10.getStartTime().toString());
+		assertEquals("01:00:00.000", task10.getEndTime().toString());
+
+		String s11 = "add meeting from 3/10 to 18/10";
+		String e11 = "meeting from 2014-10-03 to 2014-10-18 added!";
+		assertEquals(e11, Logic.uiToLogic(s11));
+		Task task11 = tasks.get(10);
+		assertEquals("meeting", task11.getDescription());
+		assertEquals(null, task11.getVenue());
+		assertEquals("2014-10-03", task11.getStartDate().toString());
+		assertEquals("2014-10-18", task11.getEndDate().toString());
+		assertEquals(null, task11.getStartTime());
+		assertEquals(null, task11.getEndTime());
+		
+		String s12 = "update 11 description study date";
+		String e12 = "Task 11's description updated!";
+		assertEquals(e12, Logic.uiToLogic(s12));
+		assertEquals("study date", task11.getDescription());
+		assertEquals(null, task11.getVenue());
+		assertEquals("2014-10-03", task11.getStartDate().toString());
+		assertEquals("2014-10-18", task11.getEndDate().toString());
+		assertEquals(null, task11.getStartTime());
+		assertEquals(null, task11.getEndTime());
+		
+		String s13 = "update 11 venue CLB";
+		String e13 = "Task 11's venue updated!";
+		assertEquals(e13, Logic.uiToLogic(s13));
+		assertEquals("study date", task11.getDescription());
+		assertEquals("CLB", task11.getVenue().toString());
+		assertEquals("2014-10-03", task11.getStartDate().toString());
+		assertEquals("2014-10-18", task11.getEndDate().toString());
+		assertEquals(null, task11.getStartTime());
+		assertEquals(null, task11.getEndTime());
+		
+		String s14 = "update 11 start 4/10";
+		String e14 = "Task 11's start date updated!";
+		assertEquals(e14, Logic.uiToLogic(s14));
+		assertEquals("study date", task11.getDescription());
+		assertEquals("CLB", task11.getVenue().toString());
+		assertEquals("2014-10-04", task11.getStartDate().toString());
+		assertEquals("2014-10-18", task11.getEndDate().toString());
+		assertEquals(null, task11.getStartTime());
+		assertEquals(null, task11.getEndTime());
+		
+		String s15 = "update 11 start 11am";
+		String e15 = "Task 11's start time updated!";
+		assertEquals(e15, Logic.uiToLogic(s15));
+		assertEquals("study date", task11.getDescription());
+		assertEquals("CLB", task11.getVenue().toString());
+		assertEquals("2014-10-04", task11.getStartDate().toString());
+		assertEquals("2014-10-18", task11.getEndDate().toString());
+		assertEquals("11:00:00.000", task11.getStartTime().toString());
+		assertEquals("11:00:00.000", task11.getEndTime().toString());
+		
+		String s16 = "update 11 end 19/10";
+		String e16 = "Task 11's end date updated!";
+		assertEquals(e16, Logic.uiToLogic(s16));
+		assertEquals("study date", task11.getDescription());
+		assertEquals("CLB", task11.getVenue().toString());
+		assertEquals("2014-10-04", task11.getStartDate().toString());
+		assertEquals("2014-10-19", task11.getEndDate().toString());
+		assertEquals("11:00:00.000", task11.getStartTime().toString());
+		assertEquals("11:00:00.000", task11.getEndTime().toString());
+		
+		String s17 = "update 11 end 2pm";
+		String e17 = "Task 11's end time updated!";
+		assertEquals(e17, Logic.uiToLogic(s17));
+		assertEquals("study date", task11.getDescription());
+		assertEquals("CLB", task11.getVenue().toString());
+		assertEquals("2014-10-04", task11.getStartDate().toString());
+		assertEquals("2014-10-19", task11.getEndDate().toString());
+		assertEquals("11:00:00.000", task11.getStartTime().toString());
+		assertEquals("14:00:00.000", task11.getEndTime().toString());
+		
+		String s18 = "update 7 start 2 October";
+		String e18 = "Task 7's start date updated!";
+		assertEquals(e18, Logic.uiToLogic(s18));
+		assertEquals("gathering", task7.getDescription());
+		assertEquals(null, task7.getVenue());
+		assertEquals("2014-10-02", task7.getStartDate().toString());
+		assertEquals("2014-10-02", task7.getEndDate().toString());
+		assertEquals(null, task7.getStartTime());
+		assertEquals(null, task7.getEndTime());
+		
+		String dataThree = "display";
+		Logic.uiToLogic(dataThree);
+		String result = "";
+		result = String.format(DisplayHandler.DISPLAY_NUM_OF_TASKS,
+				tasks.size());
+
+		result += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+				ansi().fg(RED).a("ID").reset(),
+				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi().fg(CYAN)
+						.a(" VENUE").reset(), ansi().fg(YELLOW).a(" TIME")
+						.reset(), ansi().fg(GREEN).a(" DATE").reset());
+		result += DisplayHandler.displayLineSeparator();
+		for (int i = 0; i < tasks.size(); i++) {
+			result += DisplayHandler.displayTaskInTable(i, tasks.get(i));
+		}
+		result += DisplayHandler.displayLineSeparator();
+		result += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+				ansi().fg(RED).a("ID").reset(),
+				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi().fg(CYAN)
+						.a(" VENUE").reset(), ansi().fg(YELLOW).a(" TIME")
+						.reset(), ansi().fg(GREEN).a(" DATE").reset());
+		assertEquals(result, Logic.uiToLogic(dataThree));
+
+		// update task venue
+		String dataFour = "update 1 venue nlb";
+		String expectedFour = "Task 1's venue updated!";
+		Logic.uiToLogic(dataFour);
+		assertEquals(expectedFour, Logic.uiToLogic(dataFour));
+
+		// delete tasks in an empty list
+		String dataFive = "delete all";
+		String expectedFive = "Sorry, the arguments must only contain the task IDs to be deleted. Please try again.";
+		Logic.uiToLogic(dataFive);
+		assertEquals(expectedFive, Logic.uiToLogic(dataFive));
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\test\logic\LogicTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\test\logic\UpdateHandlerTest.java
+	 */
+
+	@Test
+	public void testExecute() {
+		String s1 = "meeting with Prof at 11pm at CLB on 3/10/2014";
+		CommandHandler e1 = new AddHandler(s1);
+		e1.execute();
+		String ss1 = "1 description date with girlfriend";
+		UpdateHandler u1 = new UpdateHandler(ss1);
+		u1.execute();
+		assertEquals("New description:", "date with girlfriend", UpdateHandler.getTask(1).getDescription());
+
+		String s2 = "meeting with Prof at Central Forum at 11pm on 3/10";
+		CommandHandler e2 = new AddHandler(s2);
+		e2.execute();
+		String ss2 = "2 venue Reeds cafe";
+		UpdateHandler u2 = new UpdateHandler(ss2);
+		u2.execute();
+		assertEquals("New venue:", "Reeds cafe", UpdateHandler.getTask(2).getVenue());
+		
+		String s3 = "meeting with Prof at CLB on 4/12 at 11pm";
+		CommandHandler e3 = new AddHandler(s3);
+		e3.execute();
+		String ss3 = "3 start 9 October";
+		UpdateHandler u3 = new UpdateHandler(ss3);
+		u3.execute();
+		assertEquals("New start date:", "2014-10-09", UpdateHandler.getTask(3).getStartDate().toString());
+		
+		String s4 = "gathering on 3/10/2014";
+		CommandHandler e4 = new AddHandler(s4);
+		e4.execute();
+		String ss4 = "4 end 9/10";
+		UpdateHandler u4 = new UpdateHandler(ss4);
+		u4.execute();
+		assertEquals("New start date:", "2014-10-09", UpdateHandler.getTask(4).getEndDate().toString());
+
+		String s5 = "gathering on 3/10";
+		CommandHandler e5 = new AddHandler(s5);
+		e5.execute();
+		String ss5 = "5 start 11am";
+		UpdateHandler u5 = new UpdateHandler(ss5);
+		u5.execute();
+		assertEquals("New start time:", "11:00:00.000", UpdateHandler.getTask(5).getStartTime().toString());
+
+		String s6 = "meeting from 3/10/2014 11pm to 4/10/2014 1am at Utown";	
+		CommandHandler e6 = new AddHandler(s6);
+		e6.execute();
+		String ss6 = "6 end 2am";
+		UpdateHandler u6 = new UpdateHandler(ss6);
+		u6.execute();
+		assertEquals("New end time:", "02:00:00.000", UpdateHandler.getTask(6).getEndTime().toString());
+		
+		String s7 = "gathering on 3 October 2014";
+		CommandHandler e7 = new AddHandler(s7);
+		e7.execute();
+		String ss7 = "7 recurrence weekly";
+		UpdateHandler u7 = new UpdateHandler(ss7);
+		u7.execute();
+		assertEquals("New recurrence:", "weekly", UpdateHandler.getTask(7).getRecurrence());
+		
+		String s8 = "meeting from 3/10/2014 11pm to 4/10/2014 1am at Utown";
+		CommandHandler e8 = new AddHandler(s8);
+		e8.execute();
+		String ss8 = "8 complete";
+		UpdateHandler u8 = new UpdateHandler(ss8);
+		u8.execute();
+		assertEquals("New completed:", true, UpdateHandler.getTask(8).hasCompleted());
+		
+		String ss9 = "8 incomplete";
+		UpdateHandler u9 = new UpdateHandler(ss9);
+		u9.execute();		
+		assertEquals("New completed:", false, UpdateHandler.getTask(8).hasCompleted());
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\test\logic\UpdateHandlerTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\test\storage\StorageTest.java
+	 */
+
+	@Test
+	public void testConvertToDateTime() {
+		DateTime result = Storage.convertToDateTime("2014-10-20T09:00:00.000+08:00");
+		assertEquals("converted DateTime: ", new DateTime(2014, 10, 20, 9, 0, 0, 0), result);
+	}
+
+	@Test
+	public void testConvertToBoolean() {
+		boolean condition = Storage.convertToBoolean("false");
+		assertEquals("convertToBoolean: ", false, condition);
+		condition = Storage.convertToBoolean("true");
+		assertEquals("convertToBoolean: ", true, condition);
+	}
+
+/**	@Test
+	public void testWriteToFileAndReadFromFile() {
+		Storage s1 = Storage.getInstance();
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setStartTime(new LocalTime(20, 0));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setEndTime(new LocalTime(23, 59));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		Task task1 = builder.buildTask();
+		
+		s1.addTask(task1);
+		
+		builder.setDescription("overseas");
+		builder.setVenue("Germany");
+		builder.setStartDate(new LocalDate(2015, 12, 20));
+		builder.setStartTime(new LocalTime(20, 0));
+		builder.setEndDate(new LocalDate(2015, 12, 31));
+		builder.setEndTime(new LocalTime(23, 59));
+		builder.setReminder(null);
+		builder.setRecurrence(null);
+		Task task2 = builder.buildTask();
+		
+		s1.addTask(task2);
+		
+		assertEquals("writeToFile: ", "Tasks added.", Storage.writeToFile());
+		
+		s1.clearAllTasks();
+		
+		assertEquals("readFromFile: ", "Data read from storage.", Storage.readFromFile());
+		
+	} **/
+	
+	@Test
+	public void testUpdateAndRevertTaskHistories() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setStartTime(new LocalTime(20, 0));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setEndTime(new LocalTime(23, 59));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		Task task = builder.buildTask();
+		
+		Storage storage = Storage.getInstance();
+		storage.addTask(task);
+		storage.addTask(task);
+		storage.updateTaskHistories();
+		
+		int taskHistoryLength = storage.getTaskHistory().size();
+		int deletedTaskHistoryLength = storage.getDeletedTaskHistory().size();
+		
+		assertEquals(deletedTaskHistoryLength, taskHistoryLength);
+		
+		storage.revertTaskHistories();
+		taskHistoryLength = storage.getTaskHistory().size();
+		deletedTaskHistoryLength = storage.getDeletedTaskHistory().size();
+		
+		assertEquals(deletedTaskHistoryLength, taskHistoryLength);
+
+		
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\test\storage\StorageTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\test\storage\TaskBuilderTest.java
+	 */
+
+	@Test
+	public void testTaskBuilder() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setStartTime(new LocalTime(23, 59));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setEndTime(new LocalTime(00, 00));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		
+		assertEquals("meeting", task.getDescription());
+		
+		assertEquals("CLB", task.getVenue());
+		assertEquals("startDate - Year: ", 2014, task.getStartDate().getYear());
+		assertEquals("startDate - Month: ", 10, task.getStartDate().getMonthOfYear());
+		assertEquals("StartDate - Day: ", 20, task.getStartDate().getDayOfMonth());
+		assertEquals("StartTime - Hour: ", 23, task.getStartTime().getHourOfDay());
+		assertEquals("StartTime - Minute: ", 59, task.getStartTime().getMinuteOfHour());
+
+		
+		assertEquals("endDate - Year: ", 2014, task.getEndDate().getYear());
+		assertEquals("endDate - Month: ", 11, task.getEndDate().getMonthOfYear());
+		assertEquals("endDate - Day: ", 21, task.getEndDate().getDayOfMonth());
+		assertEquals("endTime - Hour: ", 00, task.getEndTime().getHourOfDay());
+		assertEquals("endTime - Minute: ", 00, task.getEndTime().getMinuteOfHour());
+		
+		assertEquals(task.hasReminder(), true);
+		
+		assertEquals("Reminder - Year: ", 2014, task.getReminder().getYear());
+		assertEquals("Reminder - Month: ", 9, task.getReminder().getMonthOfYear());
+		assertEquals("Reminder - Day: ", 20, task.getReminder().getDayOfMonth());
+		assertEquals("Reminder - Hour: ", 21, task.getReminder().getHourOfDay());
+		assertEquals("Reminder - Minute: ", 30, task.getReminder().getMinuteOfHour());
+		
+		assertEquals(true, task.hasRecurrence());
+		assertEquals("weekly", task.getRecurrence());
+		assertEquals(false, task.hasCompleted());
+		
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\test\storage\TaskBuilderTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\test\storage\TaskTest.java
+	 */
+
+	@Test
+	public void testSetVenue() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		
+		task.setVenue("COM1");
+		assertEquals("Venue: ", "COM1", task.getVenue());
+	}
+
+	@Test
+	public void testSetStartDate() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		
+		task.setStartDate(new LocalDate(2014, 10, 19));
+		assertEquals("Start date: ", "2014-10-19", task.getStartDate().toString());
+		assertEquals("has start date: ", true, task.hasStartDate());
+	}
+	
+	//This is the case for the start later than end equivalence partition
+	@Test(expected=IllegalArgumentException.class)
+	public void testSetStartDateWithStartLaterThanEnd() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		//this case should throw an exception because we set start to be later than end
+		task.setStartDate(new LocalDate(2014, 11, 24));
+	}
+	//This is the case for the end earlier than start equivalence partition	
+	@Test(expected=IllegalArgumentException.class)
+	public void testSetStartDateWithEndEarlierThanStart() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		//this case should throw an exception because we set end to be earlier than start
+		task.setEndDate(new LocalDate(2013, 11, 24));
+	}
+	
+	@Test
+	public void testSetStartTime() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setStartTime(new LocalTime(12, 30));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setEndTime(new LocalTime(14, 30));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		
+		task.setStartTime(new LocalTime(9, 0));
+		assertEquals("Start time: ", "09:00:00.000", task.getStartTime().toString());
+	}
+
+	@Test
+	public void testSetEndDate() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		
+		task.setEndDate(new LocalDate(2014, 12, 25));
+		assertEquals("End date: ", "2014-12-25", task.getEndDate().toString());
+	}
+	
+	@Test
+	public void testSetEndTime() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setStartTime(new LocalTime(12, 30));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setEndTime(new LocalTime(14, 30));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		
+		task.setEndTime(new LocalTime(20, 59));
+		assertEquals("End time: ", "20:59:00.000", task.getEndTime().toString());
+	}
+
+	@Test
+	public void testSetReminder() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		builder.setRecurrence("weekly");
+		builder.setCompleted(false);
+		Task task = builder.buildTask();
+		
+		task.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
+		assertEquals("has reminder: ", true, task.hasReminder());
+		assertEquals("reminder: ", "2014-09-20T21:30:00.000+08:00", task.getReminder().toString());
+		task.setReminder(null);
+		assertEquals("has reminder: ", false, task.hasReminder());
+		assertEquals("reminder: ", null, task.getReminder());
+	}
+
+
+	@Test
+	public void testSetRecurrence() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		Task task = builder.buildTask();
+		
+		task.setRecurrence("weekly");
+		assertEquals("has recurrence: ", true, task.hasRecurrence());
+		assertEquals("recurrence: ", "weekly", task.getRecurrence());
+		task.setRecurrence(null);
+		assertEquals("has recurrence: ", false, task.hasRecurrence());
+		assertEquals("recurrence: ", null, task.getRecurrence());
+	}
+
+	@Test
+	public void testSetCompleted() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		Task task = builder.buildTask();	
+		
+		task.setCompleted(true);
+		
+		assertEquals("completed: ", true, task.hasCompleted());
+	}
+
+	@Test
+	public void testConvertToCSVFormat() {
+		TaskBuilder builder = new TaskBuilder();
+		builder.setDescription("meeting");
+		builder.setVenue("CLB");
+		Task task = builder.buildTask();
+		
+		//System.out.println(task.convertToCSVFormat());
+		
+		builder.setStartDate(new LocalDate(2014, 10, 20));
+		builder.setEndDate(new LocalDate(2014, 11, 21));
+		task.setRecurrence("weekly");
+		task.setCompleted(true);
+		
+		//System.out.println(task.convertToCSVFormat());
+		
+	}
+	
+	@Test
+	public void testEndIsEarlierThanStart() {
+		LocalDate startDate = new LocalDate(2014, 10, 13);
+		LocalDate endDate = new LocalDate(2014, 10, 14);
+		LocalTime startTime = new LocalTime(10, 0);
+		LocalTime endTime = new LocalTime(12, 0);
+		//start earlier than end
+		assertEquals("End earlier than start: ", false, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
+		
+		startDate = new LocalDate(2014, 10, 15);
+		endDate = new LocalDate(2014, 10, 10);
+		startTime = new LocalTime(10, 0);
+		endTime = new LocalTime(12, 0);
+		//startDate later than endDate
+		assertEquals("End earlier than start: ", true, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
+		
+		startDate = new LocalDate(2014, 10, 10);
+		endDate = new LocalDate(2014, 10, 10);
+		startTime = new LocalTime(12, 0);
+		endTime = new LocalTime(10, 0);
+		//For the same date, startTime later than endTime
+		assertEquals("End earlier than start: ", true, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
+		
+		startDate = new LocalDate(2014, 10, 10);
+		endDate = new LocalDate(2014, 10, 10);
+		startTime = null;
+		endTime = null;
+		//user did not specify a startTime and endTime and startDate equals endDate
+		assertEquals("End earlier than start: ", false, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
+		
+		startDate = new LocalDate(2014, 10, 10);
+		endDate = new LocalDate(2014, 10, 12);
+		startTime = null;
+		endTime = null;
+		//user did not specify a startTime and endTime and startDate is earlier than endDate
+		assertEquals("End earlier than start: ", false, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
+		
+		startDate = new LocalDate(2014, 10, 20);
+		endDate = new LocalDate(2014, 10, 10);
+		startTime = null;
+		endTime = null;
+		//user did not specify a startTime and endTime and startDate is later than endDate
+		assertEquals("End earlier than start: ", true, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime)); 
+		
+		startDate = new LocalDate(2014, 10, 20);
+		endDate = new LocalDate(2014, 10, 20);
+		startTime = new LocalTime(10, 0);
+		endTime = new LocalTime(10, 0);
+		//both times are equal
+		assertEquals("End earlier than start: ", false, Task.endIsEarlierThanStart(startDate, startTime, endDate, endTime));
+	}
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\test\storage\TaskTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\test\ui\UITest.java
+	 */
+
+	@Test
+	public void test() throws IOException {
+		Storage storage = Storage.getInstance();
+		ArrayList<Task> tasks = storage.getTasks();
+
+		// Test the UI input for basic CRUD functions
+
+		// the first 3 cases allow the venue, time and date to be swapped around
+		String s1 = "add meeting with Prof at 11pm at CLB next Thursday";
+		String e1 = "meeting with Prof at CLB on 2014-11-06 at 23:00 added!";
+		assertEquals(e1, Logic.uiToLogic(s1));
+		tasks.clear();
+		
+		String s2 = "add meeting with Prof at CLB at 11pm next Thursday";
+		String e2 = "meeting with Prof at CLB on 2014-11-06 at 23:00 added!";
+		assertEquals(e2, Logic.uiToLogic(s2));
+		tasks.clear();
+		
+		String s3 = "add meeting with Prof at CLB next Thursday at 11pm";
+		String e3 = "meeting with Prof at CLB on 2014-11-06 at 23:00 added!";
+		assertEquals(e3, Logic.uiToLogic(s3));
+		tasks.clear();
+		
+		// cases 4 to 7 allow different kinds of time formatting
+		String s4 = "add gathering on 3/10/2014";
+		String e4 = "gathering on 2014-10-03 added!";
+		assertEquals(e4, Logic.uiToLogic(s4));
+		tasks.clear();
+		
+		String s5 = "add gathering on 3/10";
+		String e5 = "gathering on 2014-10-03 added!";
+		assertEquals(e5, Logic.uiToLogic(s5));
+		tasks.clear();
+		
+		String s6 = "add gathering on 3 October";
+		String e6 = "gathering on 2014-10-03 added!";
+		assertEquals(e6, Logic.uiToLogic(s6));
+		tasks.clear();
+		
+		String s7 = "add gathering on 3 October 2014";
+		String e7 = "gathering on 2014-10-03 added!";
+		assertEquals(e7, Logic.uiToLogic(s7));
+		tasks.clear();
+		
+		String s8 = "add meeting from next Thursday 11pm to next Friday 1am Utown";
+		String e8 = "gathering added!";
+		assertEquals(e8, Logic.uiToLogic(s8));
+		tasks.clear();
+		
+		String s9 = "add meeting from Thursday to Friday at Utown";
+		String e9 = "gathering added!";
+		assertEquals(e9, Logic.uiToLogic(s9));
+		tasks.clear();
+		
+		String s10 = "add meeting from Thursday 11pm to Friday 1am at Utown";
+		String e10 = "gathering added!";
+		assertEquals(e10, Logic.uiToLogic(s10));
+		tasks.clear();
+
+		String s11 = "add meeting from 3/10 to 18/10";
+		String e11 = "gathering added!";
+		assertEquals(e11, Logic.uiToLogic(s11));
+		
+		String s12 = "update 1 description study date";
+		String e12 = "gathering added!";
+		assertEquals(e12, Logic.uiToLogic(s12));
+		
+		String s13 = "update 1 venue CLB";
+		String e13 = "gathering added!";
+		assertEquals(e13, Logic.uiToLogic(s13));
+		
+		String s14 = "update 1 start 4/10";
+		String e14 = "gathering added!";
+		assertEquals(e14, Logic.uiToLogic(s14));
+		
+		String s15 = "update 1 start 11am";
+		String e15 = "gathering added!";
+		assertEquals(e15, Logic.uiToLogic(s15));
+		
+		String s16 = "update 1 end 19/10";
+		String e16 = "gathering added!";
+		assertEquals(e16, Logic.uiToLogic(s16));
+		
+		String s17 = "update 1 start 2pm";
+		String e17 = "gathering added!";
+		assertEquals(e17, Logic.uiToLogic(s17));
+		
+		// display task
+		String dataThree = "display";
+		Logic.uiToLogic(dataThree);
+		String result = "";
+		result = String.format(DisplayHandler.DISPLAY_NUM_OF_TASKS,
+				tasks.size());
+
+		result += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+				ansi().fg(RED).a("ID").reset(),
+				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi().fg(CYAN)
+						.a(" VENUE").reset(), ansi().fg(YELLOW).a(" TIME")
+						.reset(), ansi().fg(GREEN).a(" DATE").reset());
+		result += DisplayHandler.displayLineSeparator();
+		for (int i = 0; i < tasks.size(); i++) {
+			result += DisplayHandler.displayTaskInTable(i, tasks.get(i));
+		}
+		result += DisplayHandler.displayLineSeparator();
+		result += String.format(DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT,
+				ansi().fg(RED).a("ID").reset(),
+				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), ansi().fg(CYAN)
+						.a(" VENUE").reset(), ansi().fg(YELLOW).a(" TIME")
+						.reset(), ansi().fg(GREEN).a(" DATE").reset());
+		assertEquals(result, Logic.uiToLogic(dataThree));
+
+		// update task venue
+		String dataFour = "update 1 venue nlb";
+		String expectedFour = "Task 1's venue updated!";
+		Logic.uiToLogic(dataFour);
+		assertEquals(expectedFour, Logic.uiToLogic(dataFour));
+
+		// delete tasks in an empty list
+		String dataFive = "delete all";
+		String expectedFive = "Sorry, the arguments must only contain the task IDs to be deleted. Please try again.";
+		Logic.uiToLogic(dataFive);
+		assertEquals(expectedFive, Logic.uiToLogic(dataFive));
+
+	}
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\test\ui\UITest.java
+
+
+
+
+

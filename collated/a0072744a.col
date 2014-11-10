@@ -1,0 +1,1322 @@
+//@author: a0072744a
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\googlecalendar\GoogleCalendar.java
+	 */
+
+/**
+ * This class represents the Google Calendar component. The synchronisation of
+ * all tasks is handled here.
+ */
+@SuppressWarnings("unused")
+public class GoogleCalendar {
+
+	private static String MESSAGE_SYNC_SUCCESS = "You have successfully synchronised all changes to Google.";
+	private static String MESSAGE_SYNC_FAIL = "Sorry, an error has occurred while synchronising to Google. Please check your Internet connection.";
+	private static String MESSAGE_SYNC_EMPTY = "Your Google Calendar is in sync.";
+	private static String OPERATING_SYSTEM = System.getProperty("os.name")
+			.toLowerCase();
+
+	private static long SLEEP_DURATION_IF_ONLINE = 10000; // 10 seconds
+	private static long SLEEP_DURATION_IF_OFFLINE = 5000; // 5 seconds
+
+	private static GoogleCalendar theOne = null;
+	private static LoginToGoogle loginToGoogle;
+	private static Storage storage;
+	private Runnable syncUnsyncedTasksRunnable;
+	private boolean isRunning;
+
+	/**
+	 * This constructor initalises LoginToGoogle and the thread for background
+	 * synchronisation.
+	 */
+	private GoogleCalendar() {
+		storage = Storage.getInstance();
+		loginToGoogle = LoginToGoogle.getInstance();
+		setupSyncRunnable();
+		Thread autoSyncThread = new Thread(syncUnsyncedTasksRunnable);
+		autoSyncThread.setDaemon(true);
+		autoSyncThread.start();
+	}
+
+	/**
+	 * This method creates the singleton for GoogleCalendar class and ensures
+	 * that the GoogleCalendar constructor is not called more than once.
+	 * 
+	 * @return GoogleCalendar constructor
+	 */
+	public static GoogleCalendar getInstance() {
+		if (theOne == null) {
+			theOne = new GoogleCalendar();
+		}
+		return theOne;
+	}
+
+	/**
+	 * This method sets up the Runnable to run the synchronisation in the
+	 * background thread.
+	 */
+	private void setupSyncRunnable() {
+		syncUnsyncedTasksRunnable = new Runnable() {
+
+			@Override
+			public void run() {
+				isRunning = true;
+				while (isRunning) {
+					long sleepDuration;
+					if (isConnectedToInternet()) {
+						sleepDuration = SLEEP_DURATION_IF_ONLINE;
+						syncToGoogle();
+					} else {
+						sleepDuration = SLEEP_DURATION_IF_OFFLINE;
+					}
+					try {
+						Thread.sleep(sleepDuration);
+					} catch (InterruptedException e) {
+						isRunning = false;
+					}
+				}
+			}
+		};
+	}
+
+	/**
+	 * This method terminates the background thread.
+	 */
+	public void killSyncThread() {
+		isRunning = false;
+	}
+
+	/**
+	 * This method synchronises the adding of a task to Google Calendar.
+	 * 
+	 * @param task
+	 * @return the task ID provided by Google Calendar or Google Tasks
+	 */
+	public String syncAddTask(Task task) {
+		String id = null;
+		if (isFloatingTask(task)) {
+			id = SyncFloatingTasks.syncAddTask(task);
+		} else {
+			id = SyncNonFloatingTasks.syncAddTask(task);
+		}
+		return id;
+	}
+
+	/**
+	 * This method synchronises the deleting of a task to Google Calendar.
+	 * 
+	 * @param task
+	 * @throws IOException
+	 */
+	public void syncDeleteTask(Task task) throws IOException {
+		if (task.hasId()) {
+			if (isFloatingTask(task)) {
+				SyncFloatingTasks.syncDeleteTask(task);
+			} else {
+				SyncNonFloatingTasks.syncDeleteTask(task);
+			}
+		} else {
+			// do nothing for unsynced tasks
+		}
+	}
+
+	/**
+	 * This method synchronises the updating of the task description to Google
+	 * Calendar.
+	 * 
+	 * @param task
+	 * @param newDescription
+	 */
+	public void syncUpdateTaskDescription(Task task, String newDescription) {
+		try {
+			if (isFloatingTask(task)) {
+				SyncFloatingTasks.syncUpdateTaskDescription(task,
+						newDescription);
+			} else {
+				SyncNonFloatingTasks.syncUpdateTaskDescription(task,
+						newDescription);
+			}
+		} catch (IOException e) {
+			task.setHasBeenUpdated(true);
+		}
+	}
+
+	/**
+	 * This method synchronises the first step of undo by deleting all created
+	 * tasks in Google Calendar.
+	 * 
+	 * @return true if all tasks in Google Calendar are deleted
+	 */
+	public boolean syncDeleteAllTasks() {
+		ArrayList<Task> tasks = storage.getTasks();
+		try {
+			for (Task task : tasks) {
+				if (task.hasId()) {
+					if (isFloatingTask(task)) {
+						SyncFloatingTasks.syncDeleteTask(task);
+					} else {
+						SyncNonFloatingTasks.syncDeleteTask(task);
+					}
+				}
+			}
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * This method synchronises the second step of undo by adding back all
+	 * previous tasks to Google Calendar.
+	 */
+	public void syncAddPreviousTasks() {
+		ArrayList<Task> tasks = storage.getTasks();
+		for (Task task : tasks) {
+			task.setId(null);
+		}
+		syncToGoogle();
+	}
+
+	/**
+	 * This method synchronises any unsynchronised changes to Google Calendar.
+	 * 
+	 * @return the relevant synchronisation result for user
+	 */
+	public String syncToGoogle() {
+		if (hasUnsyncedTasks()) {
+			String message = "";
+
+			ArrayList<Task> tasks = storage.getTasks();
+			message = syncUnsyncedAddedAndUpdatedTasks(message, tasks);
+
+			ArrayList<Task> deletedTasks = storage.getDeletedTasks();
+			message = syncUnsyncedDeletedTasks(message, deletedTasks);
+
+			if (message.equals(MESSAGE_SYNC_SUCCESS)) {
+				postSyncToGoogle(tasks, deletedTasks);
+			}
+			return message;
+		} else {
+			return MESSAGE_SYNC_EMPTY;
+		}
+	}
+
+	/**
+	 * This method synchronises any unsynchronised adding and updating of tasks
+	 * to Google Calendar.
+	 * 
+	 * @param message
+	 * @param tasks
+	 * @return the relevant synchronisation result for user
+	 */
+	private String syncUnsyncedAddedAndUpdatedTasks(String message,
+			ArrayList<Task> tasks) {
+		for (Task task : tasks) {
+			if (!task.hasId()) {
+				String taskId = syncAddTask(task);
+				if (taskId == null) {
+					message = MESSAGE_SYNC_FAIL;
+				} else {
+					task.setId(taskId);
+					message = MESSAGE_SYNC_SUCCESS;
+				}
+			} else if (task.hasBeenUpdated()) {
+				try {
+					if (isFloatingTask(task)) {
+						com.google.api.services.tasks.model.Task updatedTask = SyncFloatingTasks
+								.convertFloatingTaskToGoogleTask(task);
+						SyncFloatingTasks.syncPatchTask(updatedTask);
+					} else {
+						Event updatedEvent = SyncNonFloatingTasks
+								.convertNonFloatingTaskToEvent(task);
+						SyncNonFloatingTasks.syncPatchTask(updatedEvent);
+					}
+					task.setHasBeenUpdated(false);
+					message = MESSAGE_SYNC_SUCCESS;
+				} catch (IOException e) {
+					message = MESSAGE_SYNC_FAIL;
+				}
+			}
+		}
+		return message;
+	}
+
+	/**
+	 * This method synchronises any unsynchronised deleting of tasks to Google
+	 * Calendar.
+	 * 
+	 * @param message
+	 * @param deletedTasks
+	 * @return the relevant synchronisation result for user
+	 */
+	private String syncUnsyncedDeletedTasks(String message,
+			ArrayList<Task> deletedTasks) {
+		ListIterator<Task> iterator = deletedTasks.listIterator();
+		if (!deletedTasks.isEmpty()) {
+			try {
+				while (iterator.hasNext()) {
+					Task task = iterator.next();
+					syncDeleteTask(task);
+					iterator.remove();
+					message = MESSAGE_SYNC_SUCCESS;
+				}
+			} catch (IOException e) {
+				message = MESSAGE_SYNC_FAIL;
+			}
+		}
+		return message;
+	}
+
+	/**
+	 * This method locally saves any changes made after synchronisation.
+	 * 
+	 * @param tasks
+	 * @param deletedTasks
+	 */
+	private void postSyncToGoogle(ArrayList<Task> tasks,
+			ArrayList<Task> deletedTasks) {
+		deletedTasks.clear();
+		Storage.writeToFile(Storage.DATABASE_FILENAME, tasks);
+		Storage.writeToFile(Storage.DELETED_TASKS_FILENAME, deletedTasks);
+	}
+
+	/**
+	 * This method determines whether the task is a floating task.
+	 * 
+	 * @param task
+	 * @return true if the task is a floating task
+	 */
+	private boolean isFloatingTask(Task task) {
+		if (task.hasStartDate()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	/**
+	 * This method determines whether there are any unsynchronised changes.
+	 * 
+	 * @return true if there are unsynchronised changes
+	 */
+	public boolean hasUnsyncedTasks() {
+		ArrayList<Task> tasks = storage.getTasks();
+		ArrayList<Task> deletedTasks = storage.getDeletedTasks();
+		if (!deletedTasks.isEmpty()) {
+			return true;
+		}
+		for (Task task : tasks) {
+			if (!task.hasId() || task.hasBeenUpdated()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This method determines whether the user is connected to the Internet.
+	 * 
+	 * @return true if user is online
+	 */
+	private boolean isConnectedToInternet() {
+		int returnVal = -1;
+		Process p1;
+		try {
+			if (OPERATING_SYSTEM.indexOf("win") >= 0) {
+				p1 = java.lang.Runtime.getRuntime().exec(
+						"ping -n 1 www.google.com");
+			} else {
+				p1 = java.lang.Runtime.getRuntime().exec(
+						"ping -c 1 www.google.com");
+			}
+			returnVal = p1.waitFor();
+		} catch (IOException | InterruptedException e) {
+
+		}
+
+		return (returnVal == 0);
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\googlecalendar\GoogleCalendar.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\googlecalendar\LoginToGoogle.java
+	 */
+
+/**
+ * This class handles the logging in to Google Calendar and Google Tasks.
+ */
+public class LoginToGoogle {
+
+	private static String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+	private static String CLIENT_ID = "101595183122-6l80mvk11dn0o476g77773fi73mev60c.apps.googleusercontent.com";
+	private static String CLIENT_SECRET = "0qES2e4j6ob4WlgekNRCESzR";
+	private static String NAME_APPLICATION = "Tasker/0.5";
+	private static String GOOGLE_CALENDAR_TYPE = "primary";
+
+	private static String MESSAGE_LOGIN_SUCCESS = "You have successfully logged in to Google.";
+	private static String MESSAGE_LOGIN_FAIL = "Sorry, an error has occurred while logging in to Google. Please restart Tasker.";
+	private static String MESSAGE_OFFLINE_FIRST_TIME = "You are currently offline. Please provide your Google account ID to continue: ";
+	private static String MESSAGE_OFFLINE_CONFIRM_ID = "Are you sure %s is the correct ID? [Y/N]\n";
+	private static String MESSAGE_CALENDAR_ID_SET = "Google ID registered. You may now proceed.";
+	private static String MESSAGE_INVALID_ARGUMENT = "Sorry, the argument must either be 'Y' or 'N'.";
+	private static String MESSAGE_INVALID_EMAIL = "Sorry, the argument must be a valid email address.";
+
+	private static final File CREDENTIAL_STORE_DIR = new File(
+			System.getProperty("user.dir"), ".store/Tasker"); // Directory to
+																// store user
+																// credentials.
+	private static FileDataStoreFactory dataStoreFactory;
+	private static HttpTransport httpTransport;
+	private static final JsonFactory JSON_FACTORY = JacksonFactory
+			.getDefaultInstance();
+
+	private static LoginToGoogle theOne = null;
+	private static Calendar googleCalendarClient;
+	private static Tasks googleTasksClient;
+	private static String googleId = null;
+	private static Scanner scanner;
+
+	/**
+	 * This constructor calls the login() method.
+	 */
+	private LoginToGoogle() {
+		scanner = new Scanner(System.in);
+		System.out.println(login());
+	}
+
+	/**
+	 * This method creates the singleton for LoginToGoogle class and ensures
+	 * that the LoginToGoogle constructor is not called more than once.
+	 * 
+	 * @return
+	 */
+	public static LoginToGoogle getInstance() {
+		if (theOne == null) {
+			theOne = new LoginToGoogle();
+		}
+		return theOne;
+	}
+
+	public Calendar getGoogleCalendarClient() {
+		return googleCalendarClient;
+	}
+
+	public Tasks getGoogleTasksClient() {
+		return googleTasksClient;
+	}
+
+	public String getGoogleId() {
+		return googleId;
+	}
+
+	/**
+	 * This method initiates the logging in to Google Calendar and Google Tasks.
+	 * 
+	 * @return the relevant login result for user
+	 */
+	private String login() {
+		try {
+			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+			dataStoreFactory = new FileDataStoreFactory(CREDENTIAL_STORE_DIR);
+			Credential credential = authorise();
+			googleCalendarClient = new com.google.api.services.calendar.Calendar.Builder(
+					httpTransport, JSON_FACTORY, credential)
+					.setApplicationName(NAME_APPLICATION).build();
+			googleTasksClient = new Tasks.Builder(httpTransport, JSON_FACTORY,
+					credential).setApplicationName(NAME_APPLICATION).build();
+		} catch (Exception e) {
+			System.out.println(MESSAGE_LOGIN_FAIL);
+			System.exit(0);
+		}
+
+		try {
+			googleId = googleCalendarClient.calendars()
+					.get(GOOGLE_CALENDAR_TYPE).execute().getId();
+		} catch (IOException e) {
+			if (googleId == null) {
+				return getGoogleIdFromUser();
+			}
+		}
+		return MESSAGE_LOGIN_SUCCESS;
+	}
+
+	/**
+	 * This method authorises Tasker to access the user's protected data in
+	 * Google Calendar and Google Tasks.
+	 * 
+	 * @return the credentials
+	 * @throws Exception
+	 */
+	private static Credential authorise() throws Exception {
+		// load client secrets
+		GoogleClientSecrets.Details installedDetails = new GoogleClientSecrets.Details();
+		installedDetails.setClientId(CLIENT_ID);
+		installedDetails.setClientSecret(CLIENT_SECRET);
+		GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
+		clientSecrets.setInstalled(installedDetails);
+
+		// set up authorisation code flow
+		ArrayList<String> scopes = new ArrayList<>();
+		scopes.add(CalendarScopes.CALENDAR);
+		scopes.add(TasksScopes.TASKS);
+		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+				httpTransport, JSON_FACTORY, clientSecrets, scopes)
+				.setDataStoreFactory(dataStoreFactory).build();
+
+		// authorise
+		return new AuthorizationCodeInstalledApp(flow,
+				new LocalServerReceiver()).authorize("user");
+	}
+
+	/**
+	 * This method asks and retrieves the Google ID from the user.
+	 * 
+	 * @return the relevant success message of retrieving the Google ID
+	 */
+	private String getGoogleIdFromUser() {
+		String message = "";
+		System.out.println(MESSAGE_OFFLINE_FIRST_TIME);
+		googleId = scanner.nextLine();
+		if (!isValidEmail(googleId)) {
+			System.out.println(MESSAGE_INVALID_EMAIL);
+			return getGoogleIdFromUser();
+		} else {
+			if (confirmGoogleIdFromUser()) {
+				message = MESSAGE_CALENDAR_ID_SET;
+			} else {
+				message = getGoogleIdFromUser();
+			}
+		}
+		return message;
+	}
+
+	/**
+	 * This method confirms with the user that the Google ID provided is
+	 * correct.
+	 * 
+	 * @return true if user enters Y
+	 */
+	private boolean confirmGoogleIdFromUser() {
+		System.out.printf(MESSAGE_OFFLINE_CONFIRM_ID, googleId);
+		String userReply = scanner.nextLine();
+		if (userReply.equalsIgnoreCase("y")) {
+			return true;
+		} else if (userReply.equalsIgnoreCase("n")) {
+			return false;
+		} else {
+			System.out.println(MESSAGE_INVALID_ARGUMENT);
+			return confirmGoogleIdFromUser();
+		}
+	}
+
+	/**
+	 * This method determines whether the Google ID provided by the user is of
+	 * the correct email format.
+	 * 
+	 * @param calendarId
+	 * @return true if the Google ID is of the correct email format
+	 */
+	private boolean isValidEmail(String calendarId) {
+		boolean isValid = calendarId.matches(EMAIL_REGEX);
+		return isValid;
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\googlecalendar\LoginToGoogle.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\googlecalendar\SyncFloatingTasks.java
+	 */
+
+/**
+ * This class handles the synchronisation of floating tasks to Google Tasks.
+ */
+public class SyncFloatingTasks {
+
+	private static String ID_GOOGLE_TASKS = "@default";
+
+	private static LoginToGoogle loginToGoogle = LoginToGoogle.getInstance();
+	private static Tasks googleTasksClient = loginToGoogle
+			.getGoogleTasksClient();
+
+	/**
+	 * This method synchronises the adding of a floating task to Google Tasks.
+	 * 
+	 * @param task
+	 * @return the task ID provided by Google Tasks
+	 */
+	protected static String syncAddTask(Task task) {
+		String id = null;
+		com.google.api.services.tasks.model.Task googleTask = new com.google.api.services.tasks.model.Task();
+		googleTask.setTitle(task.getDescription());
+		try {
+			googleTask = googleTasksClient.tasks()
+					.insert(ID_GOOGLE_TASKS, googleTask).execute();
+			id = googleTask.getId();
+		} catch (IOException e) {
+
+		}
+		return id;
+	}
+
+	/**
+	 * This method synchronises the deleting of a floating task to Google Tasks.
+	 * 
+	 * @param task
+	 * @throws IOException
+	 */
+	protected static void syncDeleteTask(Task task) throws IOException {
+		String id = task.getId();
+		googleTasksClient.tasks().delete(ID_GOOGLE_TASKS, id).execute();
+	}
+
+	/**
+	 * This method synchronises the updating of a floating task to Google Tasks.
+	 * 
+	 * @param googleTask
+	 * @throws IOException
+	 */
+	protected static void syncPatchTask(
+			com.google.api.services.tasks.model.Task googleTask)
+			throws IOException {
+		String taskId = googleTask.getId();
+		if (taskId != null) {
+			googleTasksClient.tasks()
+					.patch(ID_GOOGLE_TASKS, taskId, googleTask).execute();
+		}
+	}
+
+	/**
+	 * This method synchronises the updating of the description of a floating
+	 * task to Google Tasks.
+	 * 
+	 * @param task
+	 * @param newDescription
+	 * @throws IOException
+	 */
+	public static void syncUpdateTaskDescription(Task task,
+			String newDescription) throws IOException {
+		com.google.api.services.tasks.model.Task googleTask = convertFloatingTaskToGoogleTask(task);
+		googleTask.setTitle(newDescription);
+		syncPatchTask(googleTask);
+	}
+
+	/**
+	 * This method converts a floating task to a Google Task.
+	 * 
+	 * @param task
+	 * @return the converted Google Task object
+	 */
+	protected static com.google.api.services.tasks.model.Task convertFloatingTaskToGoogleTask(
+			Task task) {
+		com.google.api.services.tasks.model.Task googleTask = new com.google.api.services.tasks.model.Task();
+		googleTask.setId(task.getId());
+		googleTask.setTitle(task.getDescription());
+		return googleTask;
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\googlecalendar\SyncFloatingTasks.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\googlecalendar\SyncNonFloatingTasks.java
+	 */
+
+/**
+ * This class handles the synchronisation of non-floating tasks to Google
+ * Calendar.
+ */
+public class SyncNonFloatingTasks {
+
+	private static LoginToGoogle loginToGoogle = LoginToGoogle.getInstance();
+	private static Calendar googleCalendarClient = loginToGoogle
+			.getGoogleCalendarClient();
+	private static String googleId = loginToGoogle.getGoogleId();
+
+	/**
+	 * This method synchronises the adding of a non-floating task to Google
+	 * Calendar.
+	 * 
+	 * @param task
+	 * @return the task ID provided by Google Calendar
+	 */
+	protected static String syncAddTask(Task task) {
+		String id = null;
+		Event event = convertNonFloatingTaskToEvent(task);
+		try {
+			event = googleCalendarClient.events().insert(googleId, event)
+					.execute();
+			id = event.getId();
+		} catch (IOException e) {
+
+		}
+		return id;
+	}
+
+	/**
+	 * This method synchronises the deleting of a non-floating task to Google
+	 * Calendar.
+	 * 
+	 * @param task
+	 * @throws IOException
+	 */
+	protected static void syncDeleteTask(Task task) throws IOException {
+		String id = task.getId();
+		googleCalendarClient.events().delete(googleId, id).execute();
+	}
+
+	/**
+	 * This method synchronises the updating of a non-floating task to Google
+	 * Calendar.
+	 * 
+	 * @param event
+	 * @throws IOException
+	 */
+	protected static void syncPatchTask(Event event) throws IOException {
+		String eventId = event.getId();
+		if (eventId != null) {
+			googleCalendarClient.events().patch(googleId, eventId, event)
+					.execute();
+		}
+	}
+
+	/**
+	 * This method synchronises the updating of the description of a
+	 * non-floating task to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newDescription
+	 * @throws IOException
+	 */
+	protected static void syncUpdateTaskDescription(Task task,
+			String newDescription) throws IOException {
+		Event event = convertNonFloatingTaskToEvent(task);
+		event.setSummary(newDescription);
+		syncPatchTask(event);
+	}
+
+	/**
+	 * This method synchronises the updating of the venue of a non-floating task
+	 * to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newVenue
+	 */
+	public static void syncUpdateTaskVenue(Task task, String newVenue) {
+		Event event = convertNonFloatingTaskToEvent(task);
+		event.setLocation(newVenue);
+		try {
+			syncPatchTask(event);
+		} catch (IOException e) {
+			task.setHasBeenUpdated(true);
+		}
+	}
+
+	/**
+	 * This method synchronises the updating of the start date of a non-floating
+	 * task to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newStartDate
+	 */
+	public static void syncUpdateTaskStartDate(Task task, LocalDate newStartDate) {
+		Event event = convertNonFloatingTaskToEvent(task);
+		EventDateTime eventDateTime = null;
+		if (task.hasStartTime()) {
+			LocalTime taskTime = task.getStartTime();
+			eventDateTime = convertToEventDateTime(newStartDate, taskTime);
+		} else {
+			eventDateTime = convertToEventDateTime(newStartDate);
+		}
+		event.setStart(eventDateTime);
+		if (task.startDateEqualsEndDate()) {
+			LocalDate newEndDate = newStartDate.plusDays(1);
+			eventDateTime = convertToEventDateTime(newEndDate);
+			event.setEnd(eventDateTime);
+		}
+		try {
+			syncPatchTask(event);
+		} catch (IOException e) {
+			task.setHasBeenUpdated(true);
+		}
+	}
+
+	/**
+	 * This method synchronises the updating of the start time of a non-floating
+	 * task to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newStartTime
+	 * @throws IOException
+	 */
+	public static void syncUpdateTaskStartTime(Task task, LocalTime newStartTime)
+			throws IOException {
+		Event event = convertNonFloatingTaskToEvent(task);
+		EventDateTime eventDateTime = event.getStart();
+		LocalDateTime taskDateTime = convertToLocalDateTime(eventDateTime);
+		LocalDate taskDate = taskDateTime.toLocalDate();
+		eventDateTime = convertToEventDateTime(taskDate, newStartTime);
+		event.setStart(eventDateTime);
+		try {
+			syncPatchTask(event);
+		} catch (IOException e) {
+			task.setHasBeenUpdated(true);
+		}
+	}
+
+	/**
+	 * This method synchronises the updating of the end date of a non-floating
+	 * task to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newEndDate
+	 */
+	public static void syncUpdateTaskEndDate(Task task, LocalDate newEndDate) {
+		Event event = convertNonFloatingTaskToEvent(task);
+		EventDateTime eventDateTime = null;
+		if (task.hasEndTime()) {
+			LocalTime taskTime = task.getEndTime();
+			eventDateTime = convertToEventDateTime(newEndDate, taskTime);
+		} else {
+			eventDateTime = convertToEventDateTime(newEndDate.plusDays(1));
+		}
+		event.setEnd(eventDateTime);
+		try {
+			syncPatchTask(event);
+		} catch (IOException e) {
+			task.setHasBeenUpdated(true);
+		}
+	}
+
+	/**
+	 * This method synchronises the updating of the end time of a non-floating
+	 * task to Google Calendar.
+	 * 
+	 * @param task
+	 * @param newEndTime
+	 * @throws IOException
+	 */
+	public static void syncUpdateTaskEndTime(Task task, LocalTime newEndTime)
+			throws IOException {
+		Event event = convertNonFloatingTaskToEvent(task);
+		EventDateTime eventDateTime = event.getEnd();
+		LocalDateTime taskDateTime = convertToLocalDateTime(eventDateTime);
+		LocalDate taskDate = taskDateTime.toLocalDate();
+		eventDateTime = convertToEventDateTime(taskDate, newEndTime);
+		event.setEnd(eventDateTime);
+		try {
+			syncPatchTask(event);
+		} catch (IOException e) {
+			task.setHasBeenUpdated(true);
+		}
+	}
+
+	/**
+	 * This method converts a non-floating task to a Google Calendar Event.
+	 * 
+	 * @param task
+	 * @return the converted Google Calendar Event object
+	 */
+	protected static Event convertNonFloatingTaskToEvent(Task task) {
+		Event event = new Event();
+		event.setId(task.getId());
+		event.setSummary(task.getDescription());
+		event.setLocation(task.getVenue());
+
+		LocalDate taskStartDate = task.getStartDate();
+		LocalTime taskStartTime = task.getStartTime();
+
+		LocalDate taskEndDate = task.getEndDate();
+		LocalTime taskEndTime = task.getEndTime();
+
+		if (taskStartTime == null && taskEndTime == null) {
+			EventDateTime eventStartDateTime = convertToEventDateTime(taskStartDate);
+			event.setStart(eventStartDateTime);
+			EventDateTime eventEndDateTime = convertToEventDateTime(taskEndDate
+					.plusDays(1));
+			event.setEnd(eventEndDateTime);
+		} else {
+			EventDateTime eventStartDateTime = convertToEventDateTime(
+					taskStartDate, taskStartTime);
+			event.setStart(eventStartDateTime);
+
+			EventDateTime eventEndDateTime = convertToEventDateTime(
+					taskEndDate, taskEndTime);
+			event.setEnd(eventEndDateTime);
+		}
+
+		return event;
+	}
+
+	/**
+	 * This method converts a LocalDate to a EventDateTime.
+	 * 
+	 * @param localDate
+	 * @return the converted EventDateTime object
+	 */
+	private static EventDateTime convertToEventDateTime(LocalDate localDate) {
+		String temp = localDate.toString(); // of the format YYYY-MM-DD
+		DateTime date = new DateTime(temp);
+		EventDateTime eventDateTime = new EventDateTime();
+		eventDateTime.setDate(date);
+		return eventDateTime;
+	}
+
+	/**
+	 * This method converts a LocalDate and LocalTime to a EventDateTime.
+	 * 
+	 * @param taskDate
+	 * @param taskTime
+	 * @return the converted EventDateTime object
+	 */
+	private static EventDateTime convertToEventDateTime(LocalDate taskDate,
+			LocalTime taskTime) {
+		org.joda.time.DateTime jodaDateTime = taskDate.toDateTime(taskTime);
+		Date date = jodaDateTime.toDate();
+		DateTime dateTime = new DateTime(date, TimeZone.getTimeZone("UTC"));
+		EventDateTime eventDateTime = new EventDateTime();
+		eventDateTime.setDateTime(dateTime);
+		return eventDateTime;
+	}
+
+	/**
+	 * This method converts a EventDateTime to LocalDateTime.
+	 * 
+	 * @param eventDateTime
+	 * @return the converted LocalDateTime object
+	 */
+	private static LocalDateTime convertToLocalDateTime(
+			EventDateTime eventDateTime) {
+		DateTime dateTime = eventDateTime.getDateTime();
+		LocalDateTime localDateTime = new LocalDateTime(dateTime.getValue());
+		return localDateTime;
+	}
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\googlecalendar\SyncNonFloatingTasks.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DeleteHandler.java
+	 */
+
+/**
+ * This class handles the deleting of tasks.
+ */
+public class DeleteHandler extends CommandHandler {
+
+	private static String MESSAGE_DELETE = "List of deleted tasks:";
+	private static String MESSAGE_DELETED = "Note that you can undo to retrieve the deleted tasks.";
+
+	private DeleteParser parser;
+	private static Storage storage = Storage.getInstance();
+	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
+
+	/**
+	 * This method creates a new DeleteParser constructor to parse the user
+	 * parameters.
+	 * 
+	 * @param details
+	 */
+	public DeleteHandler(String details) {
+		super(details);
+		parser = new DeleteParser(details);
+	}
+
+	/*
+	 * This method overrides the execute() method of CommandHandler class. It
+	 * retrieves the stored tasks and delete according to the user parameters.
+	 * 
+	 * @see main.logic.CommandHandler#execute()
+	 */
+	@Override
+	public String execute() {
+		String returnMessage = parser.parse();
+		ArrayList<Task> tasks = storage.getTasks();
+		if (returnMessage.equals(CommandParser.MESSAGE_PARSE_SUCCESS)) {
+			returnMessage = deleteSelectedTasks(tasks);
+		} else if (returnMessage.equals(DeleteParser.ARGUMENT_ALL)) {
+			returnMessage = deleteAllTasks(tasks);
+		}
+		return returnMessage;
+	}
+
+	/**
+	 * This method deletes user-selected tasks before executing the
+	 * synchronisation.
+	 * 
+	 * @param tasks
+	 * @return the relevant delete result for the user
+	 */
+	private String deleteSelectedTasks(ArrayList<Task> tasks) {
+		String returnMessage;
+		ArrayList<Integer> listOfIndexes = parser.getListOfIndexes();
+		System.out.println(MESSAGE_DELETE);
+		DisplayHandler.displayTop();
+		for (int index : listOfIndexes) {
+			Task task = tasks.get(index);
+			DisplayHandler.displayContents(index, task);
+			storage.removeTask(index);
+			try {
+				googleCalendar.syncDeleteTask(task);
+			} catch (IOException e) {
+				storage.addDeletedTask(task);
+			}
+		}
+		DisplayHandler.displayBottom();
+		storage.saveCurrentState();
+		returnMessage = MESSAGE_DELETED;
+		return returnMessage;
+	}
+
+	/**
+	 * This method deletes all tasks before executing the synchronisation.
+	 * 
+	 * @param tasks
+	 * @return the relevant delete result for the user
+	 */
+	private String deleteAllTasks(ArrayList<Task> tasks) {
+		String returnMessage;
+		int index = 0;
+		DisplayHandler.displayTop();
+		for (Task task : tasks) {
+			DisplayHandler.displayContents(index, task);
+			try {
+				googleCalendar.syncDeleteTask(task);
+			} catch (IOException e) {
+				storage.addDeletedTask(task);
+			}
+			index++;
+		}
+		storage.clearAllTasks();
+		storage.saveCurrentState();
+		DisplayHandler.displayBottom();
+		returnMessage = MESSAGE_DELETED;
+		return returnMessage;
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DeleteHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DeleteParser.java
+	 */
+
+/**
+ * This class parses the user parameters for DeleteHandler to verify the
+ * validity.
+ */
+public class DeleteParser extends CommandParser {
+
+	private static String MESSAGE_INVALID_ARGUMENT_TYPE = "Sorry, you have entered invalid task IDs. Please try again.";
+	private static String MESSAGE_DUPLICATE_ARGUMENTS = "Sorry, you have entered duplicate task IDs. Please try again.";
+	public static String ARGUMENT_ALL = "all";
+
+	private static Storage storage = Storage.getInstance();
+	private String arguments;
+	private ArrayList<Integer> listOfIndexes;
+
+	/**
+	 * This constructor initialises the ArrayList to store the user parameters.
+	 * 
+	 * @param arguments
+	 */
+	public DeleteParser(String arguments) {
+		super(arguments);
+		this.arguments = arguments;
+		listOfIndexes = new ArrayList<>();
+	}
+
+	/*
+	 * This method overrides the parse() method of CommandParser class. It
+	 * breaks up the user parameters to determine the deleting action.
+	 * 
+	 * @see main.logic.CommandParser#parse()
+	 */
+	@Override
+	public String parse() {
+		if (arguments.equalsIgnoreCase(ARGUMENT_ALL)) {
+			return ARGUMENT_ALL;
+		} else {
+			int index = 0;
+			int numberOfStoredTasks = storage.getTasks().size();
+			String[] indexes = arguments.split(" ");
+			try {
+				for (String indexString : indexes) {
+					index = Integer.parseInt(indexString) - 1;
+					if (index < 0 || index >= numberOfStoredTasks) {
+						return MESSAGE_INVALID_ARGUMENT_TYPE;
+					} else {
+						listOfIndexes.add(index);
+					}
+				}
+				Collections.sort(listOfIndexes);
+				Collections.reverse(listOfIndexes);
+			} catch (NumberFormatException e) {
+				return MESSAGE_INVALID_ARGUMENT_TYPE;
+			}
+			index = -1;
+			for (int deleteIndex : listOfIndexes) {
+				if (Objects.equals(deleteIndex, index)) {
+					return MESSAGE_DUPLICATE_ARGUMENTS;
+				}
+				index = deleteIndex;
+			}
+		}
+		return MESSAGE_PARSE_SUCCESS;
+	}
+
+	public ArrayList<Integer> getListOfIndexes() {
+		return listOfIndexes;
+	}
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DeleteParser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\Logic.java
+	 */
+
+/**
+ * This class handles the user commands, determines the appropriate command
+ * before constructing and executing the corresponding classes.
+ */
+public class Logic {
+
+	private final static String MESSAGE_INVALID_COMMAND = "Sorry, you entered an invalid command.";
+	private static GoogleCalendar googleCalendar = GoogleCalendar.getInstance();
+
+	/**
+	 * This enumerator is to store the commands available to the user.
+	 */
+	private enum CommandType {
+		ADD, DELETE, DISPLAY, UPDATE, SEARCH, UNDO, REPEAT, REMIND, SYNC, INVALID, EXIT
+	}
+
+	/**
+	 * This method is to retrieve the user command from the UI component before
+	 * executing the corresponding command.
+	 * 
+	 * @param userCommand
+	 * @return the relevant result from the corresponding execution of command
+	 */
+	public static String uiToLogic(String userCommand) {
+		try {
+			String commandTypeString = getFirstWord(userCommand);
+			CommandType commandType = determineCommandType(commandTypeString);
+			String details = removeFirstWord(userCommand);
+			String message = executeCommand(commandType, details);
+			return message;
+		} catch (PatternSyntaxException e) {
+			return MESSAGE_INVALID_COMMAND;
+		}
+
+	}
+
+	/**
+	 * This method determines the command type from the user command.
+	 * 
+	 * @param commandTypeString
+	 * @return the corresponding CommandType
+	 */
+	private static CommandType determineCommandType(String commandTypeString) {
+		TaskerLog.logSystemInfo("determineCommandType received input");
+		if (commandTypeString.equalsIgnoreCase("add")) {
+			TaskerLog.logSystemInfo("add command detected");
+			return CommandType.ADD;
+		} else if (commandTypeString.equalsIgnoreCase("delete")) {
+			TaskerLog.logSystemInfo("delete command detected");
+			return CommandType.DELETE;
+		} else if (commandTypeString.equalsIgnoreCase("display")) {
+			TaskerLog.logSystemInfo("display command detected");
+			return CommandType.DISPLAY;
+		} else if (commandTypeString.equalsIgnoreCase("update")) {
+			TaskerLog.logSystemInfo("update command detected");
+			return CommandType.UPDATE;
+		} else if (commandTypeString.equalsIgnoreCase("search")) {
+			TaskerLog.logSystemInfo("search command detected");
+			return CommandType.SEARCH;
+		} else if (commandTypeString.equalsIgnoreCase("undo")) {
+			TaskerLog.logSystemInfo("undo command detected");
+			return CommandType.UNDO;
+		} else if (commandTypeString.equalsIgnoreCase("sync")) {
+			TaskerLog.logSystemInfo("login command detected");
+			return CommandType.SYNC;
+		} else if (commandTypeString.equalsIgnoreCase("exit")) {
+			TaskerLog.logSystemInfo("exit command detected");
+			return CommandType.EXIT;
+		} else {
+			TaskerLog.logSystemInfo("Invalid command type detected.");
+			return CommandType.INVALID;
+		}
+	}
+
+	/**
+	 * This method executes the corresponding command after determing the
+	 * command type.
+	 * 
+	 * @param commandType
+	 * @param details
+	 * @return the relevant result from the corresponding execution of commands
+	 */
+	public static String executeCommand(CommandType commandType, String details) {
+		TaskerLog.logSystemInfo("executeCommand received commandType");
+		switch (commandType) {
+		case ADD:
+			return addTask(details);
+		case DELETE:
+			return deleteTask(details);
+		case DISPLAY:
+			return displayTasks(details);
+		case UPDATE:
+			return updateTask(details);
+		case SEARCH:
+			return searchTask(details);
+		case UNDO:
+			return undo(details);
+		case SYNC:
+			return googleCalendar.syncToGoogle();
+		case EXIT:
+			googleCalendar.killSyncThread();
+			System.exit(0);
+		default:
+			TaskerLog.logSystemInfo("Unable to execute invalid command type.");
+			return MESSAGE_INVALID_COMMAND;
+		}
+	}
+
+	/**
+	 * This method constructs the AddHandler to add a new task.
+	 * 
+	 * @param details
+	 * @return the relevant result from the adding
+	 */
+	private static String addTask(String details) {
+		CommandHandler executor = new AddHandler(details);
+		String message = executor.execute();
+		return message;
+	}
+
+	/**
+	 * This method constructs the DeleteHandler to delete a task.
+	 * 
+	 * @param details
+	 * @return the relevant result from the deleting
+	 */
+	private static String deleteTask(String details) {
+		CommandHandler executor = new DeleteHandler(details);
+		String message = executor.execute();
+		return message;
+	}
+
+	/**
+	 * This method constructs the DisplayHandler to display all tasks.
+	 * 
+	 * @param details
+	 * @return the list of tasks in a formatted table
+	 */
+	private static String displayTasks(String details) {
+		CommandHandler executor = new DisplayHandler(details);
+		String message = executor.execute();
+		return message;
+	}
+
+	/**
+	 * This method constructs the UpdateHandler to update a task.
+	 * 
+	 * @param details
+	 * @return the relevant result from the updating
+	 */
+	private static String updateTask(String details) {
+		CommandHandler executor = new UpdateHandler(details);
+		String message = executor.execute();
+		return message;
+	}
+
+	/**
+	 * This method constructs the UndoHandler to undo an action.
+	 * 
+	 * @param details
+	 * @return the relevant result from the undo
+	 */
+	private static String undo(String details) {
+		CommandHandler executor = new UndoHandler(details);
+		String message = executor.execute();
+		return message;
+	}
+
+	/**
+	 * This method constructs the SearchHandler to search for a task.
+	 * 
+	 * @param details
+	 * @return the relevant search result
+	 */
+	private static String searchTask(String details) {
+		CommandHandler executor = new SearchHandler(details);
+		String message = executor.execute();
+		return message;
+	}
+
+	/**
+	 * This method gets the first word in the user command.
+	 * 
+	 * @param userCommand
+	 * @return the first word of the user command
+	 */
+	private static String getFirstWord(String userCommand) {
+		String firstWord = userCommand.trim().split(" ")[0];
+		return firstWord;
+	}
+
+	/**
+	 * This method removes the first word in the user command.
+	 * 
+	 * @param userCommand
+	 * @return the user command without the first word
+	 */
+	private static String removeFirstWord(String userCommand) {
+		String withoutFirstWord = userCommand.replaceFirst(
+				getFirstWord(userCommand), "").trim();
+		return withoutFirstWord;
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\Logic.java
+
+
+
+
+

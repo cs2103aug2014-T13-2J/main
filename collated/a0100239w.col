@@ -1,0 +1,2650 @@
+//@author: a0100239w
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+	 */
+
+	/*
+	 * This method takes care of line overflow in the display table, as well as
+	 * column alignment. It also assigns the correct colors to the
+	 * corresponding tasks.
+	 */
+	public static String displayTaskInTable(int number, Task task) {
+		result = "";
+		boolean completed = task.hasCompleted();
+		int status = determinePastPresentFuture(task);
+		int maximumWidth = 9;
+		String taskNumber = getTaskNumber(number);
+		String taskDescription = task.getDescription();
+		String taskDescriptionExtra = "";
+		String taskDescriptionExtraOne = "";
+		String taskDescriptionExtraTwo = "";
+
+		if (taskDescription.length() >= 25 && taskDescription.length() < 50) {
+			taskDescriptionExtraOne = taskDescription.substring(25);
+			taskDescription = taskDescription.substring(0, 25);
+		}
+
+		else if (taskDescription.length() >= 50
+				&& taskDescription.length() < 75) {
+			taskDescriptionExtraTwo = taskDescription.substring(50);
+			taskDescriptionExtraOne = taskDescription.substring(25, 50);
+			taskDescription = taskDescription.substring(0, 25);
+		}
+
+		else if (taskDescription.length() >= 75) {
+			taskDescriptionExtra = taskDescription.substring(75);
+			taskDescriptionExtraTwo = taskDescription.substring(50, 75);
+			taskDescriptionExtraOne = taskDescription.substring(25, 50);
+			taskDescription = taskDescription.substring(0, 25);
+		}
+
+		String taskVenue = "-";
+		String taskVenueExtra = "";
+		String taskVenueExtraOne = "";
+		String taskVenueExtraTwo = "";
+		if (task.hasVenue()) {
+			taskVenue = task.getVenue();
+
+			if (taskVenue.length() >= 17 && taskVenue.length() < 34) {
+				taskVenueExtraOne = taskVenue.substring(17);
+				taskVenue = taskVenue.substring(0, 17);
+			} else if (taskVenue.length() >= 34 && taskVenue.length() < 51) {
+				taskVenueExtraTwo = taskVenue.substring(34);
+				taskVenueExtraOne = taskVenue.substring(17, 34);
+				taskVenue = taskVenue.substring(0, 17);
+			} else if (taskVenue.length() >= 51) {
+				taskVenueExtra = taskVenue.substring(51);
+				taskVenueExtraTwo = taskVenue.substring(34, 51);
+				taskVenueExtraOne = taskVenue.substring(17, 34);
+				taskVenue = taskVenue.substring(0, 17);
+			}
+		}
+
+		String startTaskTime = "-";
+		String endTaskTime = "-";
+		if (task.hasStartTime()) {
+			startTaskTime = addStartTime(task);
+			if (!task.getEndTime().equals(task.getStartTime())) {
+				// taskTime += "to " + addEndTime(task);
+				endTaskTime = addEndTime(task);
+			}
+		}
+
+		String startTaskDate = "-";
+		String endTaskDate = "-";
+		if (task.hasStartDate()) {
+			startTaskDate = addStartDate(task);
+			if (!task.getEndDate().equals(task.getStartDate())) {
+				// taskDate += "to " + addEndDate(task);
+				endTaskDate = addEndDate(task);
+			}
+		}
+
+		String nullSpace = "";
+		int nullSpaceLength = taskNumber.length();
+		for (int i = 0; i < nullSpaceLength; i++) {
+			nullSpace += " ";
+		}
+
+		if (taskVenue.contains("null")) {
+			taskVenue = "-";
+		}
+
+		String to = "to";
+		if (number < maximumWidth) {
+			if (completed) {
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(YELLOW).a(taskNumber).reset(), " |",
+						ansi().fg(YELLOW).a(taskDescription).reset(), "|",
+						ansi().fg(YELLOW).a(taskVenue).reset(), "|",
+						ansi().fg(YELLOW).a(startTaskTime).reset(), "|", ansi()
+								.fg(YELLOW).a(startTaskDate).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(YELLOW).a(nullSpace).reset(), " |",
+						ansi().fg(YELLOW).a(taskDescriptionExtraOne).reset(),
+						"|", ansi().fg(YELLOW).a(taskVenueExtraOne).reset(),
+						"|", ansi().fg(YELLOW).a(to).reset(), "|",
+						ansi().fg(YELLOW).a(to).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(YELLOW).a(nullSpace).reset(), " |",
+						ansi().fg(YELLOW).a(taskDescriptionExtraTwo).reset(),
+						"|", ansi().fg(YELLOW).a(taskVenueExtraTwo).reset(),
+						"|", ansi().fg(YELLOW).a(endTaskTime).reset(), "|",
+						ansi().fg(YELLOW).a(endTaskDate).reset());
+				result += "\n";
+
+			} else if (status == PRESENT) {
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(RED).a(taskNumber).reset(), " |",
+						ansi().fg(RED).a(taskDescription).reset(), "|", ansi()
+								.fg(RED).a(taskVenue).reset(), "|",
+						ansi().fg(RED).a(startTaskTime).reset(), "|", ansi()
+								.fg(RED).a(startTaskDate).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(RED).a(nullSpace).reset(), " |",
+						ansi().fg(RED).a(taskDescriptionExtraOne).reset(), "|",
+						ansi().fg(RED).a(taskVenueExtraOne).reset(), "|",
+						ansi().fg(RED).a(to).reset(), "|", ansi().fg(RED).a(to)
+								.reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(RED).a(nullSpace).reset(), " |",
+						ansi().fg(RED).a(taskDescriptionExtraTwo).reset(), "|",
+						ansi().fg(RED).a(taskVenueExtraTwo).reset(), "|",
+						ansi().fg(RED).a(endTaskTime).reset(), "|",
+						ansi().fg(RED).a(endTaskDate).reset());
+				result += "\n";
+
+			} else if (status == PAST) {
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(CYAN).a(taskNumber).reset(), " |", ansi().fg(CYAN)
+						.a(taskDescription).reset(), "|",
+						ansi().fg(CYAN).a(taskVenue).reset(), "|",
+						ansi().fg(CYAN).a(startTaskTime).reset(), "|", ansi()
+								.fg(CYAN).a(startTaskDate).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(CYAN).a(nullSpace).reset(), " |", ansi().fg(CYAN)
+						.a(taskDescriptionExtraOne).reset(), "|",
+						ansi().fg(CYAN).a(taskVenueExtraOne).reset(), "|",
+						ansi().fg(CYAN).a(to).reset(), "|",
+						ansi().fg(CYAN).a(to).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(CYAN).a(nullSpace).reset(), " |", ansi().fg(CYAN)
+						.a(taskDescriptionExtraTwo).reset(), "|",
+						ansi().fg(CYAN).a(taskVenueExtraTwo).reset(), "|",
+						ansi().fg(CYAN).a(endTaskTime).reset(), "|",
+						ansi().fg(CYAN).a(endTaskDate).reset());
+				result += "\n";
+
+			}
+
+			else if (status == FUTURE) {
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(GREEN).a(taskNumber).reset(), " |", ansi()
+						.fg(GREEN).a(taskDescription).reset(), "|",
+						ansi().fg(GREEN).a(taskVenue).reset(), "|",
+						ansi().fg(GREEN).a(startTaskTime).reset(), "|", ansi()
+								.fg(GREEN).a(startTaskDate).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(GREEN).a(nullSpace).reset(), " |", ansi().fg(GREEN)
+						.a(taskDescriptionExtraOne).reset(), "|",
+						ansi().fg(GREEN).a(taskVenueExtraOne).reset(), "|",
+						ansi().fg(GREEN).a(to).reset(), "|", ansi().fg(GREEN)
+								.a(to).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(GREEN).a(nullSpace).reset(), " |", ansi().fg(GREEN)
+						.a(taskDescriptionExtraTwo).reset(), "|",
+						ansi().fg(GREEN).a(taskVenueExtraTwo).reset(), "|",
+						ansi().fg(GREEN).a(endTaskTime).reset(), "|", ansi()
+								.fg(GREEN).a(endTaskDate).reset());
+				result += "\n";
+
+			}
+
+			else {
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(MAGENTA).a(taskNumber).reset(), " |",
+						ansi().fg(MAGENTA).a(taskDescription).reset(), "|",
+						ansi().fg(MAGENTA).a(taskVenue).reset(), "|", ansi()
+								.fg(MAGENTA).a(startTaskTime).reset(), "|",
+						ansi().fg(MAGENTA).a(startTaskDate).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(MAGENTA).a(nullSpace).reset(), " |",
+						ansi().fg(MAGENTA).a(taskDescriptionExtraOne).reset(),
+						"|", ansi().fg(MAGENTA).a(taskVenueExtraOne).reset(),
+						"|", ansi().fg(MAGENTA).a(to).reset(), "|",
+						ansi().fg(MAGENTA).a(to).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(MAGENTA).a(nullSpace).reset(), " |",
+						ansi().fg(MAGENTA).a(taskDescriptionExtraTwo).reset(),
+						"|", ansi().fg(MAGENTA).a(taskVenueExtraTwo).reset(),
+						"|", ansi().fg(MAGENTA).a(endTaskTime).reset(), "|",
+						ansi().fg(MAGENTA).a(endTaskDate).reset());
+				result += "\n";
+
+			}
+		} else {
+			if (completed) {
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(YELLOW).a(taskNumber).reset(), "|",
+						ansi().fg(YELLOW).a(taskDescription).reset(), "|",
+						ansi().fg(YELLOW).a(taskVenue).reset(), "|",
+						ansi().fg(YELLOW).a(startTaskTime).reset(), "|", ansi()
+								.fg(YELLOW).a(startTaskDate).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(YELLOW).a(nullSpace).reset(), "|", ansi()
+						.fg(YELLOW).a(taskDescriptionExtraOne).reset(), "|",
+						ansi().fg(YELLOW).a(taskVenueExtraOne).reset(), "|",
+						ansi().fg(YELLOW).a(to).reset(), "|", ansi().fg(YELLOW)
+								.a(to).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(YELLOW).a(nullSpace).reset(), "|", ansi()
+						.fg(YELLOW).a(taskDescriptionExtraTwo).reset(), "|",
+						ansi().fg(YELLOW).a(taskVenueExtraTwo).reset(), "|",
+						ansi().fg(YELLOW).a(endTaskTime).reset(), "|", ansi()
+								.fg(YELLOW).a(endTaskDate).reset());
+				result += "\n";
+
+			} else if (status == PRESENT) {
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(RED).a(taskNumber).reset(), "|",
+						ansi().fg(RED).a(taskDescription).reset(), "|", ansi()
+								.fg(RED).a(taskVenue).reset(), "|",
+						ansi().fg(RED).a(startTaskTime).reset(), "|", ansi()
+								.fg(RED).a(startTaskDate).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(RED).a(nullSpace).reset(), "|",
+						ansi().fg(RED).a(taskDescriptionExtraOne).reset(), "|",
+						ansi().fg(RED).a(taskVenueExtraOne).reset(), "|",
+						ansi().fg(RED).a(to).reset(), "|", ansi().fg(RED).a(to)
+								.reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(RED).a(nullSpace).reset(), "|",
+						ansi().fg(RED).a(taskDescriptionExtraTwo).reset(), "|",
+						ansi().fg(RED).a(taskVenueExtraTwo).reset(), "|",
+						ansi().fg(RED).a(endTaskTime).reset(), "|",
+						ansi().fg(RED).a(endTaskDate).reset());
+				result += "\n";
+
+			} else if (status == PAST) {
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(CYAN).a(taskNumber).reset(), "|", ansi().fg(CYAN)
+						.a(taskDescription).reset(), "|",
+						ansi().fg(CYAN).a(taskVenue).reset(), "|",
+						ansi().fg(CYAN).a(startTaskTime).reset(), "|", ansi()
+								.fg(CYAN).a(startTaskDate).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(CYAN).a(nullSpace).reset(), "|",
+						ansi().fg(CYAN).a(taskDescriptionExtraOne).reset(),
+						"|", ansi().fg(CYAN).a(taskVenueExtraOne).reset(), "|",
+						ansi().fg(CYAN).a(to).reset(), "|",
+						ansi().fg(CYAN).a(to).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(CYAN).a(nullSpace).reset(), "|",
+						ansi().fg(CYAN).a(taskDescriptionExtraTwo).reset(),
+						"|", ansi().fg(CYAN).a(taskVenueExtraTwo).reset(), "|",
+						ansi().fg(CYAN).a(endTaskTime).reset(), "|",
+						ansi().fg(CYAN).a(endTaskDate).reset());
+				result += "\n";
+
+			}
+
+			else if (status == FUTURE) {
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(GREEN).a(taskNumber).reset(), "|", ansi().fg(GREEN)
+						.a(taskDescription).reset(), "|",
+						ansi().fg(GREEN).a(taskVenue).reset(), "|",
+						ansi().fg(GREEN).a(startTaskTime).reset(), "|", ansi()
+								.fg(GREEN).a(startTaskDate).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(GREEN).a(nullSpace).reset(), "|", ansi().fg(GREEN)
+						.a(taskDescriptionExtraOne).reset(), "|",
+						ansi().fg(GREEN).a(taskVenueExtraOne).reset(), "|",
+						ansi().fg(GREEN).a(to).reset(), "|", ansi().fg(GREEN)
+								.a(to).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(GREEN).a(nullSpace).reset(), "|", ansi().fg(GREEN)
+						.a(taskDescriptionExtraTwo).reset(), "|",
+						ansi().fg(GREEN).a(taskVenueExtraTwo).reset(), "|",
+						ansi().fg(GREEN).a(endTaskTime).reset(), "|", ansi()
+								.fg(GREEN).a(endTaskDate).reset());
+				result += "\n";
+
+			}
+
+			else {
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(MAGENTA).a(taskNumber).reset(), "|",
+						ansi().fg(MAGENTA).a(taskDescription).reset(), "|",
+						ansi().fg(MAGENTA).a(taskVenue).reset(), "|", ansi()
+								.fg(MAGENTA).a(startTaskTime).reset(), "|",
+						ansi().fg(MAGENTA).a(startTaskDate).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(MAGENTA).a(nullSpace).reset(), "|",
+						ansi().fg(MAGENTA).a(taskDescriptionExtraOne).reset(),
+						"|", ansi().fg(MAGENTA).a(taskVenueExtraOne).reset(),
+						"|", ansi().fg(MAGENTA).a(to).reset(), "|",
+						ansi().fg(MAGENTA).a(to).reset());
+				result += "\n";
+
+				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+						.fg(MAGENTA).a(nullSpace).reset(), "|",
+						ansi().fg(MAGENTA).a(taskDescriptionExtraTwo).reset(),
+						"|", ansi().fg(MAGENTA).a(taskVenueExtraTwo).reset(),
+						"|", ansi().fg(MAGENTA).a(endTaskTime).reset(), "|",
+						ansi().fg(MAGENTA).a(endTaskDate).reset());
+				result += "\n";
+
+			}
+		}
+
+		if (taskDescriptionExtra.isEmpty() && taskVenueExtra.isEmpty()) {
+			result += displayLineSeparator();
+
+		}
+
+		if (!taskDescriptionExtra.isEmpty() || !taskVenueExtra.isEmpty()) {
+			double descriptionLines = Math
+					.ceil(taskDescriptionExtra.length() / 25.0);
+			double venueLines = Math.ceil(taskVenueExtra.length() / 17.0);
+
+			if (venueLines == descriptionLines) {
+				for (int i = 0; i < venueLines - 1; i++) {
+					String displayVenue = taskVenueExtra.substring(0, 17);
+					String displayDescription = taskDescriptionExtra.substring(
+							0, 25);
+					taskVenueExtra = taskVenueExtra.substring(17);
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+
+					if (number < maximumWidth) {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									" |",
+									ansi().fg(YELLOW).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(YELLOW).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), " |",
+									ansi().fg(RED).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(RED).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), " |",
+									ansi().fg(CYAN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(CYAN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |", ansi().fg(GREEN)
+											.a(displayDescription).reset(),
+									"|", ansi().fg(GREEN).a(displayVenue)
+											.reset(), "|", "           |", "",
+									"");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
+									ansi().fg(MAGENTA).a(displayDescription)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(displayVenue).reset(), "|",
+									"           |", "", "");
+						}
+					} else {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									"|", ansi().fg(YELLOW)
+											.a(displayDescription).reset(),
+									"|", ansi().fg(YELLOW).a(displayVenue)
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), "|",
+									ansi().fg(RED).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(RED).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), "|",
+									ansi().fg(CYAN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(CYAN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(), "|",
+									ansi().fg(GREEN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(GREEN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|",
+									ansi().fg(MAGENTA).a(displayDescription)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(displayVenue).reset(), "|",
+									"           |", "", "");
+						}
+					}
+				}
+				if (number < maximumWidth) {
+					if (completed) {
+						result += String.format(
+								DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(YELLOW).a(nullSpace).reset(), " |",
+								ansi().fg(YELLOW).a(taskDescriptionExtra)
+										.reset(), "|",
+								ansi().fg(YELLOW).a(taskVenueExtra).reset(),
+								"|", "           |", "", "");
+						result += displayLineSeparator();
+
+					} else if (status == PRESENT) {
+						result += String.format(
+								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
+										.a(nullSpace).reset(), " |",
+								ansi().fg(RED).a(taskDescriptionExtra).reset(),
+								"|", ansi().fg(RED).a(taskVenueExtra).reset(),
+								"|", "           |", "", "");
+						result += displayLineSeparator();
+					} else if (status == PAST) {
+						result += String
+								.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+										.fg(CYAN).a(nullSpace).reset(), " |",
+										ansi().fg(CYAN).a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(CYAN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+						result += displayLineSeparator();
+					} else if (status == FUTURE) {
+						result += String.format(
+								DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(GREEN).a(nullSpace).reset(), " |",
+								ansi().fg(GREEN).a(taskDescriptionExtra)
+										.reset(), "|",
+								ansi().fg(GREEN).a(taskVenueExtra).reset(),
+								"|", "           |", "", "");
+						result += displayLineSeparator();
+					} else {
+						result += String.format(
+								DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(MAGENTA).a(nullSpace).reset(), " |",
+								ansi().fg(MAGENTA).a(taskDescriptionExtra)
+										.reset(), "|",
+								ansi().fg(MAGENTA).a(taskVenueExtra).reset(),
+								"|", "           |", "", "");
+						result += displayLineSeparator();
+
+					}
+				} else {
+					if (completed) {
+						result += String.format(
+								DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(YELLOW).a(nullSpace).reset(), "|",
+								ansi().fg(YELLOW).a(taskDescriptionExtra)
+										.reset(), "|",
+								ansi().fg(YELLOW).a(taskVenueExtra).reset(),
+								"|", "           |", "", "");
+						result += displayLineSeparator();
+
+					} else if (status == PRESENT) {
+						result += String.format(
+								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
+										.a(nullSpace).reset(), "|",
+								ansi().fg(RED).a(taskDescriptionExtra).reset(),
+								"|", ansi().fg(RED).a(taskVenueExtra).reset(),
+								"|", "           |", "", "");
+						result += displayLineSeparator();
+					} else if (status == PAST) {
+						result += String
+								.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+										.fg(CYAN).a(nullSpace).reset(), "|",
+										ansi().fg(CYAN).a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(CYAN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+						result += displayLineSeparator();
+					} else if (status == FUTURE) {
+						result += String.format(
+								DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(GREEN).a(nullSpace).reset(), "|",
+								ansi().fg(GREEN).a(taskDescriptionExtra)
+										.reset(), "|",
+								ansi().fg(GREEN).a(taskVenueExtra).reset(),
+								"|", "           |", "", "");
+						result += displayLineSeparator();
+					} else {
+						result += String.format(
+								DISPLAY_TABLE_ROW_STRING_FORMAT,
+								ansi().fg(MAGENTA).a(nullSpace).reset(), "|",
+								ansi().fg(MAGENTA).a(taskDescriptionExtra)
+										.reset(), "|",
+								ansi().fg(MAGENTA).a(taskVenueExtra).reset(),
+								"|", "           |", "", "");
+						result += displayLineSeparator();
+
+					}
+				}
+			}
+
+			else if (venueLines > descriptionLines) {
+
+				for (int i = 0; i < descriptionLines - 1; i++) {
+					String displayVenue = taskVenueExtra.substring(0, 17);
+					String displayDescription = taskDescriptionExtra.substring(
+							0, 25);
+
+					if (number < maximumWidth) {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									" |",
+									ansi().fg(YELLOW).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(YELLOW).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						}
+
+						else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), " |",
+									ansi().fg(RED).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(RED).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), " |",
+									ansi().fg(CYAN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(CYAN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |", ansi().fg(GREEN)
+											.a(displayDescription).reset(),
+									"|", ansi().fg(GREEN).a(displayVenue)
+											.reset(), "|", "           |", "",
+									"");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
+									ansi().fg(MAGENTA).a(displayDescription)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(displayVenue).reset(), "|",
+									"           |", "", "");
+						}
+					} else {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									"|", ansi().fg(YELLOW)
+											.a(displayDescription).reset(),
+									"|", ansi().fg(YELLOW).a(displayVenue)
+											.reset(), "|", "           |", "",
+									"");
+						}
+
+						else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), "|",
+									ansi().fg(RED).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(RED).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), "|",
+									ansi().fg(CYAN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(CYAN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(), "|",
+									ansi().fg(GREEN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(GREEN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|",
+									ansi().fg(MAGENTA).a(displayDescription)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(displayVenue).reset(), "|",
+									"           |", "", "");
+						}
+					}
+					taskVenueExtra = taskVenueExtra.substring(17);
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+				}
+				if (venueLines - descriptionLines - 1 == 0) {
+					if (number < maximumWidth) {
+						if (completed) {
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(YELLOW)
+													.a(taskDescriptionExtra)
+													.reset(), "|",
+											ansi().fg(YELLOW).a(taskVenueExtra)
+													.reset(), "|",
+											"           |", "", "");
+						} else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), " |",
+									ansi().fg(RED).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(RED).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), " |",
+									ansi().fg(CYAN).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(CYAN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |",
+									ansi().fg(GREEN).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(GREEN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
+									ansi().fg(MAGENTA).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(taskVenueExtra).reset(), "|",
+									"           |", "", "");
+						}
+					} else {
+						if (completed) {
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(YELLOW)
+													.a(taskDescriptionExtra)
+													.reset(), "|",
+											ansi().fg(YELLOW).a(taskVenueExtra)
+													.reset(), "|",
+											"           |", "", "");
+						} else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), "|",
+									ansi().fg(RED).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(RED).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), "|",
+									ansi().fg(CYAN).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(CYAN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(), "|",
+									ansi().fg(GREEN).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(GREEN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|",
+									ansi().fg(MAGENTA).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(taskVenueExtra).reset(), "|",
+									"           |", "", "");
+						}
+					}
+					result += displayLineSeparator();
+
+				} else {
+					if (number < maximumWidth) {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									" |",
+									ansi().fg(YELLOW).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(YELLOW)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(),
+									" |",
+									ansi().fg(RED).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(RED)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(),
+									" |",
+									ansi().fg(CYAN).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(CYAN)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |",
+									ansi().fg(GREEN).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(GREEN)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
+									ansi().fg(MAGENTA).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						}
+					} else {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									"|",
+									ansi().fg(YELLOW).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(YELLOW)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(),
+									"|",
+									ansi().fg(RED).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(RED)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(),
+									"|",
+									ansi().fg(CYAN).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(CYAN)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									"|",
+									ansi().fg(GREEN).a(taskDescriptionExtra)
+											.reset(),
+									"|",
+									ansi().fg(GREEN)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|",
+									ansi().fg(MAGENTA).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(taskVenueExtra.substring(0, 17))
+											.reset(), "|", "           |", "",
+									"");
+						}
+					}
+
+					taskVenueExtra = taskVenueExtra.substring(17);
+
+					for (int i = 0; i < venueLines - descriptionLines - 1; i++) {
+						if (taskVenueExtra.length() > 17) {
+
+							if (number < maximumWidth) {
+								if (completed) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(YELLOW).a("").reset(),
+											"|",
+											ansi().fg(YELLOW)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else if (status == PRESENT) {
+									result += String
+											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+													ansi().fg(RED).a(nullSpace)
+															.reset(),
+													" |",
+													ansi().fg(RED).a("")
+															.reset(),
+													"|",
+													ansi().fg(RED)
+															.a(taskVenueExtra
+																	.substring(
+																			0,
+																			17))
+															.reset(), "|",
+													"           |", "", "");
+								} else if (status == PAST) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(CYAN).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(CYAN).a("").reset(),
+											"|",
+											ansi().fg(CYAN)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else if (status == FUTURE) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(GREEN).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(GREEN).a("").reset(),
+											"|",
+											ansi().fg(GREEN)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(MAGENTA).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(MAGENTA).a("").reset(),
+											"|",
+											ansi().fg(MAGENTA)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								}
+							} else {
+								if (completed) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(YELLOW).a("").reset(),
+											"|",
+											ansi().fg(YELLOW)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else if (status == PRESENT) {
+									result += String
+											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+													ansi().fg(RED).a(nullSpace)
+															.reset(),
+													"|",
+													ansi().fg(RED).a("")
+															.reset(),
+													"|",
+													ansi().fg(RED)
+															.a(taskVenueExtra
+																	.substring(
+																			0,
+																			17))
+															.reset(), "|",
+													"           |", "", "");
+								} else if (status == PAST) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(CYAN).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(CYAN).a("").reset(),
+											"|",
+											ansi().fg(CYAN)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else if (status == FUTURE) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(GREEN).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(GREEN).a("").reset(),
+											"|",
+											ansi().fg(GREEN)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								} else {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(MAGENTA).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(MAGENTA).a("").reset(),
+											"|",
+											ansi().fg(MAGENTA)
+													.a(taskVenueExtra
+															.substring(0, 17))
+													.reset(), "|",
+											"           |", "", "");
+								}
+							}
+							taskVenueExtra = taskVenueExtra.substring(17);
+						}
+
+					}
+
+					if (number < maximumWidth) {
+						if (completed) {
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(), " |",
+											ansi().fg(YELLOW).a("").reset(),
+											"|",
+											ansi().fg(YELLOW).a(taskVenueExtra)
+													.reset(), "|",
+											"           |", "", "");
+						}
+
+						else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), " |",
+									ansi().fg(RED).a("").reset(), "|", ansi()
+											.fg(RED).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), " |",
+									ansi().fg(CYAN).a("").reset(), "|",
+									ansi().fg(CYAN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |", ansi().fg(GREEN).a("").reset(), "|",
+									ansi().fg(GREEN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |", ansi().fg(MAGENTA).a("").reset(),
+									"|", ansi().fg(MAGENTA).a(taskVenueExtra)
+											.reset(), "|", "           |", "",
+									"");
+						}
+					} else {
+						if (completed) {
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(), "|",
+											ansi().fg(YELLOW).a("").reset(),
+											"|",
+											ansi().fg(YELLOW).a(taskVenueExtra)
+													.reset(), "|",
+											"           |", "", "");
+						}
+
+						else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), "|",
+									ansi().fg(RED).a("").reset(), "|", ansi()
+											.fg(RED).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), "|",
+									ansi().fg(CYAN).a("").reset(), "|",
+									ansi().fg(CYAN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(), "|",
+									ansi().fg(GREEN).a("").reset(), "|", ansi()
+											.fg(GREEN).a(taskVenueExtra)
+											.reset(), "|", "           |", "",
+									"");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|", ansi().fg(MAGENTA).a("").reset(), "|",
+									ansi().fg(MAGENTA).a(taskVenueExtra)
+											.reset(), "|", "           |", "",
+									"");
+						}
+					}
+
+					result += displayLineSeparator();
+				}
+
+			}
+
+			else if (descriptionLines > venueLines) {
+				for (int i = 0; i < venueLines - 1; i++) {
+					String displayVenue = taskVenueExtra.substring(0, 17);
+					String displayDescription = taskDescriptionExtra.substring(
+							0, 25);
+
+					if (number < maximumWidth) {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									" |",
+									ansi().fg(YELLOW).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(YELLOW).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), " |",
+									ansi().fg(RED).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(RED).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), " |",
+									ansi().fg(CYAN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(CYAN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |", ansi().fg(GREEN)
+											.a(displayDescription).reset(),
+									"|", ansi().fg(GREEN).a(displayVenue)
+											.reset(), "|", "           |", "",
+									"");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
+									ansi().fg(MAGENTA).a(displayDescription)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(displayVenue).reset(), "|",
+									"           |", "", "");
+						}
+
+					} else {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									"|", ansi().fg(YELLOW)
+											.a(displayDescription).reset(),
+									"|", ansi().fg(YELLOW).a(displayVenue)
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), "|",
+									ansi().fg(RED).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(RED).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), "|",
+									ansi().fg(CYAN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(CYAN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(), "|",
+									ansi().fg(GREEN).a(displayDescription)
+											.reset(), "|",
+									ansi().fg(GREEN).a(displayVenue).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|",
+									ansi().fg(MAGENTA).a(displayDescription)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a(displayVenue).reset(), "|",
+									"           |", "", "");
+						}
+					}
+					taskVenueExtra = taskVenueExtra.substring(17);
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+				}
+
+				if (descriptionLines - venueLines - 1 == 0) {
+					if (taskDescriptionExtra.length() > 25) {
+						if (number < maximumWidth) {
+							if (completed) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(YELLOW).a(nullSpace).reset(),
+										" |",
+										ansi().fg(YELLOW)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi()
+												.fg(YELLOW).a(taskVenueExtra)
+												.reset(), "|", "           |",
+										"", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(YELLOW).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(YELLOW)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(YELLOW).a("")
+														.reset(), "|",
+												"           |", "", "");
+							} else if (status == PRESENT) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(RED).a(nullSpace).reset(),
+										" |",
+										ansi().fg(RED)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi().fg(RED)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(RED).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(RED)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(RED).a("").reset(),
+												"|", "           |", "", "");
+							} else if (status == PAST) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(CYAN).a(nullSpace).reset(),
+										" |",
+										ansi().fg(CYAN)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi().fg(CYAN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(CYAN).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(CYAN)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|",
+												ansi().fg(CYAN).a("").reset(),
+												"|", "           |", "", "");
+							} else if (status == FUTURE) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(GREEN).a(nullSpace).reset(),
+										" |",
+										ansi().fg(GREEN)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi().fg(GREEN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(GREEN).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(GREEN)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(GREEN).a("")
+														.reset(), "|",
+												"           |", "", "");
+							}
+
+							else {
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(MAGENTA).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(MAGENTA)
+														.a(taskDescriptionExtra
+																.substring(0,
+																		25))
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskVenueExtra)
+														.reset(), "|",
+												"           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(MAGENTA).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(MAGENTA)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(MAGENTA).a("")
+														.reset(), "|",
+												"           |", "", "");
+							}
+
+						} else {
+							if (completed) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(YELLOW).a(nullSpace).reset(),
+										"|",
+										ansi().fg(YELLOW)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi()
+												.fg(YELLOW).a(taskVenueExtra)
+												.reset(), "|", "           |",
+										"", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(YELLOW).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(YELLOW)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(YELLOW).a("")
+														.reset(), "|",
+												"           |", "", "");
+							} else if (status == PRESENT) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(RED).a(nullSpace).reset(),
+										"|",
+										ansi().fg(RED)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi().fg(RED)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(RED).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(RED)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(RED).a("").reset(),
+												"|", "           |", "", "");
+							} else if (status == PAST) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(CYAN).a(nullSpace).reset(),
+										"|",
+										ansi().fg(CYAN)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi().fg(CYAN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(CYAN).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(CYAN)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|",
+												ansi().fg(CYAN).a("").reset(),
+												"|", "           |", "", "");
+							} else if (status == FUTURE) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(GREEN).a(nullSpace).reset(),
+										"|",
+										ansi().fg(GREEN)
+												.a(taskDescriptionExtra
+														.substring(0, 25))
+												.reset(), "|", ansi().fg(GREEN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(GREEN).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(GREEN)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(GREEN).a("")
+														.reset(), "|",
+												"           |", "", "");
+							}
+
+							else {
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(MAGENTA).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskDescriptionExtra
+																.substring(0,
+																		25))
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskVenueExtra)
+														.reset(), "|",
+												"           |", "", "");
+
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(MAGENTA).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskDescriptionExtra
+																.substring(25))
+														.reset(), "|", ansi()
+														.fg(MAGENTA).a("")
+														.reset(), "|",
+												"           |", "", "");
+							}
+						}
+						result += displayLineSeparator();
+					} else {
+
+						if (number < maximumWidth) {
+							if (completed) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(YELLOW).a(nullSpace).reset(),
+										" |",
+										ansi().fg(YELLOW)
+												.a(taskDescriptionExtra)
+												.reset(), "|", ansi()
+												.fg(YELLOW).a(taskVenueExtra)
+												.reset(), "|", "           |",
+										"", "");
+							}
+
+							else if (status == PRESENT) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+												.fg(RED).a(nullSpace).reset(),
+										" |",
+										ansi().fg(RED).a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(RED)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else if (status == PAST) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+												.fg(CYAN).a(nullSpace).reset(),
+										" |",
+										ansi().fg(CYAN).a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(CYAN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else if (status == FUTURE) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(GREEN).a(nullSpace).reset(),
+										" |",
+										ansi().fg(GREEN)
+												.a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(GREEN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else {
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(MAGENTA).a(nullSpace)
+														.reset(),
+												" |",
+												ansi().fg(MAGENTA)
+														.a(taskDescriptionExtra)
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskVenueExtra)
+														.reset(), "|",
+												"           |", "", "");
+							}
+						} else {
+							if (completed) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(YELLOW).a(nullSpace).reset(),
+										"|",
+										ansi().fg(YELLOW)
+												.a(taskDescriptionExtra)
+												.reset(), "|", ansi()
+												.fg(YELLOW).a(taskVenueExtra)
+												.reset(), "|", "           |",
+										"", "");
+							}
+
+							else if (status == PRESENT) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+												.fg(RED).a(nullSpace).reset(),
+										"|",
+										ansi().fg(RED).a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(RED)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else if (status == PAST) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
+												.fg(CYAN).a(nullSpace).reset(),
+										"|",
+										ansi().fg(CYAN).a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(CYAN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else if (status == FUTURE) {
+								result += String.format(
+										DISPLAY_TABLE_ROW_STRING_FORMAT,
+										ansi().fg(GREEN).a(nullSpace).reset(),
+										"|",
+										ansi().fg(GREEN)
+												.a(taskDescriptionExtra)
+												.reset(), "|", ansi().fg(GREEN)
+												.a(taskVenueExtra).reset(),
+										"|", "           |", "", "");
+							} else {
+								result += String
+										.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+												ansi().fg(MAGENTA).a(nullSpace)
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskDescriptionExtra)
+														.reset(),
+												"|",
+												ansi().fg(MAGENTA)
+														.a(taskVenueExtra)
+														.reset(), "|",
+												"           |", "", "");
+							}
+						}
+						result += displayLineSeparator();
+					}
+
+				}
+
+				else {
+
+					if (number < maximumWidth) {
+						if (completed) {
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(YELLOW)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(YELLOW).a(taskVenueExtra)
+													.reset(), "|",
+											"           |", "", "");
+						}
+
+						else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(),
+									" |",
+									ansi().fg(RED)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(RED).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(),
+									" |",
+									ansi().fg(CYAN)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(CYAN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |",
+									ansi().fg(GREEN)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(GREEN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
+									ansi().fg(MAGENTA)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(MAGENTA).a(taskVenueExtra)
+											.reset(), "|", "           |", "",
+									"");
+						}
+
+					} else {
+						if (completed) {
+							result += String
+									.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(YELLOW)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(YELLOW).a(taskVenueExtra)
+													.reset(), "|",
+											"           |", "", "");
+						}
+
+						else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(),
+									"|",
+									ansi().fg(RED)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(RED).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(),
+									"|",
+									ansi().fg(CYAN)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(CYAN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									"|",
+									ansi().fg(GREEN)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(GREEN).a(taskVenueExtra).reset(),
+									"|", "           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|",
+									ansi().fg(MAGENTA)
+											.a(taskDescriptionExtra.substring(
+													0, 25)).reset(), "|",
+									ansi().fg(MAGENTA).a(taskVenueExtra)
+											.reset(), "|", "           |", "",
+									"");
+						}
+
+					}
+					taskDescriptionExtra = taskDescriptionExtra.substring(25);
+
+					for (int i = 0; i < descriptionLines - venueLines - 1; i++) {
+						if (taskDescriptionExtra.length() > 25) {
+							if (number < maximumWidth) {
+								if (completed) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(YELLOW)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(YELLOW).a("").reset(),
+											"|", "           |", "", "");
+								} else if (status == PRESENT) {
+									result += String
+											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+													ansi().fg(RED).a(nullSpace)
+															.reset(),
+													" |",
+													ansi().fg(RED)
+															.a(taskDescriptionExtra
+																	.substring(
+																			0,
+																			25))
+															.reset(), "|",
+													ansi().fg(RED).a("")
+															.reset(), "|",
+													"           |", "", "");
+								} else if (status == PAST) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(CYAN).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(CYAN)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(CYAN).a("").reset(), "|",
+											"           |", "", "");
+								} else if (status == FUTURE) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(GREEN).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(GREEN)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(GREEN).a("").reset(),
+											"|", "           |", "", "");
+								} else {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(MAGENTA).a(nullSpace)
+													.reset(),
+											" |",
+											ansi().fg(MAGENTA)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(MAGENTA).a("").reset(),
+											"|", "           |", "", "");
+								}
+							} else {
+								if (completed) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(YELLOW).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(YELLOW)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(YELLOW).a("").reset(),
+											"|", "           |", "", "");
+								} else if (status == PRESENT) {
+									result += String
+											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
+													ansi().fg(RED).a(nullSpace)
+															.reset(),
+													"|",
+													ansi().fg(RED)
+															.a(taskDescriptionExtra
+																	.substring(
+																			0,
+																			25))
+															.reset(), "|",
+													ansi().fg(RED).a("")
+															.reset(), "|",
+													"           |", "", "");
+								} else if (status == PAST) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(CYAN).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(CYAN)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(CYAN).a("").reset(), "|",
+											"           |", "", "");
+								} else if (status == FUTURE) {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(GREEN).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(GREEN)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(GREEN).a("").reset(),
+											"|", "           |", "", "");
+								} else {
+									result += String.format(
+											DISPLAY_TABLE_ROW_STRING_FORMAT,
+											ansi().fg(MAGENTA).a(nullSpace)
+													.reset(),
+											"|",
+											ansi().fg(MAGENTA)
+													.a(taskDescriptionExtra
+															.substring(0, 25))
+													.reset(), "|",
+											ansi().fg(MAGENTA).a("").reset(),
+											"|", "           |", "", "");
+								}
+							}
+							taskDescriptionExtra = taskDescriptionExtra
+									.substring(25);
+						}
+					}
+					if (number < maximumWidth) {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									" |",
+									ansi().fg(YELLOW).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(YELLOW).a("").reset(), "|",
+									"           |", "", "");
+						} else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), " |",
+									ansi().fg(RED).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(RED).a("")
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), " |",
+									ansi().fg(CYAN).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(CYAN)
+											.a("").reset(), "|",
+									"           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(),
+									" |",
+									ansi().fg(GREEN).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(GREEN).a("").reset(), "|",
+									"           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									" |",
+									ansi().fg(MAGENTA).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a("").reset(), "|",
+									"           |", "", "");
+						}
+					} else {
+						if (completed) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(YELLOW).a(nullSpace).reset(),
+									"|",
+									ansi().fg(YELLOW).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(YELLOW).a("").reset(), "|",
+									"           |", "", "");
+						} else if (status == PRESENT) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(RED).a(nullSpace).reset(), "|",
+									ansi().fg(RED).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(RED).a("")
+											.reset(), "|", "           |", "",
+									"");
+						} else if (status == PAST) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(CYAN).a(nullSpace).reset(), "|",
+									ansi().fg(CYAN).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(CYAN)
+											.a("").reset(), "|",
+									"           |", "", "");
+						} else if (status == FUTURE) {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(GREEN).a(nullSpace).reset(), "|",
+									ansi().fg(GREEN).a(taskDescriptionExtra)
+											.reset(), "|",
+									ansi().fg(GREEN).a("").reset(), "|",
+									"           |", "", "");
+						} else {
+							result += String.format(
+									DISPLAY_TABLE_ROW_STRING_FORMAT,
+									ansi().fg(MAGENTA).a(nullSpace).reset(),
+									"|",
+									ansi().fg(MAGENTA).a(taskDescriptionExtra)
+											.reset(), "|", ansi().fg(MAGENTA)
+											.a("").reset(), "|",
+									"           |", "", "");
+						}
+					}
+					result += displayLineSeparator();
+
+				}
+
+			}
+
+		}
+
+		return result;
+	}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+	 */
+
+	/*
+	 * This method displays the top header of display table.
+	 */
+	public static void displayTop() {
+		String resultTop = "";
+		resultTop += DisplayHandler.displayLineSeparatorHeader();
+		resultTop += String.format(
+				DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
+						.a("ID").reset(), "  |",
+				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|",
+				ansi().fg(CYAN).a(" VENUE").reset(), "|",
+				ansi().fg(YELLOW).a(" TIME").reset(), "|",
+				ansi().fg(GREEN).a(" DATE").reset());
+		resultTop += DisplayHandler.displayLineSeparatorHeader();
+		System.out.print(resultTop);
+	}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+	 */
+
+	/*
+	 * This method displays the bottom header of display table.
+	 */
+	public static void displayBottom() {
+		String resultBottom = "";
+		resultBottom += String.format(
+				DisplayHandler.DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
+						.a("ID").reset(), "  |",
+				ansi().fg(MAGENTA).a(" DESCRIPTION").reset(), "|",
+				ansi().fg(CYAN).a(" VENUE").reset(), "|",
+				ansi().fg(YELLOW).a(" TIME").reset(), "|",
+				ansi().fg(GREEN).a(" DATE").reset());
+		resultBottom += DisplayHandler.displayLineSeparatorHeader();
+		System.out.print(resultBottom);
+	}
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+	 */
+
+	/*
+	 * This method displays the contents of the display table.
+	 */
+	public static void displayContents(int number, Task task) {
+		String print = "";
+		int index = number;
+		print += displayTaskInTable(index, task);
+		System.out.print(print);
+	}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\DisplayHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\SearchHandler.java
+	 */
+
+/**
+ * This class handles the searching of tasks.
+ */
+public class SearchHandler extends CommandHandler {
+	private SearchParser parser;
+	private static Storage storage = Storage.getInstance();
+
+	/*
+	 * This method passes the user input and current task list to the search
+	 * parser.
+	 */
+	public SearchHandler(String details) {
+		super(details);
+		ArrayList<Task> tasks = storage.getTasks();
+		parser = new SearchParser(details, tasks);
+	}
+
+	/*
+	 * This method overrides the main execute() function of CommandHandler. 
+	 * @see main.logic.CommandHandler#execute()
+	 */
+	@Override
+	public String execute() {
+		return parser.parse();
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\SearchHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\SearchParser.java
+	 */
+
+/**
+ * This class parses through the user input and prints out either the valid
+ * searched items or the appropriate messages if search keyword is not valid.
+ */
+public class SearchParser extends CommandParser {
+	public static final String MESSAGE_ERROR = "Would you like to search \"floating\", \"past\", \"today\" or \"future\"?.";
+	public static final String MESSAGE_NULL = "Task list is empty. There is nothing to search from.";
+	public static final String MESSAGE_UNAVAILABLE = "Tasker can't find what you asked for. Perhaps you could try another keyword?";
+	public static final String MESSAGE_SEARCH = "List of tasks containing";
+	public static final String MESSAGE_NOT_TODAY = "There are no tasks due today.";
+	public static final String MESSAGE_TODAY = "These are the tasks due today.";
+	public static final String MESSAGE_PAST = "These are the tasks that were due in the past";
+	public static final String MESSAGE_FLOAT = "This is the list of floating tasks";
+	public static final String MESSAGE_NOT_FLOAT = "There are no floating tasks in the list currently.";
+	public static final String MESSAGE_NOT_PAST = "There are no past tasks in the list.";
+	public static final String MESSAGE_FUTURE = "These are the lists of upcoming tasks.";
+	public static final String MESSAGE_NOT_FUTURE = "There are no upcoming tasks from tomorrow onwards.";
+	public static final String MESSAGE_LONGER = "A search keyword should be longer than one character. Try again?";
+
+	public static String returnMessage = "";
+	public static String lowerCaseKey = "";
+
+	private String userInput;
+	private ArrayList<Task> list;
+
+	public SearchParser(String arguments, ArrayList<Task> tasks) {
+		super(arguments);
+		userInput = arguments;
+		list = tasks;
+
+	}
+
+	/*
+	 * This method overwrites the parse() method of the CommandParser class. It
+	 * checks what message to return based on the input, and prints out the
+	 * valid return message.
+	 * 
+	 * @see main.logic.CommandParser#parse()
+	 */
+	@Override
+	public String parse() {
+		int oneCharacter = 1;
+
+		if (list.isEmpty()) {
+			return MESSAGE_NULL;
+		}
+
+		else if (userInput.equals("")) {
+			return MESSAGE_ERROR;
+		}
+
+		else if (userInput.toLowerCase().equals("today")) {
+			if (isToday()) {
+				System.out.println();
+				System.out.println(MESSAGE_TODAY);
+				DisplayHandler.displayTop();
+
+				for (int i = 0; i < list.size(); i++) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.PRESENT) {
+						DisplayHandler.displayContents(i, list.get(i));
+					}
+				}
+
+				DisplayHandler.displayBottom();
+
+			} else {
+				System.out.println(MESSAGE_NOT_TODAY);
+			}
+
+			return returnMessage;
+		}
+
+		else if (userInput.toLowerCase().equals("past")) {
+			if (isPast()) {
+
+				System.out.println();
+				System.out.println(MESSAGE_PAST);
+				DisplayHandler.displayTop();
+
+				for (int i = 0; i < list.size(); i++) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.PAST) {
+						DisplayHandler.displayContents(i, list.get(i));
+					}
+				}
+
+				DisplayHandler.displayBottom();
+
+			} else {
+				System.out.println(MESSAGE_NOT_PAST);
+			}
+
+			return returnMessage;
+		}
+
+		else if (userInput.toLowerCase().equals("floating")) {
+			if (isFloating()) {
+				System.out.println();
+				System.out.println(MESSAGE_FLOAT);
+				DisplayHandler.displayTop();
+
+				for (int i = 0; i < list.size(); i++) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.TASK_DOES_NOT_HAVE_DATE_TIME ) {
+						DisplayHandler.displayContents(i, list.get(i));
+					}
+				}
+
+				DisplayHandler.displayBottom();
+			} else {
+				System.out.println(MESSAGE_NOT_FLOAT);
+			}
+			return returnMessage;
+		}
+
+		else if (userInput.toLowerCase().equals("future")) {
+			if (isFuture()) {
+
+				System.out.println();
+				System.out.println(MESSAGE_FUTURE);
+				DisplayHandler.displayTop();
+
+				for (int i = 0; i < list.size(); i++) {
+					if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.FUTURE) {
+						DisplayHandler.displayContents(i, list.get(i));
+					}
+				}
+
+				DisplayHandler.displayBottom();
+
+			} else {
+				System.out.println(MESSAGE_NOT_FUTURE);
+			}
+
+			return returnMessage;
+		}
+
+		else if (!isWithin(userInput)) {
+			return MESSAGE_UNAVAILABLE;
+		}
+
+		else if (userInput.length() == oneCharacter) {
+			return MESSAGE_UNAVAILABLE;
+		}
+
+		else if (isWithin(userInput)) {
+			lowerCaseKey = userInput.toLowerCase();
+
+			System.out.println();
+			System.out.println(MESSAGE_SEARCH + " " + "'"
+					+ ansi().fg(RED).a(userInput).reset() + "'" + ": ");
+			DisplayHandler.displayTop();
+
+			for (int i = 0; i < list.size(); i++) {
+				if (list.get(i).toString().toLowerCase().contains(lowerCaseKey)) {
+					DisplayHandler.displayContents(i, list.get(i));
+				}
+			}
+
+			DisplayHandler.displayBottom();
+
+			return returnMessage;
+		}
+		return returnMessage;
+	}
+
+	/**
+	 * This method checks whether the keyword is within the task list.
+	 * 
+	 * @param input
+	 * @return
+	 */
+	private boolean isWithin(String input) {
+
+		lowerCaseKey = userInput.toLowerCase();
+
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).getDescription().toString().toLowerCase()
+					.contains(lowerCaseKey)) {
+				return true;
+			} else if (list.get(i).hasVenue()
+					&& list.get(i).getVenue().toString().toLowerCase()
+							.contains(lowerCaseKey)
+					&& !list.get(i).getVenue().contains("null")) {
+
+				return true;
+			} else if (list.get(i).hasStartDate()
+					&& list.get(i).getStartDate().toString()
+							.contains(lowerCaseKey)) {
+
+				return true;
+			} else if (list.get(i).hasStartTime()
+					&& list.get(i).getStartTime().toString()
+							.contains(lowerCaseKey)) {
+
+				return true;
+			} else if (list.get(i).hasEndDate()
+					&& list.get(i).getEndDate().toString()
+							.contains(lowerCaseKey)) {
+
+				return true;
+			} else if (list.get(i).hasEndTime()
+					&& list.get(i).getEndTime().toString()
+							.contains(lowerCaseKey)) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * This method checks whether there are any tasks to do from the current
+	 * time until the end of the current day.
+	 * 
+	 * @return
+	 */
+	private boolean isToday() {
+		for (int i = 0; i < list.size(); i++) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.PRESENT) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This method checks whether there were any tasks that were already due.
+	 * 
+	 * @return
+	 */
+	private boolean isPast() {
+		for (int i = 0; i < list.size(); i++) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.PAST) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This method checks whether there are tasks due from the next day onwards.
+	 * 
+	 * @return
+	 */
+	private boolean isFuture() {
+		for (int i = 0; i < list.size(); i++) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.FUTURE) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This method checks whether there are any floating tasks.
+	 * 
+	 * @return
+	 */
+	private boolean isFloating() {
+		for (int i = 0; i < list.size(); i++) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.TASK_DOES_NOT_HAVE_DATE_TIME) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\logic\SearchParser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\TaskerLog.java
+	 */
+
+/*
+ * This class contains the logging function used for defensive coding. 
+ */
+public class TaskerLog {
+	private static TaskerLog TaskerLogger = null;
+	private FileHandler fh;
+	private final static String fileName = "TaskerLogger.txt";
+	private final static Logger logger = Logger.getLogger("TaskerLogger");
+
+	public static TaskerLog getInstance() {
+		if (TaskerLogger == null) {
+			TaskerLogger = new TaskerLog();
+		}
+		return TaskerLogger;
+	}
+
+	private TaskerLog() {
+		try {
+			fh = new FileHandler(fileName, false);
+			logger.addHandler(fh);
+			logger.setUseParentHandlers(false);
+		} catch (SecurityException e) {
+			logger.severe("TaskerLog securityException " + e.getMessage());
+		} catch (IOException e) {
+			logger.severe("TaskerLog IOException " + e.getMessage());
+		}
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	private void logException(String Exception) {
+
+		MyFormatter formatter = new MyFormatter("Exception: ");
+		fh.setFormatter(formatter);
+		logger.severe(Exception);
+	}
+
+	private void logInfo(String input) {
+
+		MyFormatter formatter = new MyFormatter("Info: ");
+		fh.setFormatter(formatter);
+		logger.info(input);
+	}
+	
+	/*
+	 * This method is the public method used to log information.
+	 */
+	public static void logSystemInfo(String logInfo) {
+		TaskerLog infoLogger = TaskerLog.getInstance();
+		infoLogger.logInfo(logInfo);
+	}
+	
+	/*
+	 * This method is the public method used to log exceptions.
+	 */
+	public static void logSystemExceptionError(String logMessage) {
+		TaskerLog exceptionLogger = TaskerLog.getInstance();
+		exceptionLogger.logException(logMessage);
+	}
+}
+
+class MyFormatter extends Formatter {
+	private String callerInfo;
+
+	public MyFormatter(String callerInfo) {
+		if (callerInfo == null) {
+			this.callerInfo = "";
+		}
+		this.callerInfo = callerInfo;
+	}
+
+	@Override
+	public String format(LogRecord record) {
+		return callerInfo + record.getMessage() + "\n";
+	}
+}
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\TaskerLog.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\ui\TabCompletion.java
+	 */
+
+/**
+ * This class takes care of the tab completion aspect of Tasker and passes valid
+ * commands to the Logic class.
+ */
+public class TabCompletion {
+	private static String line;
+	private static final String MESSAGE_PROMPT = "Enter Command: ";
+	private static final String DISPLAY_ADD = "\033[1madd:\033[0m\n\n";
+	private static final String MESSAGE_ADD = "This is the command to add a new task to Tasker.\nYou can add tasks in a few different formats.\nTo add a new floating task, type \033[1madd\033[0m [description] \033[1mat\033[0m [venue]\n"
+			+ "To add a new timed task, type \033[1madd\033[0m [description] \033[1mat\033[0m [venue] \033[1mfrom\033[0m [start date] [start time] \033[1mto\033[0m [end date][end time]\n"
+			+ "To add a new deadline task, type \033[1madd\033[0m [description] \033[1mat\033[0m [venue] \033[1mat\033[0m [time]\n"
+			+ "For time, the acceptable formats are: \033[1m11am, 11.30pm\033[0m\n"
+			+ "For date, the acceptable formats are: \033[1m5 December, 5 December 2014, 5/12, 5/12/2014, Thursday, next Thursday\033[0m\n\n";
+	private static final String DISPLAY_DELETE = "\033[1mdelete:\033[0m\n\n";
+	private static final String MESSAGE_DELETE = "This is the command to delete task(s) from Tasker.\n"
+			+ "To delete a single task, type \033[1mdelete\033[0m [task index]\n"
+			+ "To delete multiple tasks, type \033[1mdelete\033[0m [task index] [task index] etc\n\n"
+			+ "To delete all the tasks, type \033[1mdelete all\033[0m";
+	private static final String DISPLAY_DISPLAY = "\033[1mdisplay:\033[0m\n\n";
+	private static final String MESSAGE_DISPLAY = "This is the command to display the lists of tasks you have in Tasker.\n"
+			+ "Simply type \033[1mdisplay\033[0m to see the task list.\n\n";
+	private static final String DISPLAY_SEARCH = "\033[1msearch:\033[0m\n\n";
+	private static final String MESSAGE_SEARCH = "This is the command to search for specific tasks in the list.\n"
+			+ "To search for a keyword from the task description/venue, type \033[1msearch\033[0m [keyword]\n"
+			+ "To search for tasks due today, type \033[1msearch today\033[0m\n"
+			+ "To search for floating tasks, type \033[1msearch floating\033[0m\n"
+			+ "To search for past tasks, type \033[1msearch past\033[0m\n"
+			+ "To search for tasks due in the future, type \033[1msearch future\033[0m\n\n";
+	private static final String DISPLAY_UPDATE = "\033[1mupdate:\033[0m\n\n";
+	private static final String MESSAGE_UPDATE = "This is the command to update and edit different aspects of the task.\n"
+			+ "To update the description, type \033[1mupdate\033[0m [task index] \033[1mdescription\033[0m [new description]\n"
+			+ "To update the venue, type \033[1mupdate\033[0m [task index] \033[1mvenue\033[0m [new venue]\n"
+			+ "To update the start time or date, type \033[1mupdate\033[0m [task index] \033[1mstart\033[0m [new time/date]\n"
+			+ "To update the end time or date, type \033[1mupdate\033[0m [task index] \033[1mend\033[0m [new time/date]\n"
+			+ "For time, the acceptable formats are: \033[1m11am, 11.30pm\033[0m\n"
+			+ "For date, the acceptable formats are: \033[1m5 December, 5 December 2014, 5/12, 5/12/2014, Thursday, next Thursday\033[0m\n"
+			+ "Do note that for floating tasks, you are unable to update the venue, start time/date and end time/date\n\n";
+	private static final String DISPLAY_SYNC = "\033[1msync:\033[0m\n\n";
+	private static final String MESSAGE_SYNC = "This is the command to synchronise your task list with your Google Calender.\n"
+			+ "To synchronise, type \033[1msync\033[0m\n\n";
+	private static final String DISPLAY_EXIT = "\033[1mexit:\033[0m\n\n";
+	private static final String MESSAGE_EXIT = "This is the command to exit Tasker. Simply type \033[1mexit\033[0m\n\n";
+	private static final String DISPLAY_UNDO = "\033[1mundo:\033[0m\n\n";
+	private static final String MESSAGE_UNDO = "This is the command to undo your previous action. The command keyword is \033[1mundo\033[0m.\n\n";
+
+	/**
+	 * This method contains the tab completion feature using Jline library.
+	 */
+	public void run() throws IOException {
+		ConsoleReader reader = new ConsoleReader();
+		String[] availableCommandStrings = new String[] { "add", "search",
+				"update", "exit", "display", "help", "sync", "undo", "delete" };
+		SimpleCompletor simpleCompletor = new SimpleCompletor(
+				availableCommandStrings);
+
+		ArgumentCompletor argumentCompletor = new ArgumentCompletor(
+				simpleCompletor);
+		reader.addCompletor(argumentCompletor);
+
+		while ((line = readLine(reader, "")) != null) {
+			if (line.trim().equalsIgnoreCase("help")) {
+				printHelp();
+			} else {
+				System.out.println(Logic.uiToLogic(line));
+			}
+		}
+	}
+
+	/**
+	 * This method prints out the help manual for users. 
+	 */
+	private void printHelp() {
+		String result = "\n";
+		result += DISPLAY_ADD;
+		result += MESSAGE_ADD;
+		result += DISPLAY_DELETE;
+		result += MESSAGE_DELETE;
+		result += DISPLAY_DISPLAY;
+		result += MESSAGE_DISPLAY;
+		result += DISPLAY_SEARCH;
+		result += MESSAGE_SEARCH;
+		result += DISPLAY_UPDATE;
+		result += MESSAGE_UPDATE;
+		result += DISPLAY_SYNC;
+		result += MESSAGE_SYNC;
+		result += DISPLAY_UNDO;
+		result += MESSAGE_UNDO;
+		result += DISPLAY_EXIT;
+		result += MESSAGE_EXIT;
+		System.out.println(result);
+	}
+
+	private String readLine(ConsoleReader reader, String promptMessage)
+			throws IOException {
+
+		String line = reader.readLine(promptMessage + MESSAGE_PROMPT);
+		return line;
+	}
+
+	public static void main(String[] args) throws IOException {
+		TabCompletion shell = new TabCompletion();
+		shell.run();
+	}
+}
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\ui\TabCompletion.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\User\Documents\Eclipse\Tasker\src\main\ui\UI.java
+	 */
+
+/**
+ * This class initializes Tasker to sync with Google Calendar and read in user
+ * input.
+ * 
+ */
+@SuppressWarnings("unused")
+public class UI {
+
+	public static final String MESSAGE_WELCOME = "Welcome to Tasker!";
+	public static final String MESSAGE_PROMPT = "Enter command:";
+
+	private static GoogleCalendar googleCalendar;
+	private static TabCompletion tab = new TabCompletion();
+
+	/**
+	 * This method initializes Tasker's synchronization with Google Calendar
+	 */
+	public static void initializeEnvironment() {
+		AnsiConsole.systemInstall();
+		System.out.println(MESSAGE_WELCOME);
+		readFromStorage();
+		googleCalendar = GoogleCalendar.getInstance();
+		TaskerLog.logSystemInfo("Tasker initialized.");
+	}
+
+	/**
+	 * This method calls the tab completion class. The commented portion of the
+	 * code is for running Tasker without tab completion.
+	 * 
+	 * @throws IOException
+	 */
+	public static void readAndExecuteCommands() throws IOException {
+		// Comment the line below to disable tab completion.
+		tab.run();
+
+		/*
+		 * @SuppressWarnings("resource") Scanner scanner = new
+		 * Scanner(System.in); while (true) {
+		 * System.out.println(MESSAGE_PROMPT); String userCommand =
+		 * scanner.nextLine(); TaskerLog.logSystemInfo("User entered:" +
+		 * userCommand); System.out.println(Logic.uiToLogic(userCommand)); }
+		 */
+	}
+
+	/**
+	 * This method reads from storage for previously entered tasks or deleted
+	 * tasks.
+	 */
+	private static void readFromStorage() {
+		Storage.readFromFile(Storage.DATABASE_FILENAME, Storage.getInstance()
+				.getTasks());
+		Storage.readFromFile(Storage.DELETED_TASKS_FILENAME, Storage
+				.getInstance().getDeletedTasks());
+		Storage storage = Storage.getInstance();
+		storage.saveCurrentState();
+	}
+
+}
+
+	// End of segment: C:\Users\User\Documents\Eclipse\Tasker\src\main\ui\UI.java
+
+
+
+
+
