@@ -207,7 +207,7 @@ public class SearchParser extends CommandParser {
 
 	private boolean isToday() {
 		for (int i = 0; i < list.size(); i++) {
-			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 0) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.PRESENT) {
 				return true;
 			}
 		}
@@ -216,7 +216,7 @@ public class SearchParser extends CommandParser {
 
 	private boolean isPast() {
 		for (int i = 0; i < list.size(); i++) {
-			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -1) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.PAST) {
 				return true;
 			}
 		}
@@ -225,7 +225,7 @@ public class SearchParser extends CommandParser {
 
 	private boolean isFuture() {
 		for (int i = 0; i < list.size(); i++) {
-			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == 1) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.FUTURE) {
 				return true;
 			}
 		}
@@ -234,7 +234,7 @@ public class SearchParser extends CommandParser {
 
 	private boolean isFloating() {
 		for (int i = 0; i < list.size(); i++) {
-			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == -2) {
+			if (DisplayHandler.determinePastPresentFuture(list.get(i)) == DisplayHandler.TASK_DOES_NOT_HAVE_DATE_TIME) {
 				return true;
 			}
 		}

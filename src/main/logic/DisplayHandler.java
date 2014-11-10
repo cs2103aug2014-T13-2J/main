@@ -28,6 +28,11 @@ public class DisplayHandler extends CommandHandler {
 	public static final Integer TIME_STRING_END_INDEX = 5;
 	public static final String STRING_SPACE = " ";
 	public static final String MESSAGE_ADDED = " added!";
+	public static final Integer PAST = -1;
+	public static final Integer PRESENT = 0;
+	public static final Integer FUTURE = 1;
+	public static final Integer TASK_DOES_NOT_HAVE_DATE_TIME = 2;
+	
 	private static String result;
 	private static Storage storage = Storage.getInstance();
 
@@ -189,7 +194,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(YELLOW).a(endTaskDate).reset());
 				result += "\n";
 
-			} else if (status == 0) {
+			} else if (status == PRESENT) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(RED).a(taskNumber).reset(), " |",
 						ansi().fg(RED).a(taskDescription).reset(), "|", ansi()
@@ -214,7 +219,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(RED).a(endTaskDate).reset());
 				result += "\n";
 
-			} else if (status == -1) {
+			} else if (status == PAST) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(CYAN).a(taskNumber).reset(), " |", ansi().fg(CYAN)
 						.a(taskDescription).reset(), "|",
@@ -241,7 +246,7 @@ public class DisplayHandler extends CommandHandler {
 
 			}
 
-			else if (status == 1) {
+			else if (status == FUTURE) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(GREEN).a(taskNumber).reset(), " |", ansi()
 						.fg(GREEN).a(taskDescription).reset(), "|",
@@ -320,7 +325,7 @@ public class DisplayHandler extends CommandHandler {
 								.fg(YELLOW).a(endTaskDate).reset());
 				result += "\n";
 
-			} else if (status == 0) {
+			} else if (status == PRESENT) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(RED).a(taskNumber).reset(), "|",
 						ansi().fg(RED).a(taskDescription).reset(), "|", ansi()
@@ -345,7 +350,7 @@ public class DisplayHandler extends CommandHandler {
 						ansi().fg(RED).a(endTaskDate).reset());
 				result += "\n";
 
-			} else if (status == -1) {
+			} else if (status == PAST) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(CYAN).a(taskNumber).reset(), "|", ansi().fg(CYAN)
 						.a(taskDescription).reset(), "|",
@@ -372,7 +377,7 @@ public class DisplayHandler extends CommandHandler {
 
 			}
 
-			else if (status == 1) {
+			else if (status == FUTURE) {
 				result += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 						.fg(GREEN).a(taskNumber).reset(), "|", ansi().fg(GREEN)
 						.a(taskDescription).reset(), "|",
@@ -455,7 +460,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(YELLOW).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == 0) {
+						} else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), " |",
@@ -463,7 +468,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(RED).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), " |",
@@ -471,7 +476,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(CYAN).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
@@ -500,7 +505,7 @@ public class DisplayHandler extends CommandHandler {
 									"|", ansi().fg(YELLOW).a(displayVenue)
 											.reset(), "|", "           |", "",
 									"");
-						} else if (status == 0) {
+						} else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), "|",
@@ -508,7 +513,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(RED).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), "|",
@@ -516,7 +521,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(CYAN).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(), "|",
@@ -547,7 +552,7 @@ public class DisplayHandler extends CommandHandler {
 								"|", "           |", "", "");
 						result += displayLineSeparator();
 
-					} else if (status == 0) {
+					} else if (status == PRESENT) {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
 										.a(nullSpace).reset(), " |",
@@ -555,7 +560,7 @@ public class DisplayHandler extends CommandHandler {
 								"|", ansi().fg(RED).a(taskVenueExtra).reset(),
 								"|", "           |", "", "");
 						result += displayLineSeparator();
-					} else if (status == -1) {
+					} else if (status == PAST) {
 						result += String
 								.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 										.fg(CYAN).a(nullSpace).reset(), " |",
@@ -564,7 +569,7 @@ public class DisplayHandler extends CommandHandler {
 												.a(taskVenueExtra).reset(),
 										"|", "           |", "", "");
 						result += displayLineSeparator();
-					} else if (status == 1) {
+					} else if (status == FUTURE) {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT,
 								ansi().fg(GREEN).a(nullSpace).reset(), " |",
@@ -595,7 +600,7 @@ public class DisplayHandler extends CommandHandler {
 								"|", "           |", "", "");
 						result += displayLineSeparator();
 
-					} else if (status == 0) {
+					} else if (status == PRESENT) {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT, ansi().fg(RED)
 										.a(nullSpace).reset(), "|",
@@ -603,7 +608,7 @@ public class DisplayHandler extends CommandHandler {
 								"|", ansi().fg(RED).a(taskVenueExtra).reset(),
 								"|", "           |", "", "");
 						result += displayLineSeparator();
-					} else if (status == -1) {
+					} else if (status == PAST) {
 						result += String
 								.format(DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 										.fg(CYAN).a(nullSpace).reset(), "|",
@@ -612,7 +617,7 @@ public class DisplayHandler extends CommandHandler {
 												.a(taskVenueExtra).reset(),
 										"|", "           |", "", "");
 						result += displayLineSeparator();
-					} else if (status == 1) {
+					} else if (status == FUTURE) {
 						result += String.format(
 								DISPLAY_TABLE_ROW_STRING_FORMAT,
 								ansi().fg(GREEN).a(nullSpace).reset(), "|",
@@ -654,7 +659,7 @@ public class DisplayHandler extends CommandHandler {
 									"|", "           |", "", "");
 						}
 
-						else if (status == 0) {
+						else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), " |",
@@ -662,7 +667,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(RED).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), " |",
@@ -670,7 +675,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(CYAN).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
@@ -701,7 +706,7 @@ public class DisplayHandler extends CommandHandler {
 									"");
 						}
 
-						else if (status == 0) {
+						else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), "|",
@@ -709,7 +714,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(RED).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), "|",
@@ -717,7 +722,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(CYAN).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(), "|",
@@ -753,7 +758,7 @@ public class DisplayHandler extends CommandHandler {
 											ansi().fg(YELLOW).a(taskVenueExtra)
 													.reset(), "|",
 											"           |", "", "");
-						} else if (status == 0) {
+						} else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), " |",
@@ -761,7 +766,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(RED).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), " |",
@@ -769,7 +774,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(CYAN).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
@@ -801,7 +806,7 @@ public class DisplayHandler extends CommandHandler {
 											ansi().fg(YELLOW).a(taskVenueExtra)
 													.reset(), "|",
 											"           |", "", "");
-						} else if (status == 0) {
+						} else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), "|",
@@ -809,7 +814,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(RED).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), "|",
@@ -817,7 +822,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(CYAN).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(), "|",
@@ -852,7 +857,7 @@ public class DisplayHandler extends CommandHandler {
 											.a(taskVenueExtra.substring(0, 17))
 											.reset(), "|", "           |", "",
 									"");
-						} else if (status == 0) {
+						} else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(),
@@ -864,7 +869,7 @@ public class DisplayHandler extends CommandHandler {
 											.a(taskVenueExtra.substring(0, 17))
 											.reset(), "|", "           |", "",
 									"");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(),
@@ -876,7 +881,7 @@ public class DisplayHandler extends CommandHandler {
 											.a(taskVenueExtra.substring(0, 17))
 											.reset(), "|", "           |", "",
 									"");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
@@ -912,7 +917,7 @@ public class DisplayHandler extends CommandHandler {
 											.a(taskVenueExtra.substring(0, 17))
 											.reset(), "|", "           |", "",
 									"");
-						} else if (status == 0) {
+						} else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(),
@@ -924,7 +929,7 @@ public class DisplayHandler extends CommandHandler {
 											.a(taskVenueExtra.substring(0, 17))
 											.reset(), "|", "           |", "",
 									"");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(),
@@ -936,7 +941,7 @@ public class DisplayHandler extends CommandHandler {
 											.a(taskVenueExtra.substring(0, 17))
 											.reset(), "|", "           |", "",
 									"");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
@@ -980,7 +985,7 @@ public class DisplayHandler extends CommandHandler {
 															.substring(0, 17))
 													.reset(), "|",
 											"           |", "", "");
-								} else if (status == 0) {
+								} else if (status == PRESENT) {
 									result += String
 											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 													ansi().fg(RED).a(nullSpace)
@@ -996,7 +1001,7 @@ public class DisplayHandler extends CommandHandler {
 																			17))
 															.reset(), "|",
 													"           |", "", "");
-								} else if (status == -1) {
+								} else if (status == PAST) {
 									result += String.format(
 											DISPLAY_TABLE_ROW_STRING_FORMAT,
 											ansi().fg(CYAN).a(nullSpace)
@@ -1009,7 +1014,7 @@ public class DisplayHandler extends CommandHandler {
 															.substring(0, 17))
 													.reset(), "|",
 											"           |", "", "");
-								} else if (status == 1) {
+								} else if (status == FUTURE) {
 									result += String.format(
 											DISPLAY_TABLE_ROW_STRING_FORMAT,
 											ansi().fg(GREEN).a(nullSpace)
@@ -1050,7 +1055,7 @@ public class DisplayHandler extends CommandHandler {
 															.substring(0, 17))
 													.reset(), "|",
 											"           |", "", "");
-								} else if (status == 0) {
+								} else if (status == PRESENT) {
 									result += String
 											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 													ansi().fg(RED).a(nullSpace)
@@ -1066,7 +1071,7 @@ public class DisplayHandler extends CommandHandler {
 																			17))
 															.reset(), "|",
 													"           |", "", "");
-								} else if (status == -1) {
+								} else if (status == PAST) {
 									result += String.format(
 											DISPLAY_TABLE_ROW_STRING_FORMAT,
 											ansi().fg(CYAN).a(nullSpace)
@@ -1079,7 +1084,7 @@ public class DisplayHandler extends CommandHandler {
 															.substring(0, 17))
 													.reset(), "|",
 											"           |", "", "");
-								} else if (status == 1) {
+								} else if (status == FUTURE) {
 									result += String.format(
 											DISPLAY_TABLE_ROW_STRING_FORMAT,
 											ansi().fg(GREEN).a(nullSpace)
@@ -1125,21 +1130,21 @@ public class DisplayHandler extends CommandHandler {
 											"           |", "", "");
 						}
 
-						else if (status == 0) {
+						else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), " |",
 									ansi().fg(RED).a("").reset(), "|", ansi()
 											.fg(RED).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), " |",
 									ansi().fg(CYAN).a("").reset(), "|",
 									ansi().fg(CYAN).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
@@ -1168,21 +1173,21 @@ public class DisplayHandler extends CommandHandler {
 											"           |", "", "");
 						}
 
-						else if (status == 0) {
+						else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), "|",
 									ansi().fg(RED).a("").reset(), "|", ansi()
 											.fg(RED).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), "|",
 									ansi().fg(CYAN).a("").reset(), "|",
 									ansi().fg(CYAN).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(), "|",
@@ -1222,7 +1227,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(YELLOW).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == 0) {
+						} else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), " |",
@@ -1230,7 +1235,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(RED).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), " |",
@@ -1238,7 +1243,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(CYAN).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
@@ -1268,7 +1273,7 @@ public class DisplayHandler extends CommandHandler {
 									"|", ansi().fg(YELLOW).a(displayVenue)
 											.reset(), "|", "           |", "",
 									"");
-						} else if (status == 0) {
+						} else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), "|",
@@ -1276,7 +1281,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(RED).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), "|",
@@ -1284,7 +1289,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(CYAN).a(displayVenue).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(), "|",
@@ -1335,7 +1340,7 @@ public class DisplayHandler extends CommandHandler {
 														.fg(YELLOW).a("")
 														.reset(), "|",
 												"           |", "", "");
-							} else if (status == 0) {
+							} else if (status == PRESENT) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
 										ansi().fg(RED).a(nullSpace).reset(),
@@ -1358,7 +1363,7 @@ public class DisplayHandler extends CommandHandler {
 														.reset(), "|", ansi()
 														.fg(RED).a("").reset(),
 												"|", "           |", "", "");
-							} else if (status == -1) {
+							} else if (status == PAST) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
 										ansi().fg(CYAN).a(nullSpace).reset(),
@@ -1381,7 +1386,7 @@ public class DisplayHandler extends CommandHandler {
 														.reset(), "|",
 												ansi().fg(CYAN).a("").reset(),
 												"|", "           |", "", "");
-							} else if (status == 1) {
+							} else if (status == FUTURE) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
 										ansi().fg(GREEN).a(nullSpace).reset(),
@@ -1464,7 +1469,7 @@ public class DisplayHandler extends CommandHandler {
 														.fg(YELLOW).a("")
 														.reset(), "|",
 												"           |", "", "");
-							} else if (status == 0) {
+							} else if (status == PRESENT) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
 										ansi().fg(RED).a(nullSpace).reset(),
@@ -1487,7 +1492,7 @@ public class DisplayHandler extends CommandHandler {
 														.reset(), "|", ansi()
 														.fg(RED).a("").reset(),
 												"|", "           |", "", "");
-							} else if (status == -1) {
+							} else if (status == PAST) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
 										ansi().fg(CYAN).a(nullSpace).reset(),
@@ -1510,7 +1515,7 @@ public class DisplayHandler extends CommandHandler {
 														.reset(), "|",
 												ansi().fg(CYAN).a("").reset(),
 												"|", "           |", "", "");
-							} else if (status == 1) {
+							} else if (status == FUTURE) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
 										ansi().fg(GREEN).a(nullSpace).reset(),
@@ -1584,7 +1589,7 @@ public class DisplayHandler extends CommandHandler {
 										"", "");
 							}
 
-							else if (status == 0) {
+							else if (status == PRESENT) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 												.fg(RED).a(nullSpace).reset(),
@@ -1593,7 +1598,7 @@ public class DisplayHandler extends CommandHandler {
 												.reset(), "|", ansi().fg(RED)
 												.a(taskVenueExtra).reset(),
 										"|", "           |", "", "");
-							} else if (status == -1) {
+							} else if (status == PAST) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 												.fg(CYAN).a(nullSpace).reset(),
@@ -1602,7 +1607,7 @@ public class DisplayHandler extends CommandHandler {
 												.reset(), "|", ansi().fg(CYAN)
 												.a(taskVenueExtra).reset(),
 										"|", "           |", "", "");
-							} else if (status == 1) {
+							} else if (status == FUTURE) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
 										ansi().fg(GREEN).a(nullSpace).reset(),
@@ -1641,7 +1646,7 @@ public class DisplayHandler extends CommandHandler {
 										"", "");
 							}
 
-							else if (status == 0) {
+							else if (status == PRESENT) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 												.fg(RED).a(nullSpace).reset(),
@@ -1650,7 +1655,7 @@ public class DisplayHandler extends CommandHandler {
 												.reset(), "|", ansi().fg(RED)
 												.a(taskVenueExtra).reset(),
 										"|", "           |", "", "");
-							} else if (status == -1) {
+							} else if (status == PAST) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT, ansi()
 												.fg(CYAN).a(nullSpace).reset(),
@@ -1659,7 +1664,7 @@ public class DisplayHandler extends CommandHandler {
 												.reset(), "|", ansi().fg(CYAN)
 												.a(taskVenueExtra).reset(),
 										"|", "           |", "", "");
-							} else if (status == 1) {
+							} else if (status == FUTURE) {
 								result += String.format(
 										DISPLAY_TABLE_ROW_STRING_FORMAT,
 										ansi().fg(GREEN).a(nullSpace).reset(),
@@ -1708,7 +1713,7 @@ public class DisplayHandler extends CommandHandler {
 											"           |", "", "");
 						}
 
-						else if (status == 0) {
+						else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(),
@@ -1718,7 +1723,7 @@ public class DisplayHandler extends CommandHandler {
 													0, 25)).reset(), "|",
 									ansi().fg(RED).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(),
@@ -1728,7 +1733,7 @@ public class DisplayHandler extends CommandHandler {
 													0, 25)).reset(), "|",
 									ansi().fg(CYAN).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
@@ -1767,7 +1772,7 @@ public class DisplayHandler extends CommandHandler {
 											"           |", "", "");
 						}
 
-						else if (status == 0) {
+						else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(),
@@ -1777,7 +1782,7 @@ public class DisplayHandler extends CommandHandler {
 													0, 25)).reset(), "|",
 									ansi().fg(RED).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(),
@@ -1787,7 +1792,7 @@ public class DisplayHandler extends CommandHandler {
 													0, 25)).reset(), "|",
 									ansi().fg(CYAN).a(taskVenueExtra).reset(),
 									"|", "           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
@@ -1828,7 +1833,7 @@ public class DisplayHandler extends CommandHandler {
 													.reset(), "|",
 											ansi().fg(YELLOW).a("").reset(),
 											"|", "           |", "", "");
-								} else if (status == 0) {
+								} else if (status == PRESENT) {
 									result += String
 											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 													ansi().fg(RED).a(nullSpace)
@@ -1843,7 +1848,7 @@ public class DisplayHandler extends CommandHandler {
 													ansi().fg(RED).a("")
 															.reset(), "|",
 													"           |", "", "");
-								} else if (status == -1) {
+								} else if (status == PAST) {
 									result += String.format(
 											DISPLAY_TABLE_ROW_STRING_FORMAT,
 											ansi().fg(CYAN).a(nullSpace)
@@ -1855,7 +1860,7 @@ public class DisplayHandler extends CommandHandler {
 													.reset(), "|",
 											ansi().fg(CYAN).a("").reset(), "|",
 											"           |", "", "");
-								} else if (status == 1) {
+								} else if (status == FUTURE) {
 									result += String.format(
 											DISPLAY_TABLE_ROW_STRING_FORMAT,
 											ansi().fg(GREEN).a(nullSpace)
@@ -1893,7 +1898,7 @@ public class DisplayHandler extends CommandHandler {
 													.reset(), "|",
 											ansi().fg(YELLOW).a("").reset(),
 											"|", "           |", "", "");
-								} else if (status == 0) {
+								} else if (status == PRESENT) {
 									result += String
 											.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
 													ansi().fg(RED).a(nullSpace)
@@ -1908,7 +1913,7 @@ public class DisplayHandler extends CommandHandler {
 													ansi().fg(RED).a("")
 															.reset(), "|",
 													"           |", "", "");
-								} else if (status == -1) {
+								} else if (status == PAST) {
 									result += String.format(
 											DISPLAY_TABLE_ROW_STRING_FORMAT,
 											ansi().fg(CYAN).a(nullSpace)
@@ -1920,7 +1925,7 @@ public class DisplayHandler extends CommandHandler {
 													.reset(), "|",
 											ansi().fg(CYAN).a("").reset(), "|",
 											"           |", "", "");
-								} else if (status == 1) {
+								} else if (status == FUTURE) {
 									result += String.format(
 											DISPLAY_TABLE_ROW_STRING_FORMAT,
 											ansi().fg(GREEN).a(nullSpace)
@@ -1960,7 +1965,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(YELLOW).a("").reset(), "|",
 									"           |", "", "");
-						} else if (status == 0) {
+						} else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), " |",
@@ -1968,7 +1973,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|", ansi().fg(RED).a("")
 											.reset(), "|", "           |", "",
 									"");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), " |",
@@ -1976,7 +1981,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|", ansi().fg(CYAN)
 											.a("").reset(), "|",
 									"           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(),
@@ -2005,7 +2010,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|",
 									ansi().fg(YELLOW).a("").reset(), "|",
 									"           |", "", "");
-						} else if (status == 0) {
+						} else if (status == PRESENT) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(RED).a(nullSpace).reset(), "|",
@@ -2013,7 +2018,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|", ansi().fg(RED).a("")
 											.reset(), "|", "           |", "",
 									"");
-						} else if (status == -1) {
+						} else if (status == PAST) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(CYAN).a(nullSpace).reset(), "|",
@@ -2021,7 +2026,7 @@ public class DisplayHandler extends CommandHandler {
 											.reset(), "|", ansi().fg(CYAN)
 											.a("").reset(), "|",
 									"           |", "", "");
-						} else if (status == 1) {
+						} else if (status == FUTURE) {
 							result += String.format(
 									DISPLAY_TABLE_ROW_STRING_FORMAT,
 									ansi().fg(GREEN).a(nullSpace).reset(), "|",
@@ -2211,7 +2216,7 @@ public class DisplayHandler extends CommandHandler {
 		LocalDate taskDate = task.getStartDate();
 		LocalTime taskTime = task.getStartTime();
 		if (taskDate == null && taskTime == null) {
-			return -2;
+			return TASK_DOES_NOT_HAVE_DATE_TIME;
 		} else {
 			DateTime taskDateTime = taskDate.toDateTime(taskTime);
 
@@ -2220,15 +2225,15 @@ public class DisplayHandler extends CommandHandler {
 
 			switch (compareDate) {
 			case -1:
-				return -1;
+				return PAST;
 			case 0:
 			case 1: {
 				int taskDay = taskDateTime.getDayOfYear();
 				int currentDay = currentDateTime.getDayOfYear();
 				if (taskDay == currentDay) {
-					return 0;
+					return PRESENT;
 				} else {
-					return 1;
+					return FUTURE;
 				}
 			}
 			default:

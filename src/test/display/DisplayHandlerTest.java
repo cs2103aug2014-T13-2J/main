@@ -102,10 +102,6 @@ public class DisplayHandlerTest {
 	
 	@Test
 	public void testDeterminePastPresentFuture() {
-		Integer past = -1;
-		Integer present = 0;
-		Integer future = 1;
-		
 		TaskBuilder builder = new TaskBuilder();
 		builder.setDescription("meeting");
 		builder.setVenue("CLB");
@@ -118,7 +114,7 @@ public class DisplayHandlerTest {
 		builder.setCompleted(false);
 		Task t1 = builder.buildTask();
 		
-		assertEquals(past, DisplayHandler.determinePastPresentFuture(t1));
+		assertEquals(DisplayHandler.PAST, DisplayHandler.determinePastPresentFuture(t1));
 		
 		builder.setDescription("meeting");
 		builder.setVenue("CLB");
@@ -131,7 +127,7 @@ public class DisplayHandlerTest {
 		builder.setCompleted(false);
 		Task t2 = builder.buildTask();
 		
-		assertEquals(present, DisplayHandler.determinePastPresentFuture(t2));
+		assertEquals(DisplayHandler.PRESENT, DisplayHandler.determinePastPresentFuture(t2));
 		
 		builder.setDescription("meeting");
 		builder.setVenue("CLB");
@@ -144,7 +140,7 @@ public class DisplayHandlerTest {
 		builder.setCompleted(false);
 		Task t3 = builder.buildTask();
 		
-		assertEquals(future, DisplayHandler.determinePastPresentFuture(t3));
+		assertEquals(DisplayHandler.FUTURE, DisplayHandler.determinePastPresentFuture(t3));
 
 	}
 
