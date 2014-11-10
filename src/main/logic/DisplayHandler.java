@@ -18,6 +18,9 @@ import org.joda.time.DateTimeComparator;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
+/*
+ * This class contains the display table that prints out the task list to user. 
+ */
 public class DisplayHandler extends CommandHandler {
 
 	public static final String DISPLAY_NUM_OF_TASKS = "Total number of tasks: %d\n";
@@ -32,7 +35,7 @@ public class DisplayHandler extends CommandHandler {
 	public static final Integer PRESENT = 0;
 	public static final Integer FUTURE = 1;
 	public static final Integer TASK_DOES_NOT_HAVE_DATE_TIME = 2;
-	
+
 	private static String result;
 	private static Storage storage = Storage.getInstance();
 
@@ -79,18 +82,17 @@ public class DisplayHandler extends CommandHandler {
 		String lineString = "";
 		int terminalWidth = 79;
 		lineString += String.format(DISPLAY_TABLE_ROW_STRING_FORMAT,
-				ansi().fg(RED).a("  ").reset(), "  |", ansi().fg(MAGENTA)
-				.a("").reset(), "|",
-		ansi().fg(CYAN).a("").reset(), "|", ansi().fg(YELLOW)
-				.a("").reset(), "|",
-		ansi().fg(GREEN).a("").reset());
+				ansi().fg(RED).a("  ").reset(), "  |", ansi().fg(MAGENTA).a("")
+						.reset(), "|", ansi().fg(CYAN).a("").reset(), "|",
+				ansi().fg(YELLOW).a("").reset(), "|", ansi().fg(GREEN).a("")
+						.reset());
 		for (int i = 0; i < terminalWidth; i++) {
 			lineString += "-";
 		}
 		lineString += "\n";
 		return lineString;
 	}
-	
+
 	public static String displayLineSeparatorHeader() {
 		String lineString = "";
 		int terminalWidth = 79;
@@ -101,6 +103,13 @@ public class DisplayHandler extends CommandHandler {
 		return lineString;
 	}
 
+	// @author A0100239W
+	/*
+	 * This method takes care of the display table which contains the task list.
+	 * It checks for line overflow, and matches the corresponding colours to the
+	 * right tasks. This method also takes care of column alignment issues
+	 * within the display table.
+	 */
 	public static String displayTaskInTable(int number, Task task) {
 		result = "";
 		boolean completed = task.hasCompleted();
@@ -2071,7 +2080,8 @@ public class DisplayHandler extends CommandHandler {
 
 		return result;
 	}
-	//author A0108429A
+
+	// author A0108429A
 	public static String displayTaskForAdd(Task task) {
 		result = "";
 		result = result + displayTask(task) + MESSAGE_ADDED;
@@ -2188,6 +2198,10 @@ public class DisplayHandler extends CommandHandler {
 		return "(" + task.hasCompleted() + ")" + STRING_SPACE;
 	}
 
+	// @author A0100239W
+	/*
+	 * This method displays the header for search and delete classes.
+	 */
 	public static void displayTop() {
 		String resultTop = "";
 		resultTop += DisplayHandler.displayLineSeparatorHeader();
@@ -2202,6 +2216,10 @@ public class DisplayHandler extends CommandHandler {
 		System.out.print(resultTop);
 	}
 
+	// @author A0100239W
+	/*
+	 * This method displays the bottom header for search and display classes
+	 */
 	public static void displayBottom() {
 		String resultBottom = "";
 		resultBottom += String.format(
@@ -2221,7 +2239,8 @@ public class DisplayHandler extends CommandHandler {
 		print += displayTaskInTable(index, task);
 		System.out.print(print);
 	}
-	//author A0108429A
+
+	// author A0108429A
 	// this function returns -1 if the start date time of the task is before
 	// the current date time, 0 if the the start date time of the task is after
 	// the current date time but on the same day, 1 if the start date time of
