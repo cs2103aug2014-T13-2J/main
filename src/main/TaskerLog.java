@@ -6,6 +6,9 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 //@author A0100239W
+/*
+ * This class contains the logging function used for defensive coding. 
+ */
 public class TaskerLog {
 	private static TaskerLog TaskerLogger = null;
 	private FileHandler fh;
