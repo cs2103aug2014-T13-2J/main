@@ -5,7 +5,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
+//@author A0100239W
 public class TaskerLog {
 	private static TaskerLog TaskerLogger = null;
 	private FileHandler fh;
@@ -48,12 +48,18 @@ public class TaskerLog {
 		fh.setFormatter(formatter);
 		logger.info(input);
 	}
-
+	
+	/*
+	 * This method is the public method used to log information.
+	 */
 	public static void logSystemInfo(String logInfo) {
 		TaskerLog infoLogger = TaskerLog.getInstance();
 		infoLogger.logInfo(logInfo);
 	}
-
+	
+	/*
+	 * This method is the public method used to log exceptions.
+	 */
 	public static void logSystemExceptionError(String logMessage) {
 		TaskerLog exceptionLogger = TaskerLog.getInstance();
 		exceptionLogger.logException(logMessage);
