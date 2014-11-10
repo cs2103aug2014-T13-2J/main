@@ -52,7 +52,7 @@ public class DisplayHandlerTest {
 		
 		String s2 = "meeting with Prof at CLB at 11pm on 3/10";
 		CommandHandler e2 = new AddHandler(s2);
-		assertEquals("meeting with Prof at CLB on 2014-10-03 at 23:00 added!", e2.execute());
+		assertEquals("meeting with Prof at CLB on 2015-10-03 at 23:00 added!", e2.execute());
 		
 		String s3 = "meeting with Prof at CLB on 4/12 at 11pm";
 		CommandHandler e3 = new AddHandler(s3);
@@ -60,43 +60,43 @@ public class DisplayHandlerTest {
 		
 		String s4 = "gathering on 3/10/2014";
 		CommandHandler e4 = new AddHandler(s4);
-		assertEquals("1", e4.execute());
+		assertEquals("gathering on 2014-10-03 added!", e4.execute());
 		
 		String s5 = "gathering on 3/10";
 		CommandHandler e5 = new AddHandler(s5);
-		assertEquals("1", e5.execute());
+		assertEquals("gathering on 2015-10-03 added!", e5.execute());
 		
 		String s6 = "gathering on 3 October";	
 		CommandHandler e6 = new AddHandler(s6);
-		assertEquals("1", e6.execute());
+		assertEquals("gathering on 2015-10-03 added!", e6.execute());
 		
 		String s7 = "gathering on 3 October 2014";
 		CommandHandler e7 = new AddHandler(s7);
-		assertEquals("1", e7.execute());
+		assertEquals("gathering on 2014-10-03 added!", e7.execute());
 		
 		String s8 = "meeting from 3/10/2014 11pm to 4/10/2014 1am at Utown";
 		CommandHandler e8 = new AddHandler(s8);
-		assertEquals("1", e8.execute());
+		assertEquals("meeting at Utown from 2014-10-03 23:00 to 2014-10-04 01:00 added!", e8.execute());
 		
 		String s9 = "meeting from 3/10 to 4/10 at Utown";
 		CommandHandler e9 = new AddHandler(s9);
-		assertEquals("1", e9.execute());
+		assertEquals("meeting at Utown from 2015-10-03 to 2015-10-04 added!", e9.execute());
 		
 		String s10 = "meeting from 3 October 11pm to 4 October 1am at Utown";
 		CommandHandler e10 = new AddHandler(s10);
-		assertEquals("1", e10.execute());
+		assertEquals("meeting at Utown from 2015-10-03 23:00 to 2015-10-04 01:00 added!", e10.execute());
 		
 		String s11 = "meeting from 3/10 to 18/10";
 		CommandHandler e11 = new AddHandler(s11);
-		assertEquals("1", e11.execute());
+		assertEquals("meeting from 2015-10-03 to 2015-10-18 added!", e11.execute());
 		
 		String s12 = "meeting with Prof on 4/12 at CLB at 11pm";
 		CommandHandler e12 = new AddHandler(s12);
-		assertEquals("1", e12.execute());
+		assertEquals("meeting with Prof at CLB on 2014-12-04 at 23:00 added!", e12.execute());
 		
 		String s13 = "meeting with Prof on 4/12 at 11pm at CLB";
 		CommandHandler e13 = new AddHandler(s13);
-		assertEquals("1", e13.execute());
+		assertEquals("meeting with Prof at CLB on 2014-12-04 at 23:00 added!", e13.execute());
 		
 	}
 	
@@ -118,22 +118,19 @@ public class DisplayHandlerTest {
 		
 		builder.setDescription("meeting");
 		builder.setVenue("CLB");
-		builder.setStartDate(new LocalDate(2014, 11, 6));
+		builder.setStartDate(new LocalDate(2014, 11, 10));
 		builder.setStartTime(new LocalTime(23, 59));
-		builder.setEndDate(new LocalDate(2014, 11, 6));
+		builder.setEndDate(new LocalDate(2014, 11, 10));
 		builder.setEndTime(new LocalTime(23, 59));
-		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
-		builder.setRecurrence("weekly");
-		builder.setCompleted(false);
 		Task t2 = builder.buildTask();
 		
 		assertEquals(DisplayHandler.PRESENT, DisplayHandler.determinePastPresentFuture(t2));
 		
 		builder.setDescription("meeting");
 		builder.setVenue("CLB");
-		builder.setStartDate(new LocalDate(2014, 11, 7));
+		builder.setStartDate(new LocalDate(2014, 11, 14));
 		builder.setStartTime(new LocalTime(23, 59));
-		builder.setEndDate(new LocalDate(2014, 11, 7));
+		builder.setEndDate(new LocalDate(2014, 11, 14));
 		builder.setEndTime(new LocalTime(23, 59));
 		builder.setReminder(new DateTime(2014, 9, 20, 21, 30, 0, 0));
 		builder.setRecurrence("weekly");
